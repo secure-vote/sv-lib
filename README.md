@@ -33,6 +33,12 @@ Takes startTime, endTime, and submissionBits (should all be JS ints) and packs t
 
 Takes an array of flags (see SV.ballotBox.flags) and returns the submission bits. Also throws errors on badly constructed flags.
 
+`mkSignedBallotForProxy`
+
+Takes `ballotId`, `sequence`, `voteData`, `extra`, `privateKey`, and `opts = {}` and returns `{proxyReq, extra}` in the format required for `BBFarm.submitProxyVote(proxyReq, extra)`.
+
+the `opts` param is optional.
+
 ### `SV.const`
 
 Utility Constants:

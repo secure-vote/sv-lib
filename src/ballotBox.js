@@ -79,11 +79,17 @@ module.exports.mkSubmissionBits = (...toCombine) => {
  *  the vote data to use, should be 32 bytes hex encoded
  * @param {string} extra
  *  any extra data included with the vote (such as curve25519 pubkeys)
+ * @param {string} privKey
+ *  the privkey used to sign
+ * @param {object?} opts
+ *  options:
+ *   - skipSequenceSizeCheck: boolean (will not throw if sequence is >= 2^32)
  * @returns {Object}
  *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`
  */
-module.exports.mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey) => {
-    assert.equal(0 < sequence && sequence < 2**32, true, "sequence number out of bounds")
+module.exports.mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts = {}) => {
+    if (opts.skipSequenceSizeCheck !== true)
+        assert.equal(0 < sequence && sequence < 2**32, true, "sequence number out of bounds")
     assert.equal(web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId), true, "ballotId incorrect format (either not a BN or not hex)")
     assert.equal(web3Utils.isHexStrict(voteData), true, "vote data is not hex (strict)")
     assert.equal(web3Utils.isHexStrict(extra), true, "extra param is not hex (strict)")
