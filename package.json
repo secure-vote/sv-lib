@@ -1,32 +1,68 @@
 {
-  "name": "sv-lib",
-  "version": "0.1.5",
+  "_from": "sv-lib",
+  "_id": "sv-lib@0.1.8",
+  "_inBundle": false,
+  "_integrity": "sha1-iv3j9i+E9W4GyEPmgEcYc5twFYk=",
+  "_location": "/sv-lib",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "sv-lib",
+    "name": "sv-lib",
+    "escapedName": "sv-lib",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/sv-lib/-/sv-lib-0.1.8.tgz",
+  "_shasum": "8afde3f62f84f56e06c843e6804718739b701589",
+  "_spec": "sv-lib",
+  "_where": "/Users/robertscott/Documents/Developer/swm-io-governance",
+  "author": {
+    "name": "Max Kaye",
+    "email": "max@secure.vote"
+  },
+  "bugs": {
+    "url": "https://github.com/secure-vote/sv-lib/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "assert": "^1.4.1",
+    "axios": "^0.18.0",
+    "bs58": "^4.0.1",
+    "colors": "^1.3.0",
+    "eth-ens-namehash": "^2.0.8",
+    "eth-lib": "^0.2.8",
+    "ethereumjs-util": "^5.2.0",
+    "ramda": "^0.25.0",
+    "web3": "^1.0.0-beta.34",
+    "web3-eth-abi": "^1.0.0-beta.34",
+    "web3-eth-accounts": "^1.0.0-beta.34",
+    "web3-utils": "^1.0.0-beta.34"
+  },
+  "deprecated": false,
   "description": "SecureVote Light supporting functionality",
-  "main": "src/index.js",
-  "scripts": {
-    "test": "exit 0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/secure-vote/sv-lib.git"
-  },
+  "homepage": "https://github.com/secure-vote/sv-lib#readme",
   "keywords": [
     "SecureVote",
     "voting",
     "crypto",
     "blockchain"
   ],
-  "author": "Max Kaye <max@secure.vote>",
   "license": "UNLICENSED",
-  "bugs": {
-    "url": "https://github.com/secure-vote/sv-lib/issues"
+  "main": "src/index.js",
+  "name": "sv-lib",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/secure-vote/sv-lib.git"
   },
-  "homepage": "https://github.com/secure-vote/sv-lib#readme",
-  "dependencies": {
-    "assert": "^1.4.1",
-    "colors": "^1.3.0",
-    "eth-ens-namehash": "^2.0.8",
-    "ethereumjs-util": "^5.2.0",
-    "ramda": "^0.25.0"
-  }
+  "scripts": {
+    "test": "exit 0"
+  },
+  "version": "0.1.8"
 }

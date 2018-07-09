@@ -4,6 +4,9 @@ const BN = require('bn.js');
 const assert = require('assert');
 
 
+const bb = require('./ballotBox');
+
+
 /**
  * This will take an Ethereum hex string (or a normal hex string) and
  * output a normal hex string (no '0x' header) or throw an error on a
@@ -14,7 +17,7 @@ const assert = require('assert');
  * @returns {string}
  *  the hex string.
  */
-export const cleanEthHex = hex => {
+module.exports.cleanEthHex = hex => {
     if (hex === "0x0") {
         return "00";
     }
@@ -34,42 +37,22 @@ export const cleanEthHex = hex => {
 
 
 /**
- * Creates a packed copy of start and end times with submissionBits
+ * This compares ethereum addresses (taking into account case, etc)
  *
- * @param {number} start
- *  Start time in seconds since epoch
- * @param {number} end
- *  End time in seconds since epoch
- * @param {number} submissionBits
- *  Submission bits - can be created using mkSubmissionBits
- * @returns {BigNum}
- *  Returns a `bn.js` BigNum of the packed values.
- *  Format: [submissionBits(16)][startTime(64)][endTime(64)]
+ * @param {string} addr1
+ * @param {string} addr2
+ *
+ * @returns {bool}
  */
-export const mkPacked = (start, end, submissionBits) => {
-    const s = new BN(start)
-    const e = new BN(end)
-    const sb = new BN(submissionBits)
-    return sb.shln(64).add(s).shln(64).add(e);
+module.exports.ethAddrEq = (addr1, addr2) => {
+    const _clean = a => module.exports.cleanEthHex(a).toLowerCase()
+    // throw a length check in there to ensure we have valid addresses
+    return _clean(addr1) === _clean(addr2) && addr1.length === 42
 }
 
 
-/**
- * This combines flags into
- * @param {Array<number>} toCombine
- *  Array of all submission flags to combine. See SV.ballotBox.flags for flag options.
- *  All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining).
- * @returns {number}
- *  A 16 bit integer of combined flags.
- */
-export const mkSubmissionBits = (toCombine) => {
-    const toRet = R.reduce((acc, i) => acc | i, 0, toCombine);
-    assert.equal(R.all(i => typeof i == "number", toCombine), true, `Bad input to mkSubmissionBits. Input is required to be an array of numbers. Instead got: ${toCombine}`);
-    assert.equal(R.all(i => i === i | 0, toCombine), true, `Bad input to mkSubmissionBits. Input was not an array of integers. Instead got: ${toCombine}`);
-    assert.equal(toRet, R.sum(toCombine), `Bad input provided to mkSubmissionBits. Logical OR and sum sanity check failed. Input was: ${toCombine}`);
-    assert.equal(toRet < 2**16, true, `Submission bits must fit into a 16 bit integer (i.e. less than 2^16). Result was: ${toRet}`);
-    return toRet;
-}
+module.exports.mkPacked = bb.mkPacked;
+module.exports.mkSubmissionBits = bb.mkSubmissionBits;
 
 
 // this is from the bech32 spec (Bitcoin)
@@ -92,7 +75,7 @@ const toAlphabet = arr => {
  * @returns {string}
  *  The Base32 version of the hex string.
  */
-export const hexToBase32 = hex => {
+module.exports.hexToBase32 = hex => {
     const _hex = cleanEthHex(hex);
 
     const buf = Buffer.from(_hex, 'hex');
