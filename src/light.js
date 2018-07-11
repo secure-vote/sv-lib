@@ -2,6 +2,7 @@ const ENS = require('eth-ens-namehash');
 const Constants = require('./const');
 const axios = require('axios');
 const bs58 = require('bs58');
+const sha256 = require('sha256');
 
 // Lovely ABIs
 const ResolverAbi = require('./smart_contracts/SV_ENS_Resolver.abi.json');
@@ -27,6 +28,7 @@ const initializeSvLight = async svConfig => {
   const backendAddress = await getBackendAddress({ index });
   const backend = new web3.eth.Contract(BackendAbi, backendAddress);
   const aux = new web3.eth.Contract(AuxAbi, auxContract);
+  const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())
 
   return {
     svConfig,
@@ -34,7 +36,8 @@ const initializeSvLight = async svConfig => {
     resolver,
     index,
     backend,
-    aux
+    aux, 
+    payments
   };
 };
 
@@ -59,14 +62,14 @@ const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
   const archiveUrl = { svConfig };
 
   const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(backendAddress, indexAddress, democHash, nthBallot).call();
-  console.log('bbFarmAndBallotId :', bbFarmAndBallotId);
+  // console.log('bbFarmAndBallotId :', bbFarmAndBallotId);
 
   const { id, bbFarmAddress } = bbFarmAndBallotId;
   const userEthAddress = '0x0000000000000000000000000000000000000000';
   const ethBallotDetails = await aux.methods.getBallotDetails(id, bbFarmAddress, userEthAddress).call();
 
   const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash);
-  console.log('ballotSpec :', ballotSpec);
+  // console.log('ballotSpec :', ballotSpec);
   // .then(x => console.log('Then called', x))
   // .catch(x => console.log('Caught error', x));
 
@@ -109,9 +112,9 @@ const getBallotObjectFromIpfs = async ballotSpecHash => {
   return await axios.get(ipfsUrl + cid);
 };
 
+// Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array
 const getDemocBallots = async ({ svNetwork, democHash }) => {
   const { backend } = svNetwork;
-
   const democInfo = await getDemocInfo({ backend, democHash });
   const numBallots = democInfo.nBallots;
 
@@ -124,7 +127,74 @@ const getDemocBallots = async ({ svNetwork, democHash }) => {
   return ballotsArray;
 };
 
+// Takes in the svNetwork object and returns all relevant addresses
+const getContractAddresses = async ({svNetwork}) => {
+  const {index, resolver, backend, aux, svConfig} = svNetwork
+  const { delegationContractName, lookupAddress } = svConfig
+
+  return {
+    indexAddress: index._address,
+    backendAddress: backend._address,
+    auxAddress: aux._address,
+    lookupAddress: lookupAddress,
+    resolverAddress: resolver._address, 
+    communityAuctionAddress: await index.methods.getCommAuction().call(),
+    delegationAddress: await resolveEnsAddress({ resolver }, delegationContractName),
+    paymentsAddress: await index.methods.getPayments().call(),
+  }
+}
+
+const weiToCents = async ({payments}, wei) => {
+  return await payments.methods.weiToCents(wei).call()
+}
+
+const getCommunityBallotPrice = async ({payments}, democHash) => {
+  return await payments.methods.getNextPrice(democHash).call()
+}
+
+const checkIfAddressIsEditor = async ({ svNetwork }, { userAddress, democHash }) => {
+  const {backend} = svNetwork
+  return await backend.methods.isDEditor(democHash, userAddress).call();
+};
+
+// Checks the current ethereum gas price and returns a couple of values
+const getCurrentGasPrice = async () => {
+  const gasStationInfo = await axios.get('https://ethgasstation.info/json/ethgasAPI.json')
+  const {data} = gasStationInfo
+
+  return {
+    safeLow: data.safeLow / 10,
+    average: data.average / 10, 
+    fast: data.fast / 10, 
+    fastest: data.fastest / 10,
+  }
+}
+// Checks the ballot hash against the ballot content
+const checkBallotHashBSpec = (ballotSpec, assertSpecHash) => {
+    let contentHash = '0x' + sha256(JSON.stringify(ballotSpec, null, 2));
+    if (assertSpecHash === contentHash) {
+      return true;
+    } else {
+      return false;
+    }
+}
+
+// Checks the ballot hash against a ballot global ballot object
+// Does this by destructuring the specHash and data out of it
+const checkBallotHashGBallot = (ballotObject) => {
+  const {data, specHash} = ballotObject
+  return checkBallotHashBSpec(data, specHash)
+}
+
 module.exports = {
+  getAbiString,
+  checkBallotHashGBallot,
+  checkBallotHashBSpec, 
+  checkIfAddressIsEditor, 
+  getCommunityBallotPrice,
+  getCurrentGasPrice,
+  weiToCents,
+  getContractAddresses,
   initializeSvLight,
   getDemocBallots,
   getDemocNthBallot,

@@ -13,7 +13,8 @@ module.exports = {
       etherscanLink: 'https://kovan.etherscan.io/',
       name: 'Kovan',
       archiveUrl: 'https://archive.test.secure.vote/',
-      archivePushUrl: 'https://archive.test.push.secure.vote/'
+      archivePushUrl: 'https://archive.test.push.secure.vote/',
+      lookupAddress: '0x216265865e46D4c6FE506877EfAAE7dd7Ae2faCE'
     },
     mainnet: {
       indexContractName: 'index.tokenvote.eth',
@@ -25,7 +26,25 @@ module.exports = {
       etherscanLink: 'https://etherscan.io/',
       name: 'Mainnet',
       archiveUrl: 'https://archive.secure.vote/',
-      archivePushUrl: 'https://archive.push.secure.vote/'
+      archivePushUrl: 'https://archive.push.secure.vote/',
+      lookupAddress: '0x216265865e46D4c6FE506877EfAAE7dd7Ae2faCE'
+    }
+  },
+
+  networkName(networkId) {
+    switch (networkId) {
+      case 1:
+        return 'Mainnet';
+      case 2:
+        return 'Morden';
+      case 3:
+        return 'Rocpsten';
+      case 4:
+        return 'Rinkeby';
+      case 42:
+        return 'Kovan';
+      default:
+        return 'Unknown';
     }
   }
 };
