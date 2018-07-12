@@ -116,9 +116,16 @@ const getBallotObjectFromIpfs = async ballotSpecHash => {
 const getDemocBallots = async ({ svNetwork, democHash }) => {
   const { backend } = svNetwork;
   const democInfo = await getDemocInfo({ backend, democHash });
-  const numBallots = democInfo.nBallots;
+
+  // Throw an error if the democ info is not correct
+  const {erc20, owner} = democInfo 
+  if (owner === '0x0000000000000000000000000000000000000000') {
+    throw new Error('Democracy Hash does not resolve to a democracy')
+  }
 
   // TODO - Work out where / how to push an errored ballot
+  // Loop through and get all the ballots
+  const numBallots = democInfo.nBallots;
   const ballotsArray = [];
   for (let i = 0; i < numBallots; i++) {
     ballotsArray[i] = await getDemocNthBallot({ svNetwork }, { democHash: democHash, nthBallot: i });
@@ -187,7 +194,6 @@ const checkBallotHashGBallot = (ballotObject) => {
 }
 
 module.exports = {
-  getAbiString,
   checkBallotHashGBallot,
   checkBallotHashBSpec, 
   checkIfAddressIsEditor, 

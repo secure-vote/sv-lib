@@ -38,7 +38,7 @@ module.exports = {
       case 2:
         return 'Morden';
       case 3:
-        return 'Rocpsten';
+        return 'Ropsten';
       case 4:
         return 'Rinkeby';
       case 42:
