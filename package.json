@@ -1,32 +1,45 @@
 {
-  "name": "sv-lib",
-  "version": "0.1.5",
+  "author": {
+    "name": "Max Kaye",
+    "email": "max@secure.vote"
+  },
+  "bugs": {
+    "url": "https://github.com/secure-vote/sv-lib/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "assert": "^1.4.1",
+    "axios": "^0.18.0",
+    "bs58": "^4.0.1",
+    "colors": "^1.3.0",
+    "eth-ens-namehash": "^2.0.8",
+    "eth-lib": "^0.2.8",
+    "ethereumjs-util": "^5.2.0",
+    "ramda": "^0.25.0",
+    "sha256": "^0.2.0",
+    "web3": "^1.0.0-beta.34",
+    "web3-eth-abi": "^1.0.0-beta.34",
+    "web3-eth-accounts": "^1.0.0-beta.34",
+    "web3-utils": "^1.0.0-beta.34"
+  },
+  "deprecated": false,
   "description": "SecureVote Light supporting functionality",
-  "main": "src/index.js",
-  "scripts": {
-    "test": "exit 0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/secure-vote/sv-lib.git"
-  },
+  "homepage": "https://github.com/secure-vote/sv-lib#readme",
   "keywords": [
     "SecureVote",
     "voting",
     "crypto",
     "blockchain"
   ],
-  "author": "Max Kaye <max@secure.vote>",
   "license": "UNLICENSED",
-  "bugs": {
-    "url": "https://github.com/secure-vote/sv-lib/issues"
+  "main": "src/index.js",
+  "name": "sv-lib",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/secure-vote/sv-lib.git"
   },
-  "homepage": "https://github.com/secure-vote/sv-lib#readme",
-  "dependencies": {
-    "assert": "^1.4.1",
-    "colors": "^1.3.0",
-    "eth-ens-namehash": "^2.0.8",
-    "ethereumjs-util": "^5.2.0",
-    "ramda": "^0.25.0"
-  }
+  "scripts": {
+    "test": "exit 0"
+  },
+  "version": "0.1.8"
 }
