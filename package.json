@@ -1,6 +1,6 @@
 {
   "name": "sv-lib",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "SecureVote Light supporting functionality",
   "main": "src/index.js",
   "homepage": "https://github.com/secure-vote/sv-lib#readme",

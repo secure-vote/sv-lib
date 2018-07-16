@@ -43,6 +43,10 @@ const ethSignHash = (messageHash, privateKey) => {
     }
 }
 
+
+
+
+
 module.exports = {
     hashMsgRaw,
     ethSignHash,
