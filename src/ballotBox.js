@@ -11,7 +11,7 @@ const Account = require('eth-lib/lib/account')
  *
  * For more info see docs.secure.vote
  */
-module.exports.flags = {
+export const flags = {
     // flags on submission methods
     USE_ETH: 2**0,
     USE_SIGNED: 2**1,
@@ -34,11 +34,11 @@ module.exports.flags = {
  *  End time in seconds since epoch
  * @param {number} submissionBits
  *  Submission bits - can be created using mkSubmissionBits
- * @returns {BigNum}
+ * @returns {BN}
  *  Returns a `bn.js` BigNum of the packed values.
  *  Format: [submissionBits(16)][startTime(64)][endTime(64)]
  */
-module.exports.mkPacked = (start, end, submissionBits) => {
+export const mkPacked = (start, end, submissionBits) => {
     const s = new BN(start)
     const e = new BN(end)
     const sb = new BN(submissionBits)
@@ -54,7 +54,7 @@ module.exports.mkPacked = (start, end, submissionBits) => {
  * @returns {number}
  *  A 16 bit integer of combined flags.
  */
-module.exports.mkSubmissionBits = (...toCombine) => {
+export const mkSubmissionBits = (...toCombine) => {
     if (Array.isArray(toCombine[0]) && typeof toCombine[0][0] == "number") {
         console.warn("Warning: mkSubmissionBits does not take an Array<number> anymore.")
         toCombine = toCombine[0];
@@ -79,15 +79,15 @@ module.exports.mkSubmissionBits = (...toCombine) => {
  *  the vote data to use, should be 32 bytes hex encoded
  * @param {string} extra
  *  any extra data included with the vote (such as curve25519 pubkeys)
- * @param {string} privKey
+ * @param {string} privateKey
  *  the privkey used to sign
  * @param {object?} opts
  *  options:
  *   - skipSequenceSizeCheck: boolean (will not throw if sequence is >= 2^32)
- * @returns {Object}
+ * @returns {object}
  *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`
  */
-module.exports.mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts = {}) => {
+export const mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts = {}) => {
     if (opts.skipSequenceSizeCheck !== true)
         assert.equal(0 < sequence && sequence < 2**32, true, "sequence number out of bounds")
     assert.equal(web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId), true, "ballotId incorrect format (either not a BN or not hex)")
@@ -128,44 +128,47 @@ module.exports.mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, pr
 }
 
 /**
- * Prepares the transaction data required from an array of votes
+ * Prepares voteData for a Range3 ballot from an array of votes
  *
  * @param {array} votesArray
  *  Takes an array of numbers which represent the votes to be transformed
  *  Format: [1, 2, -1]
  *
  * @returns {string}
- *  Returns a string of the vote data
+ *  Returns an eth hex string of the vote data
  */
-module.exports.generateBallotTxData = votesArray => {
-  // Offset the votes and push them into a new array
-  let offsetVoteValues = [];
-  for (let i = 0; i < votesArray.length; i++) {
-    const nonOffsetValue = votesArray[i];
-    const offsetValue = nonOffsetValue + 3;
-    offsetVoteValues.push(offsetValue);
-  }
+export const genRange3VoteData = votesArray => {
+    assert.equal(R.all(v => (v | 0) === v, votesArray), true, "All array elements must be defined and integers.")
+    assert.equal(R.all(v => -3 <= v && v <= 3, votesArray), true, "Votes must be in range -3 to 3.")
+    assert.equal(votesArray.length <= 85, true, "Too many votes; maximum capacity of 32 bytes is 85 individual items.")
 
-  // Create an array of binary votes from the
-  let binaryArray = [];
-  for (var i = 0; i < offsetVoteValues.length; i++) {
-    const offsetValueForBinary = offsetVoteValues[i];
-    const unpaddedBinary = (offsetValueForBinary >>> 0).toString(2);
-    const paddedBinary = R.join('', R.repeat('0', 3 - unpaddedBinary.length)) + unpaddedBinary;
-    // let binaryValue = binaryOffset[offsetValueForBinary]
-    binaryArray.push(paddedBinary);
-  }
-  // Concatenate the votes
-  const binVotesUnpadded = R.join('', binaryArray);
-  // Pad with 0's
-  const binaryVotes = binVotesUnpadded + R.join('', R.repeat('0', 32 - binVotesUnpadded.length));
-  // Convert to bytes
-  const voteBytes = R.map(bStr => parseInt(bStr, 2), R.splitEvery(8, binaryVotes));
+    // Generate list of binary encoded votes. Read bottom to top.
+    const binaryVotes = R.compose(
+        // pad to 3 bits
+        R.map(vBin => R.join('', R.repeat('0', 3 - vBin.length)) + vBin),
+        // convert votes to binary
+        R.map(v => v.toString(2)),
+        // offset votes to be in range 0,6
+        R.map(v => v + 3)
+    )(votesArray)
 
-  const delegateAddress = '0x0000000000000000000000000000000000000000';
-  const delegatePrefix = R.take(14 * 2, R.drop(2, delegateAddress));
-  const ballotHexString = Array.prototype.map.call(new Uint8Array(voteBytes), x => ('00' + x.toString(16)).slice(-2)).join('');
-  const ballotPlaintext = '0x' + ballotHexString + delegatePrefix;
+    // check we have converted votes to bitstring representation of length 3
+    assert.equal(R.all(bVote => bVote.length == 3, binaryVotes), true, "Assertion failed: all binary-encoded votes should be 3 bits long")
 
-  return ballotPlaintext;
+    // create the binary voteData
+    const rawBinVotes = R.join('', binaryVotes)
+    // and pad it with 0s to length 256 (32 bytes total)
+    const binVoteData = rawBinVotes + R.join('', R.repeat('0', 32*8 - rawBinVotes.length))
+    assert.equal(binVoteData.length, 256, "Assertion failed: generated voteData bit string does not have length 256")
+    // Convert to bytes
+    const voteBytes = R.map(bStr => parseInt(bStr, 2), R.splitEvery(8, binVoteData));
+
+    // check bytes are in range
+    assert.equal(R.all(vByte => 0 <= vByte && vByte <= 255, voteBytes), true, "Assertion failed: voteBytes (byte array) had a byte out of bounds (<0 or >255)")
+
+    // generate final hex
+    const voteData = web3Utils.bytesToHex(voteBytes)
+    assert.equal(voteData.length, 66, "Assertion failed: final hex was not 66 characters long (32 bytes)")
+
+    return voteData
 };

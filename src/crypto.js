@@ -11,7 +11,7 @@ const web3Utils = require('web3-utils');
  * @returns {string}
  *  The hashed message (using keccak256)
  */
-const hashMsgRaw = data => {
+export const hashMsgRaw = data => {
     const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data;
     const msgBuffer = Buffer.from(msg);
     return Hash.keccak256s(msgBuffer);
@@ -29,7 +29,7 @@ const hashMsgRaw = data => {
  *
  * @returns {{messageHash: string, r: string, s: string, v: string}}
  */
-const ethSignHash = (messageHash, privateKey) => {
+export const ethSignHash = (messageHash, privateKey) => {
     // near identical to web3-eth-accounts (web3 v1)
     // the main difference is we don't envelop the data.
     const signature = Account.sign(messageHash, privateKey);
@@ -41,13 +41,4 @@ const ethSignHash = (messageHash, privateKey) => {
         s: vrs[2],
         signature
     }
-}
-
-
-
-
-
-module.exports = {
-    hashMsgRaw,
-    ethSignHash,
 }

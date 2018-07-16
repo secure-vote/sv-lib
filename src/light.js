@@ -14,7 +14,7 @@ const AuxAbi = require('./smart_contracts/AuxAbi.abi.json');
 const AuctionAbi = require('./smart_contracts/CommAuctionIface.abi.json');
 const ERC20Abi = require('./smart_contracts/ERC20.abi.json');
 
-const initializeSvLight = async svConfig => {
+export const initializeSvLight = async svConfig => {
   const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig;
 
   const Web3 = require('web3');
@@ -36,24 +36,24 @@ const initializeSvLight = async svConfig => {
     resolver,
     index,
     backend,
-    aux, 
+    aux,
     payments
   };
 };
 
-const resolveEnsAddress = async ({ resolver }, ensName) => {
+export const resolveEnsAddress = async ({ resolver }, ensName) => {
   return await resolver.methods.addr(ENS.hash(ensName)).call();
 };
 
-const getBackendAddress = async ({ index }) => {
+export const getBackendAddress = async ({ index }) => {
   return await index.methods.getBackend().call();
 };
 
-const getDemocInfo = async ({ backend, democHash }) => {
+export const getDemocInfo = async ({ backend, democHash }) => {
   return await backend.methods.getDInfo(democHash).call();
 };
 
-const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
+export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
   // Destructure and set the variables that are needed
   const { index, backend, aux, svConfig } = svNetwork;
   const { democHash, nthBallot } = democBallotInfo;
@@ -78,7 +78,7 @@ const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
   return ballotObject;
 };
 
-const getBallotSpec = async (archiveUrl, ballotSpecHash) => {
+export const getBallotSpec = async (archiveUrl, ballotSpecHash) => {
   return new Promise((res, rej) => {
     let done = false;
     const doRes = obj => {
@@ -100,11 +100,11 @@ const getBallotSpec = async (archiveUrl, ballotSpecHash) => {
   });
 };
 
-const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) => {
+export const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) => {
   return axios.get(archiveUrl + ballotSpecHash + '.json');
 };
 
-const getBallotObjectFromIpfs = async ballotSpecHash => {
+export const getBallotObjectFromIpfs = async ballotSpecHash => {
   const ipfsUrl = 'https://ipfs.infura.io/api/v0/block/get?arg=';
   const cidHex = '1220' + ballotSpecHash.substr(2);
   const bytes = Buffer.from(cidHex, 'hex');
@@ -113,12 +113,12 @@ const getBallotObjectFromIpfs = async ballotSpecHash => {
 };
 
 // Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array
-const getDemocBallots = async ({ svNetwork, democHash }) => {
+export const getDemocBallots = async ({ svNetwork, democHash }) => {
   const { backend } = svNetwork;
   const democInfo = await getDemocInfo({ backend, democHash });
 
   // Throw an error if the democ info is not correct
-  const {erc20, owner} = democInfo 
+  const {erc20, owner} = democInfo
   if (owner === '0x0000000000000000000000000000000000000000') {
     throw new Error('Democracy Hash does not resolve to a democracy')
   }
@@ -134,8 +134,8 @@ const getDemocBallots = async ({ svNetwork, democHash }) => {
   return ballotsArray;
 };
 
-// Takes in the svNetwork object and returns all relevant addresses
-const getContractAddresses = async ({svNetwork}) => {
+/** Takes in the svNetwork object and returns all relevant addresses */
+export const getContractAddresses = async ({svNetwork}) => {
   const {index, resolver, backend, aux, svConfig} = svNetwork
   const { delegationContractName, lookupAddress } = svConfig
 
@@ -144,40 +144,40 @@ const getContractAddresses = async ({svNetwork}) => {
     backendAddress: backend._address,
     auxAddress: aux._address,
     lookupAddress: lookupAddress,
-    resolverAddress: resolver._address, 
+    resolverAddress: resolver._address,
     communityAuctionAddress: await index.methods.getCommAuction().call(),
     delegationAddress: await resolveEnsAddress({ resolver }, delegationContractName),
     paymentsAddress: await index.methods.getPayments().call(),
   }
 }
 
-const weiToCents = async ({payments}, wei) => {
+export const weiToCents = async ({payments}, wei) => {
   return await payments.methods.weiToCents(wei).call()
 }
 
-const getCommunityBallotPrice = async ({payments}, democHash) => {
+export const getCommunityBallotPrice = async ({payments}, democHash) => {
   return await payments.methods.getNextPrice(democHash).call()
 }
 
-const checkIfAddressIsEditor = async ({ svNetwork }, { userAddress, democHash }) => {
+export const checkIfAddressIsEditor = async ({ svNetwork }, { userAddress, democHash }) => {
   const {backend} = svNetwork
   return await backend.methods.isDEditor(democHash, userAddress).call();
 };
 
 // Checks the current ethereum gas price and returns a couple of values
-const getCurrentGasPrice = async () => {
+export const getCurrentGasPrice = async () => {
   const gasStationInfo = await axios.get('https://ethgasstation.info/json/ethgasAPI.json')
   const {data} = gasStationInfo
 
   return {
     safeLow: data.safeLow / 10,
-    average: data.average / 10, 
-    fast: data.fast / 10, 
+    average: data.average / 10,
+    fast: data.fast / 10,
     fastest: data.fastest / 10,
   }
 }
 // Checks the ballot hash against the ballot content
-const checkBallotHashBSpec = (ballotSpec, assertSpecHash) => {
+export const checkBallotHashBSpec = (ballotSpec, assertSpecHash) => {
     let contentHash = '0x' + sha256(JSON.stringify(ballotSpec, null, 2));
     if (assertSpecHash === contentHash) {
       return true;
@@ -188,23 +188,7 @@ const checkBallotHashBSpec = (ballotSpec, assertSpecHash) => {
 
 // Checks the ballot hash against a ballot global ballot object
 // Does this by destructuring the specHash and data out of it
-const checkBallotHashGBallot = (ballotObject) => {
+export const checkBallotHashGBallot = (ballotObject) => {
   const {data, specHash} = ballotObject
   return checkBallotHashBSpec(data, specHash)
 }
-
-module.exports = {
-  checkBallotHashGBallot,
-  checkBallotHashBSpec, 
-  checkIfAddressIsEditor, 
-  getCommunityBallotPrice,
-  getCurrentGasPrice,
-  weiToCents,
-  getContractAddresses,
-  initializeSvLight,
-  getDemocBallots,
-  getDemocNthBallot,
-  getDemocInfo,
-  getBackendAddress,
-  resolveEnsAddress
-};

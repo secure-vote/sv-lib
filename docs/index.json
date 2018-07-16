@@ -1,0 +1,2316 @@
+[
+  {
+    "__docId__": 1,
+    "kind": "external",
+    "name": "Infinity",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Infinity",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Infinity",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 2,
+    "kind": "external",
+    "name": "NaN",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~NaN",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 3,
+    "kind": "external",
+    "name": "undefined",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~undefined",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 4,
+    "kind": "external",
+    "name": "null",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~null",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 5,
+    "kind": "external",
+    "name": "Object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Object",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 6,
+    "kind": "external",
+    "name": "object",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~object",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 7,
+    "kind": "external",
+    "name": "Function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Function",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 8,
+    "kind": "external",
+    "name": "function",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~function",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 9,
+    "kind": "external",
+    "name": "Boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Boolean",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 10,
+    "kind": "external",
+    "name": "boolean",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~boolean",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 11,
+    "kind": "external",
+    "name": "Symbol",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Symbol",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 12,
+    "kind": "external",
+    "name": "Error",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Error",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 13,
+    "kind": "external",
+    "name": "EvalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~EvalError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 14,
+    "kind": "external",
+    "name": "InternalError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/InternalError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~InternalError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 15,
+    "kind": "external",
+    "name": "RangeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~RangeError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 16,
+    "kind": "external",
+    "name": "ReferenceError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~ReferenceError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 17,
+    "kind": "external",
+    "name": "SyntaxError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~SyntaxError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 18,
+    "kind": "external",
+    "name": "TypeError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~TypeError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 19,
+    "kind": "external",
+    "name": "URIError",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~URIError",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 20,
+    "kind": "external",
+    "name": "Number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Number",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 21,
+    "kind": "external",
+    "name": "number",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~number",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 22,
+    "kind": "external",
+    "name": "Date",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Date",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 23,
+    "kind": "external",
+    "name": "String",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~String",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 24,
+    "kind": "external",
+    "name": "string",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~string",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 25,
+    "kind": "external",
+    "name": "RegExp",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~RegExp",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 26,
+    "kind": "external",
+    "name": "Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 27,
+    "kind": "external",
+    "name": "Int8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int8Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Int8Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 28,
+    "kind": "external",
+    "name": "Uint8Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Uint8Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 29,
+    "kind": "external",
+    "name": "Uint8ClampedArray",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Uint8ClampedArray",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 30,
+    "kind": "external",
+    "name": "Int16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int16Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Int16Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 31,
+    "kind": "external",
+    "name": "Uint16Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint16Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Uint16Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 32,
+    "kind": "external",
+    "name": "Int32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Int32Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Int32Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 33,
+    "kind": "external",
+    "name": "Uint32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Uint32Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 34,
+    "kind": "external",
+    "name": "Float32Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Float32Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 35,
+    "kind": "external",
+    "name": "Float64Array",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float64Array",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Float64Array",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 36,
+    "kind": "external",
+    "name": "Map",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Map",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 37,
+    "kind": "external",
+    "name": "Set",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Set",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 38,
+    "kind": "external",
+    "name": "WeakMap",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~WeakMap",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 39,
+    "kind": "external",
+    "name": "WeakSet",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~WeakSet",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 40,
+    "kind": "external",
+    "name": "ArrayBuffer",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~ArrayBuffer",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 41,
+    "kind": "external",
+    "name": "DataView",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DataView",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~DataView",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 42,
+    "kind": "external",
+    "name": "JSON",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~JSON",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 43,
+    "kind": "external",
+    "name": "Promise",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Promise",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 44,
+    "kind": "external",
+    "name": "Generator",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Generator",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 45,
+    "kind": "external",
+    "name": "GeneratorFunction",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/GeneratorFunction",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~GeneratorFunction",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 46,
+    "kind": "external",
+    "name": "Reflect",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Reflect",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 47,
+    "kind": "external",
+    "name": "Proxy",
+    "externalLink": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy",
+    "memberof": "src/.external-ecmascript.js",
+    "static": true,
+    "longname": "src/.external-ecmascript.js~Proxy",
+    "access": "public",
+    "description": "",
+    "builtinExternal": true
+  },
+  {
+    "__docId__": 48,
+    "kind": "file",
+    "name": "src/ballotBox.js",
+    "content": "const R = require('ramda')\nconst BN = require('bn.js')\nconst assert = require('assert')\nconst web3Utils = require('web3-utils')\nconst svCrypto = require('./crypto')\nconst Account = require('eth-lib/lib/account')\n\n/**\n * This object tracks the flags used for SV ballot boxes. They determine the submission\n * methods and whether ballots are tracked as binding, official, or testing.\n *\n * For more info see docs.secure.vote\n */\nexport const flags = {\n    // flags on submission methods\n    USE_ETH: 2**0,\n    USE_SIGNED: 2**1,\n    USE_NO_ENC: 2**2,\n    USE_ENC: 2**3,\n\n    // other ballot settings\n    IS_BINDING: 2**13,\n    IS_OFFICIAL: 2**14,\n    USE_TESTING: 2**15,\n}\n\n\n/**\n * Creates a packed copy of start and end times with submissionBits\n *\n * @param {number} start\n *  Start time in seconds since epoch\n * @param {number} end\n *  End time in seconds since epoch\n * @param {number} submissionBits\n *  Submission bits - can be created using mkSubmissionBits\n * @returns {BN}\n *  Returns a `bn.js` BigNum of the packed values.\n *  Format: [submissionBits(16)][startTime(64)][endTime(64)]\n */\nexport const mkPacked = (start, end, submissionBits) => {\n    const s = new BN(start)\n    const e = new BN(end)\n    const sb = new BN(submissionBits)\n    return sb.shln(64).add(s).shln(64).add(e);\n}\n\n\n/**\n * This combines flags into a finished submissionBits. It also does some validation.\n * @param {*} toCombine\n *  Array of all submission flags to combine. See SV.ballotBox.flags for flag options.\n *  All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining).\n * @returns {number}\n *  A 16 bit integer of combined flags.\n */\nexport const mkSubmissionBits = (...toCombine) => {\n    if (Array.isArray(toCombine[0]) && typeof toCombine[0][0] == \"number\") {\n        console.warn(\"Warning: mkSubmissionBits does not take an Array<number> anymore.\")\n        toCombine = toCombine[0];\n    }\n\n    const toRet = R.reduce((acc, i) => acc | i, 0, toCombine);\n    assert.equal(R.all(i => typeof i == \"number\", toCombine), true, `Bad input to mkSubmissionBits. Input is required to be an array of numbers. Instead got: ${toCombine}`);\n    assert.equal(R.all(i => i === i | 0, toCombine), true, `Bad input to mkSubmissionBits. Input was not an array of integers. Instead got: ${toCombine}`);\n    assert.equal(toRet, R.sum(toCombine), `Bad input provided to mkSubmissionBits. Logical OR and sum sanity check failed. Input was: ${toCombine}`);\n    assert.equal(toRet < 2**16, true, `Submission bits must fit into a 16 bit integer (i.e. less than 2^16). Result was: ${toRet}`);\n    return toRet;\n}\n\n\n/**\n * Take the arguments and produce web3 data fitting the `submitProxyVote` method.\n * @param {string} ballotId\n *  a BN.js or Hex ballotId\n * @param {number} sequence\n *  the sequence number to use (0 < sequence < 2^32)\n * @param {string} voteData\n *  the vote data to use, should be 32 bytes hex encoded\n * @param {string} extra\n *  any extra data included with the vote (such as curve25519 pubkeys)\n * @param {string} privateKey\n *  the privkey used to sign\n * @param {object?} opts\n *  options:\n *   - skipSequenceSizeCheck: boolean (will not throw if sequence is >= 2^32)\n * @returns {object}\n *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`\n */\nexport const mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts = {}) => {\n    if (opts.skipSequenceSizeCheck !== true)\n        assert.equal(0 < sequence && sequence < 2**32, true, \"sequence number out of bounds\")\n    assert.equal(web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId), true, \"ballotId incorrect format (either not a BN or not hex)\")\n    assert.equal(web3Utils.isHexStrict(voteData), true, \"vote data is not hex (strict)\")\n    assert.equal(web3Utils.isHexStrict(extra), true, \"extra param is not hex (strict)\")\n\n    const _ballotId = web3Utils.isBN(ballotId) ? web3Utils.padLeft(web3Utils.toHex(ballotId), 64) : ballotId\n\n    assert.equal(_ballotId.length, 66, 'ballotId incorrect length')\n    assert.equal(voteData.length, 66, 'voteData incorrect length')\n\n    const sequenceHex = web3Utils.padLeft(web3Utils.toHex(sequence), 8)\n\n    const messageHash = web3Utils.soliditySha3( {t: 'bytes31', v: web3Utils.padLeft(sequenceHex, '62')}\n                                              , {t: 'bytes32', v: _ballotId}\n                                              , {t: 'bytes32', v: voteData}\n                                              , {t: 'bytes', v: extra}\n                                              )\n\n    const {v,r,s} = svCrypto.ethSignHash(messageHash, privateKey)\n\n    const vBytes = web3Utils.hexToBytes(v)\n    const midBytes = web3Utils.hexToBytes(web3Utils.padRight('0x', 54))\n    const sequenceBytes = web3Utils.hexToBytes(sequenceHex)\n    const packed2Bytes = R.concat(vBytes, R.concat(midBytes, sequenceBytes))\n    const packed2 = web3Utils.bytesToHex(packed2Bytes)\n\n    return {\n        proxyReq:\n            [ r\n            , s\n            , packed2\n            , _ballotId\n            , voteData\n            ],\n        extra\n    }\n}\n\n/**\n * Prepares voteData for a Range3 ballot from an array of votes\n *\n * @param {array} votesArray\n *  Takes an array of numbers which represent the votes to be transformed\n *  Format: [1, 2, -1]\n *\n * @returns {string}\n *  Returns an eth hex string of the vote data\n */\nexport const genRange3VoteData = votesArray => {\n    assert.equal(R.all(v => (v | 0) === v, votesArray), true, \"All array elements must be defined and integers.\")\n    assert.equal(R.all(v => -3 <= v && v <= 3, votesArray), true, \"Votes must be in range -3 to 3.\")\n    assert.equal(votesArray.length <= 85, true, \"Too many votes; maximum capacity of 32 bytes is 85 individual items.\")\n\n    // Generate list of binary encoded votes. Read bottom to top.\n    const binaryVotes = R.compose(\n        // pad to 3 bits\n        R.map(vBin => R.join('', R.repeat('0', 3 - vBin.length)) + vBin),\n        // convert votes to binary\n        R.map(v => v.toString(2)),\n        // offset votes to be in range 0,6\n        R.map(v => v + 3)\n    )(votesArray)\n\n    // check we have converted votes to bitstring representation of length 3\n    assert.equal(R.all(bVote => bVote.length == 3, binaryVotes), true, \"Assertion failed: all binary-encoded votes should be 3 bits long\")\n\n    // create the binary voteData\n    const rawBinVotes = R.join('', binaryVotes)\n    // and pad it with 0s to length 256 (32 bytes total)\n    const binVoteData = rawBinVotes + R.join('', R.repeat('0', 32*8 - rawBinVotes.length))\n    assert.equal(binVoteData.length, 256, \"Assertion failed: generated voteData bit string does not have length 256\")\n    // Convert to bytes\n    const voteBytes = R.map(bStr => parseInt(bStr, 2), R.splitEvery(8, binVoteData));\n\n    // check bytes are in range\n    assert.equal(R.all(vByte => 0 <= vByte && vByte <= 255, voteBytes), true, \"Assertion failed: voteBytes (byte array) had a byte out of bounds (<0 or >255)\")\n\n    // generate final hex\n    const voteData = web3Utils.bytesToHex(voteBytes)\n    assert.equal(voteData.length, 66, \"Assertion failed: final hex was not 66 characters long (32 bytes)\")\n\n    return voteData\n};\n",
+    "static": true,
+    "longname": "/Users/maxkaye/src/sv/lib/src/ballotBox.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 49,
+    "kind": "variable",
+    "name": "R",
+    "memberof": "src/ballotBox.js",
+    "static": true,
+    "longname": "src/ballotBox.js~R",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/ballotBox.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 50,
+    "kind": "variable",
+    "name": "BN",
+    "memberof": "src/ballotBox.js",
+    "static": true,
+    "longname": "src/ballotBox.js~BN",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/ballotBox.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 2,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 51,
+    "kind": "variable",
+    "name": "assert",
+    "memberof": "src/ballotBox.js",
+    "static": true,
+    "longname": "src/ballotBox.js~assert",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/ballotBox.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 52,
+    "kind": "variable",
+    "name": "web3Utils",
+    "memberof": "src/ballotBox.js",
+    "static": true,
+    "longname": "src/ballotBox.js~web3Utils",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/ballotBox.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 4,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 53,
+    "kind": "variable",
+    "name": "svCrypto",
+    "memberof": "src/ballotBox.js",
+    "static": true,
+    "longname": "src/ballotBox.js~svCrypto",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/ballotBox.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 54,
+    "kind": "variable",
+    "name": "Account",
+    "memberof": "src/ballotBox.js",
+    "static": true,
+    "longname": "src/ballotBox.js~Account",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/ballotBox.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 6,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 55,
+    "kind": "variable",
+    "name": "flags",
+    "memberof": "src/ballotBox.js",
+    "static": true,
+    "longname": "src/ballotBox.js~flags",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/ballotBox.js",
+    "importStyle": "{flags}",
+    "description": "This object tracks the flags used for SV ballot boxes. They determine the submission\nmethods and whether ballots are tracked as binding, official, or testing.\n\nFor more info see docs.secure.vote",
+    "lineNumber": 14,
+    "type": {
+      "types": [
+        "{\"USE_ETH\": *, \"USE_SIGNED\": *, \"USE_NO_ENC\": *, \"USE_ENC\": *, \"IS_BINDING\": *, \"IS_OFFICIAL\": *, \"USE_TESTING\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 56,
+    "kind": "function",
+    "name": "mkPacked",
+    "memberof": "src/ballotBox.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/ballotBox.js~mkPacked",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/ballotBox.js",
+    "importStyle": "{mkPacked}",
+    "description": null,
+    "lineNumber": 41,
+    "undocument": true,
+    "params": [
+      {
+        "name": "start",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "end",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "submissionBits",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 57,
+    "kind": "function",
+    "name": "mkSubmissionBits",
+    "memberof": "src/ballotBox.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/ballotBox.js~mkSubmissionBits",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/ballotBox.js",
+    "importStyle": "{mkSubmissionBits}",
+    "description": "This combines flags into a finished submissionBits. It also does some validation.",
+    "lineNumber": 57,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{number}\n A 16 bit integer of combined flags."
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "toCombine",
+        "description": "Array of all submission flags to combine. See SV.ballotBox.flags for flag options.\n All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining)."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "number"
+      ],
+      "spread": false,
+      "description": "A 16 bit integer of combined flags."
+    }
+  },
+  {
+    "__docId__": 58,
+    "kind": "function",
+    "name": "mkSignedBallotForProxy",
+    "memberof": "src/ballotBox.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/ballotBox.js~mkSignedBallotForProxy",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/ballotBox.js",
+    "importStyle": "{mkSignedBallotForProxy}",
+    "description": "Take the arguments and produce web3 data fitting the `submitProxyVote` method.",
+    "lineNumber": 90,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{object}\n { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "ballotId",
+        "description": "a BN.js or Hex ballotId"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "number"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "sequence",
+        "description": "the sequence number to use (0 < sequence < 2^32)"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "voteData",
+        "description": "the vote data to use, should be 32 bytes hex encoded"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "extra",
+        "description": "any extra data included with the vote (such as curve25519 pubkeys)"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "privateKey",
+        "description": "the privkey used to sign"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object?"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "opts",
+        "description": "options:\n  - skipSequenceSizeCheck: boolean (will not throw if sequence is >= 2^32)"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "object"
+      ],
+      "spread": false,
+      "description": "{ proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`"
+    }
+  },
+  {
+    "__docId__": 59,
+    "kind": "function",
+    "name": "genRange3VoteData",
+    "memberof": "src/ballotBox.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/ballotBox.js~genRange3VoteData",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/ballotBox.js",
+    "importStyle": "{genRange3VoteData}",
+    "description": "Prepares voteData for a Range3 ballot from an array of votes",
+    "lineNumber": 140,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string}\n Returns an eth hex string of the vote data"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "votesArray",
+        "description": "Takes an array of numbers which represent the votes to be transformed\n Format: [1, 2, -1]"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "Returns an eth hex string of the vote data"
+    }
+  },
+  {
+    "__docId__": 60,
+    "kind": "file",
+    "name": "src/const.js",
+    "content": "module.exports = {\n  zeroAddr: '0x0000000000000000000000000000000000000000',\n  zeroHash: '0x0000000000000000000000000000000000000000000000000000000000000000',\n\n  networkVars: {\n    kovan: {\n      indexContractName: 'index.kov.sv',\n      auxContract: '0x0d31706febd1b8177c722fe39432f3e47143ccd9',\n      httpProvider: 'https://kovan.eth.secure.vote/tokenvote-dev',\n      delegationContractName: 'delegation-2018-06-19.kov.sv',\n      ensResolver: '0xc8c73829348cb15da4b0785a110017464fb8af51',\n      ens: '0xd6F4f22eeC158c434b17d01f62f5dF33b108Ae93',\n      etherscanLink: 'https://kovan.etherscan.io/',\n      name: 'Kovan',\n      archiveUrl: 'https://archive.test.secure.vote/',\n      archivePushUrl: 'https://archive.test.push.secure.vote/',\n      lookupAddress: '0x216265865e46D4c6FE506877EfAAE7dd7Ae2faCE'\n    },\n    mainnet: {\n      indexContractName: 'index.tokenvote.eth',\n      auxContract: '0xff553fe4183f27e2165299b3fc0ae8c3b5c07084',\n      httpProvider: 'https://mainnet.eth.secure.vote/tokenvote',\n      delegationContractName: 'delegate.secvote.eth',\n      ensResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',\n      ens: '0x314159265dd8dbb310642f98f50c066173c1259b',\n      etherscanLink: 'https://etherscan.io/',\n      name: 'Mainnet',\n      archiveUrl: 'https://archive.secure.vote/',\n      archivePushUrl: 'https://archive.push.secure.vote/',\n      lookupAddress: '0x216265865e46D4c6FE506877EfAAE7dd7Ae2faCE'\n    }\n  },\n\n  networkName(networkId) {\n    switch (networkId) {\n      case 1:\n        return 'Mainnet';\n      case 2:\n        return 'Morden';\n      case 3:\n        return 'Ropsten';\n      case 4:\n        return 'Rinkeby';\n      case 42:\n        return 'Kovan';\n      default:\n        return 'Unknown';\n    }\n  }\n};\n",
+    "static": true,
+    "longname": "/Users/maxkaye/src/sv/lib/src/const.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 61,
+    "kind": "file",
+    "name": "src/crypto.js",
+    "content": "const Account = require('eth-lib/lib/account');\nconst Hash = require(\"eth-lib/lib/hash\");\nconst web3Utils = require('web3-utils');\n\n/**\n * Like web3.eth.accounts.hashMessage without the envelope.\n *\n * @param {string} data\n *  A message to hash - if it is hex it'll be UTF8 decoded.\n *\n * @returns {string}\n *  The hashed message (using keccak256)\n */\nexport const hashMsgRaw = data => {\n    const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data;\n    const msgBuffer = Buffer.from(msg);\n    return Hash.keccak256s(msgBuffer);\n}\n\n\n/**\n * Sign a message such that it can be verified with `ecrecover`.\n * Similar to `web3.eth.accounts.sign` except that we sign the hash directly.\n *\n * @param {string} messageHash\n *  Hash of a message, as returned by `web3.utils.soliditySha3` or similar.\n * @param {string} privateKey\n *  Privkey to sign with.\n *\n * @returns {{messageHash: string, r: string, s: string, v: string}}\n */\nexport const ethSignHash = (messageHash, privateKey) => {\n    // near identical to web3-eth-accounts (web3 v1)\n    // the main difference is we don't envelop the data.\n    const signature = Account.sign(messageHash, privateKey);\n    const vrs = Account.decodeSignature(signature);\n    return {\n        messageHash,\n        v: vrs[0],\n        r: vrs[1],\n        s: vrs[2],\n        signature\n    }\n}\n",
+    "static": true,
+    "longname": "/Users/maxkaye/src/sv/lib/src/crypto.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 62,
+    "kind": "variable",
+    "name": "Account",
+    "memberof": "src/crypto.js",
+    "static": true,
+    "longname": "src/crypto.js~Account",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/crypto.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 63,
+    "kind": "variable",
+    "name": "Hash",
+    "memberof": "src/crypto.js",
+    "static": true,
+    "longname": "src/crypto.js~Hash",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/crypto.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 2,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 64,
+    "kind": "variable",
+    "name": "web3Utils",
+    "memberof": "src/crypto.js",
+    "static": true,
+    "longname": "src/crypto.js~web3Utils",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/crypto.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 65,
+    "kind": "function",
+    "name": "hashMsgRaw",
+    "memberof": "src/crypto.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/crypto.js~hashMsgRaw",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/crypto.js",
+    "importStyle": "{hashMsgRaw}",
+    "description": "Like web3.eth.accounts.hashMessage without the envelope.",
+    "lineNumber": 14,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string}\n The hashed message (using keccak256)"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "data",
+        "description": "A message to hash - if it is hex it'll be UTF8 decoded."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "The hashed message (using keccak256)"
+    }
+  },
+  {
+    "__docId__": 66,
+    "kind": "function",
+    "name": "ethSignHash",
+    "memberof": "src/crypto.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/crypto.js~ethSignHash",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/crypto.js",
+    "importStyle": "{ethSignHash}",
+    "description": "Sign a message such that it can be verified with `ecrecover`.\nSimilar to `web3.eth.accounts.sign` except that we sign the hash directly.",
+    "lineNumber": 32,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{{messageHash: string, r: string, s: string, v: string}}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "messageHash",
+        "description": "Hash of a message, as returned by `web3.utils.soliditySha3` or similar."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "privateKey",
+        "description": "Privkey to sign with."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "{messageHash: string, r: string, s: string, v: string}"
+      ],
+      "spread": false,
+      "description": ""
+    }
+  },
+  {
+    "__docId__": 67,
+    "kind": "file",
+    "name": "src/index.js",
+    "content": "module.exports = {\n  utils: require('./utils'),\n  ballotBox: require('./ballotBox'),\n  const: require('./const'),\n  crypto: require('./crypto'),\n  light: require('./light')\n};\n",
+    "static": true,
+    "longname": "/Users/maxkaye/src/sv/lib/src/index.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 68,
+    "kind": "file",
+    "name": "src/light.js",
+    "content": "const ENS = require('eth-ens-namehash');\nconst Constants = require('./const');\nconst axios = require('axios');\nconst bs58 = require('bs58');\nconst sha256 = require('sha256');\n\n// Lovely ABIs\nconst ResolverAbi = require('./smart_contracts/SV_ENS_Resolver.abi.json');\nconst IndexAbi = require('./smart_contracts/SVLightIndex.abi.json');\nconst BackendAbi = require('./smart_contracts/SVLightIndexBackend.abi.json');\nconst BBFarmAbi = require('./smart_contracts/BBFarm.abi.json');\nconst PaymentsAbi = require('./smart_contracts/SVPayments.abi.json');\nconst AuxAbi = require('./smart_contracts/AuxAbi.abi.json');\nconst AuctionAbi = require('./smart_contracts/CommAuctionIface.abi.json');\nconst ERC20Abi = require('./smart_contracts/ERC20.abi.json');\n\nexport const initializeSvLight = async svConfig => {\n  const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig;\n\n  const Web3 = require('web3');\n  const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider));\n\n  const resolver = new web3.eth.Contract(ResolverAbi, ensResolver);\n\n  // const indexAddress =\n  // console.log('indexAddress :', indexAddress);\n  const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexContractName));\n  const backendAddress = await getBackendAddress({ index });\n  const backend = new web3.eth.Contract(BackendAbi, backendAddress);\n  const aux = new web3.eth.Contract(AuxAbi, auxContract);\n  const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())\n\n  return {\n    svConfig,\n    web3,\n    resolver,\n    index,\n    backend,\n    aux,\n    payments\n  };\n};\n\nexport const resolveEnsAddress = async ({ resolver }, ensName) => {\n  return await resolver.methods.addr(ENS.hash(ensName)).call();\n};\n\nexport const getBackendAddress = async ({ index }) => {\n  return await index.methods.getBackend().call();\n};\n\nexport const getDemocInfo = async ({ backend, democHash }) => {\n  return await backend.methods.getDInfo(democHash).call();\n};\n\nexport const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {\n  // Destructure and set the variables that are needed\n  const { index, backend, aux, svConfig } = svNetwork;\n  const { democHash, nthBallot } = democBallotInfo;\n  const indexAddress = index._address;\n  const backendAddress = backend._address;\n  const archiveUrl = { svConfig };\n\n  const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(backendAddress, indexAddress, democHash, nthBallot).call();\n  // console.log('bbFarmAndBallotId :', bbFarmAndBallotId);\n\n  const { id, bbFarmAddress } = bbFarmAndBallotId;\n  const userEthAddress = '0x0000000000000000000000000000000000000000';\n  const ethBallotDetails = await aux.methods.getBallotDetails(id, bbFarmAddress, userEthAddress).call();\n\n  const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash);\n  // console.log('ballotSpec :', ballotSpec);\n  // .then(x => console.log('Then called', x))\n  // .catch(x => console.log('Caught error', x));\n\n  const ballotObject = { ...bbFarmAndBallotId, ...ethBallotDetails, data: { ...ballotSpec.data } };\n\n  return ballotObject;\n};\n\nexport const getBallotSpec = async (archiveUrl, ballotSpecHash) => {\n  return new Promise((res, rej) => {\n    let done = false;\n    const doRes = obj => {\n      if (!done) {\n        done = true;\n        res(obj);\n      }\n    };\n    getBallotObjectFromIpfs(ballotSpecHash).then(doRes);\n    setTimeout(() => {\n      if (!done) {\n        getBallotObjectFromS3(archiveUrl, ballotSpecHash)\n          .then(doRes)\n          .catch(error => {\n            rej(new Error(error));\n          });\n      }\n    }, 3500);\n  });\n};\n\nexport const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) => {\n  return axios.get(archiveUrl + ballotSpecHash + '.json');\n};\n\nexport const getBallotObjectFromIpfs = async ballotSpecHash => {\n  const ipfsUrl = 'https://ipfs.infura.io/api/v0/block/get?arg=';\n  const cidHex = '1220' + ballotSpecHash.substr(2);\n  const bytes = Buffer.from(cidHex, 'hex');\n  const cid = bs58.encode(bytes);\n  return await axios.get(ipfsUrl + cid);\n};\n\n// Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array\nexport const getDemocBallots = async ({ svNetwork, democHash }) => {\n  const { backend } = svNetwork;\n  const democInfo = await getDemocInfo({ backend, democHash });\n\n  // Throw an error if the democ info is not correct\n  const {erc20, owner} = democInfo\n  if (owner === '0x0000000000000000000000000000000000000000') {\n    throw new Error('Democracy Hash does not resolve to a democracy')\n  }\n\n  // TODO - Work out where / how to push an errored ballot\n  // Loop through and get all the ballots\n  const numBallots = democInfo.nBallots;\n  const ballotsArray = [];\n  for (let i = 0; i < numBallots; i++) {\n    ballotsArray[i] = await getDemocNthBallot({ svNetwork }, { democHash: democHash, nthBallot: i });\n  }\n\n  return ballotsArray;\n};\n\n/** Takes in the svNetwork object and returns all relevant addresses */\nexport const getContractAddresses = async ({svNetwork}) => {\n  const {index, resolver, backend, aux, svConfig} = svNetwork\n  const { delegationContractName, lookupAddress } = svConfig\n\n  return {\n    indexAddress: index._address,\n    backendAddress: backend._address,\n    auxAddress: aux._address,\n    lookupAddress: lookupAddress,\n    resolverAddress: resolver._address,\n    communityAuctionAddress: await index.methods.getCommAuction().call(),\n    delegationAddress: await resolveEnsAddress({ resolver }, delegationContractName),\n    paymentsAddress: await index.methods.getPayments().call(),\n  }\n}\n\nexport const weiToCents = async ({payments}, wei) => {\n  return await payments.methods.weiToCents(wei).call()\n}\n\nexport const getCommunityBallotPrice = async ({payments}, democHash) => {\n  return await payments.methods.getNextPrice(democHash).call()\n}\n\nexport const checkIfAddressIsEditor = async ({ svNetwork }, { userAddress, democHash }) => {\n  const {backend} = svNetwork\n  return await backend.methods.isDEditor(democHash, userAddress).call();\n};\n\n// Checks the current ethereum gas price and returns a couple of values\nexport const getCurrentGasPrice = async () => {\n  const gasStationInfo = await axios.get('https://ethgasstation.info/json/ethgasAPI.json')\n  const {data} = gasStationInfo\n\n  return {\n    safeLow: data.safeLow / 10,\n    average: data.average / 10,\n    fast: data.fast / 10,\n    fastest: data.fastest / 10,\n  }\n}\n// Checks the ballot hash against the ballot content\nexport const checkBallotHashBSpec = (ballotSpec, assertSpecHash) => {\n    let contentHash = '0x' + sha256(JSON.stringify(ballotSpec, null, 2));\n    if (assertSpecHash === contentHash) {\n      return true;\n    } else {\n      return false;\n    }\n}\n\n// Checks the ballot hash against a ballot global ballot object\n// Does this by destructuring the specHash and data out of it\nexport const checkBallotHashGBallot = (ballotObject) => {\n  const {data, specHash} = ballotObject\n  return checkBallotHashBSpec(data, specHash)\n}\n",
+    "static": true,
+    "longname": "/Users/maxkaye/src/sv/lib/src/light.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 69,
+    "kind": "variable",
+    "name": "ENS",
+    "memberof": "src/light.js",
+    "static": true,
+    "longname": "src/light.js~ENS",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 1,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 70,
+    "kind": "variable",
+    "name": "Constants",
+    "memberof": "src/light.js",
+    "static": true,
+    "longname": "src/light.js~Constants",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 2,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 71,
+    "kind": "variable",
+    "name": "axios",
+    "memberof": "src/light.js",
+    "static": true,
+    "longname": "src/light.js~axios",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 72,
+    "kind": "variable",
+    "name": "bs58",
+    "memberof": "src/light.js",
+    "static": true,
+    "longname": "src/light.js~bs58",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 4,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 73,
+    "kind": "variable",
+    "name": "sha256",
+    "memberof": "src/light.js",
+    "static": true,
+    "longname": "src/light.js~sha256",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 74,
+    "kind": "variable",
+    "name": "ResolverAbi",
+    "memberof": "src/light.js",
+    "static": true,
+    "longname": "src/light.js~ResolverAbi",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 75,
+    "kind": "variable",
+    "name": "IndexAbi",
+    "memberof": "src/light.js",
+    "static": true,
+    "longname": "src/light.js~IndexAbi",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 9,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 76,
+    "kind": "variable",
+    "name": "BackendAbi",
+    "memberof": "src/light.js",
+    "static": true,
+    "longname": "src/light.js~BackendAbi",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 10,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 77,
+    "kind": "variable",
+    "name": "BBFarmAbi",
+    "memberof": "src/light.js",
+    "static": true,
+    "longname": "src/light.js~BBFarmAbi",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 11,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 78,
+    "kind": "variable",
+    "name": "PaymentsAbi",
+    "memberof": "src/light.js",
+    "static": true,
+    "longname": "src/light.js~PaymentsAbi",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 12,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 79,
+    "kind": "variable",
+    "name": "AuxAbi",
+    "memberof": "src/light.js",
+    "static": true,
+    "longname": "src/light.js~AuxAbi",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 13,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 80,
+    "kind": "variable",
+    "name": "AuctionAbi",
+    "memberof": "src/light.js",
+    "static": true,
+    "longname": "src/light.js~AuctionAbi",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 14,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 81,
+    "kind": "variable",
+    "name": "ERC20Abi",
+    "memberof": "src/light.js",
+    "static": true,
+    "longname": "src/light.js~ERC20Abi",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 15,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 82,
+    "kind": "function",
+    "name": "initializeSvLight",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~initializeSvLight",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{initializeSvLight}",
+    "description": null,
+    "lineNumber": 17,
+    "undocument": true,
+    "params": [
+      {
+        "name": "svConfig",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"svConfig\": *, \"web3\": *, \"resolver\": *, \"index\": *, \"backend\": *, \"aux\": *, \"payments\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 83,
+    "kind": "function",
+    "name": "resolveEnsAddress",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~resolveEnsAddress",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{resolveEnsAddress}",
+    "description": null,
+    "lineNumber": 44,
+    "undocument": true,
+    "params": [
+      {
+        "name": "objectPattern",
+        "types": [
+          "{\"resolver\": *}"
+        ],
+        "defaultRaw": {
+          "resolver": null
+        },
+        "defaultValue": "{\"resolver\":null}"
+      },
+      {
+        "name": "ensName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 84,
+    "kind": "function",
+    "name": "getBackendAddress",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~getBackendAddress",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{getBackendAddress}",
+    "description": null,
+    "lineNumber": 48,
+    "undocument": true,
+    "params": [
+      {
+        "name": "objectPattern",
+        "types": [
+          "{\"index\": *}"
+        ],
+        "defaultRaw": {
+          "index": null
+        },
+        "defaultValue": "{\"index\":null}"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 85,
+    "kind": "function",
+    "name": "getDemocInfo",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~getDemocInfo",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{getDemocInfo}",
+    "description": null,
+    "lineNumber": 52,
+    "undocument": true,
+    "params": [
+      {
+        "name": "objectPattern",
+        "types": [
+          "{\"backend\": *, \"democHash\": *}"
+        ],
+        "defaultRaw": {
+          "backend": null,
+          "democHash": null
+        },
+        "defaultValue": "{\"backend\":null,\"democHash\":null}"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 86,
+    "kind": "function",
+    "name": "getDemocNthBallot",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~getDemocNthBallot",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{getDemocNthBallot}",
+    "description": null,
+    "lineNumber": 56,
+    "undocument": true,
+    "params": [
+      {
+        "name": "objectPattern",
+        "types": [
+          "{\"svNetwork\": *}"
+        ],
+        "defaultRaw": {
+          "svNetwork": null
+        },
+        "defaultValue": "{\"svNetwork\":null}"
+      },
+      {
+        "name": "democBallotInfo",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 87,
+    "kind": "function",
+    "name": "getBallotSpec",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~getBallotSpec",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{getBallotSpec}",
+    "description": null,
+    "lineNumber": 81,
+    "undocument": true,
+    "params": [
+      {
+        "name": "archiveUrl",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "ballotSpecHash",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 88,
+    "kind": "function",
+    "name": "getBallotObjectFromS3",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~getBallotObjectFromS3",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{getBallotObjectFromS3}",
+    "description": null,
+    "lineNumber": 103,
+    "undocument": true,
+    "params": [
+      {
+        "name": "archiveUrl",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "ballotSpecHash",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 89,
+    "kind": "function",
+    "name": "getBallotObjectFromIpfs",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~getBallotObjectFromIpfs",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{getBallotObjectFromIpfs}",
+    "description": null,
+    "lineNumber": 107,
+    "undocument": true,
+    "params": [
+      {
+        "name": "ballotSpecHash",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 90,
+    "kind": "function",
+    "name": "getDemocBallots",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~getDemocBallots",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{getDemocBallots}",
+    "description": null,
+    "lineNumber": 116,
+    "undocument": true,
+    "params": [
+      {
+        "name": "objectPattern",
+        "types": [
+          "{\"svNetwork\": *, \"democHash\": *}"
+        ],
+        "defaultRaw": {
+          "svNetwork": null,
+          "democHash": null
+        },
+        "defaultValue": "{\"svNetwork\":null,\"democHash\":null}"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 91,
+    "kind": "function",
+    "name": "getContractAddresses",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~getContractAddresses",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{getContractAddresses}",
+    "description": "Takes in the svNetwork object and returns all relevant addresses",
+    "lineNumber": 138,
+    "params": [
+      {
+        "name": "objectPattern",
+        "types": [
+          "{\"svNetwork\": *}"
+        ],
+        "defaultRaw": {
+          "svNetwork": null
+        },
+        "defaultValue": "{\"svNetwork\":null}"
+      }
+    ],
+    "return": {
+      "types": [
+        "{\"indexAddress\": *, \"backendAddress\": *, \"auxAddress\": *, \"lookupAddress\": *, \"resolverAddress\": *, \"communityAuctionAddress\": *, \"delegationAddress\": *, \"paymentsAddress\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 92,
+    "kind": "function",
+    "name": "weiToCents",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~weiToCents",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{weiToCents}",
+    "description": null,
+    "lineNumber": 154,
+    "undocument": true,
+    "params": [
+      {
+        "name": "objectPattern",
+        "types": [
+          "{\"payments\": *}"
+        ],
+        "defaultRaw": {
+          "payments": null
+        },
+        "defaultValue": "{\"payments\":null}"
+      },
+      {
+        "name": "wei",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 93,
+    "kind": "function",
+    "name": "getCommunityBallotPrice",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~getCommunityBallotPrice",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{getCommunityBallotPrice}",
+    "description": null,
+    "lineNumber": 158,
+    "undocument": true,
+    "params": [
+      {
+        "name": "objectPattern",
+        "types": [
+          "{\"payments\": *}"
+        ],
+        "defaultRaw": {
+          "payments": null
+        },
+        "defaultValue": "{\"payments\":null}"
+      },
+      {
+        "name": "democHash",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 94,
+    "kind": "function",
+    "name": "checkIfAddressIsEditor",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~checkIfAddressIsEditor",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{checkIfAddressIsEditor}",
+    "description": null,
+    "lineNumber": 162,
+    "undocument": true,
+    "params": [
+      {
+        "name": "objectPattern",
+        "types": [
+          "{\"svNetwork\": *}"
+        ],
+        "defaultRaw": {
+          "svNetwork": null
+        },
+        "defaultValue": "{\"svNetwork\":null}"
+      },
+      {
+        "name": "objectPattern1",
+        "types": [
+          "{\"userAddress\": *, \"democHash\": *}"
+        ],
+        "defaultRaw": {
+          "userAddress": null,
+          "democHash": null
+        },
+        "defaultValue": "{\"userAddress\":null,\"democHash\":null}"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 95,
+    "kind": "function",
+    "name": "getCurrentGasPrice",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.js~getCurrentGasPrice",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{getCurrentGasPrice}",
+    "description": null,
+    "lineNumber": 168,
+    "undocument": true,
+    "params": [],
+    "return": {
+      "types": [
+        "{\"safeLow\": *, \"average\": *, \"fast\": *, \"fastest\": *}"
+      ]
+    }
+  },
+  {
+    "__docId__": 96,
+    "kind": "function",
+    "name": "checkBallotHashBSpec",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/light.js~checkBallotHashBSpec",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{checkBallotHashBSpec}",
+    "description": null,
+    "lineNumber": 180,
+    "undocument": true,
+    "params": [
+      {
+        "name": "ballotSpec",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "assertSpecHash",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "boolean"
+      ]
+    }
+  },
+  {
+    "__docId__": 97,
+    "kind": "function",
+    "name": "checkBallotHashGBallot",
+    "memberof": "src/light.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/light.js~checkBallotHashGBallot",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.js",
+    "importStyle": "{checkBallotHashGBallot}",
+    "description": null,
+    "lineNumber": 191,
+    "undocument": true,
+    "params": [
+      {
+        "name": "ballotObject",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 98,
+    "kind": "file",
+    "name": "src/utils.js",
+    "content": "\nconst R = require('ramda');\nconst BN = require('bn.js');\nconst assert = require('assert');\n\n\nconst bb = require('./ballotBox');\n\n\n/**\n * This will take an Ethereum hex string (or a normal hex string) and\n * output a normal hex string (no '0x' header) or throw an error on a\n * bad hex string.\n *\n * @param {string} hex\n *\n * @returns {string}\n *  the hex string.\n */\nexport const cleanEthHex = hex => {\n    if (hex === \"0x0\") {\n        return \"00\";\n    }\n\n    // hex must be even - only exception above\n    if (hex.length % 2 !== 0) {\n        throw Error(`Bad hex string: ${hex}`);\n    }\n\n    // this covers the case hex==\"0x\" => \"\"\n    if (hex.slice(0, 2) === \"0x\") {\n        return hex.slice(2);\n    }\n\n    return hex;\n}\n\n\n/**\n * This compares ethereum addresses (taking into account case, etc)\n *\n * @param {string} addr1\n * @param {string} addr2\n *\n * @returns {bool}\n */\nexport const ethAddrEq = (addr1, addr2) => {\n    const _clean = a => module.exports.cleanEthHex(a).toLowerCase()\n    // throw a length check in there to ensure we have valid addresses\n    return _clean(addr1) === _clean(addr2) && addr1.length === 42\n}\n\n\nexport const mkPacked = bb.mkPacked;\nexport const mkSubmissionBits = bb.mkSubmissionBits;\n\n\n// this is from the bech32 spec (Bitcoin)\nconst B32_ALPHA = \"qpzry9x8gf2tvdw0s3jn54khce6mua7l\";\nconst toAlphabet = arr => {\n    ret = \"\";\n    for (let i = 0; i < arr.length; i++) {\n        ret += B32_ALPHA.charAt(arr[i]);\n    }\n    return ret;\n}\n\n\n/**\n * This will convert a hex string to Base32 in the bech32 format WITHOUT a checksum.\n *\n * @param {string} hex\n *  The hex string to convert to Base32 - can be an EthHex or plain hex string.\n *\n * @returns {string}\n *  The Base32 version of the hex string.\n */\nexport const hexToBase32 = hex => {\n    const _hex = cleanEthHex(hex);\n\n    const buf = Buffer.from(_hex, 'hex');\n    const digits = [0];\n    let digitlength = 1;\n\n    let carry;\n    for (let i = 0; i < buf.length; ++i) {\n        carry = buf[i];\n        for (let j = 0; j < digitlength; ++j) {\n            carry += digits[j] * 256;\n            digits[j] = carry % 32;\n            carry = (carry / 32) | 0;\n        }\n\n        while (carry > 0) {\n            digits[digitlength] = carry % 32;\n            digitlength++;\n            carry = (carry / 32) | 0;\n        }\n    }\n\n    return toAlphabet(R.reverse(digits.slice(0,digitlength)));\n}\n",
+    "static": true,
+    "longname": "/Users/maxkaye/src/sv/lib/src/utils.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 99,
+    "kind": "variable",
+    "name": "R",
+    "memberof": "src/utils.js",
+    "static": true,
+    "longname": "src/utils.js~R",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/utils.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 2,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 100,
+    "kind": "variable",
+    "name": "BN",
+    "memberof": "src/utils.js",
+    "static": true,
+    "longname": "src/utils.js~BN",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/utils.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 101,
+    "kind": "variable",
+    "name": "assert",
+    "memberof": "src/utils.js",
+    "static": true,
+    "longname": "src/utils.js~assert",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/utils.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 4,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 102,
+    "kind": "variable",
+    "name": "bb",
+    "memberof": "src/utils.js",
+    "static": true,
+    "longname": "src/utils.js~bb",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/utils.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 7,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 103,
+    "kind": "function",
+    "name": "cleanEthHex",
+    "memberof": "src/utils.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/utils.js~cleanEthHex",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/utils.js",
+    "importStyle": "{cleanEthHex}",
+    "description": "This will take an Ethereum hex string (or a normal hex string) and\noutput a normal hex string (no '0x' header) or throw an error on a\nbad hex string.",
+    "lineNumber": 20,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string}\n the hex string."
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "hex",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "the hex string."
+    }
+  },
+  {
+    "__docId__": 104,
+    "kind": "function",
+    "name": "ethAddrEq",
+    "memberof": "src/utils.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/utils.js~ethAddrEq",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/utils.js",
+    "importStyle": "{ethAddrEq}",
+    "description": "This compares ethereum addresses (taking into account case, etc)",
+    "lineNumber": 47,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{bool}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "addr1",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "addr2",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "bool"
+      ],
+      "spread": false,
+      "description": ""
+    }
+  },
+  {
+    "__docId__": 105,
+    "kind": "variable",
+    "name": "mkPacked",
+    "memberof": "src/utils.js",
+    "static": true,
+    "longname": "src/utils.js~mkPacked",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/utils.js",
+    "importStyle": "{mkPacked}",
+    "description": null,
+    "lineNumber": 54,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 106,
+    "kind": "variable",
+    "name": "mkSubmissionBits",
+    "memberof": "src/utils.js",
+    "static": true,
+    "longname": "src/utils.js~mkSubmissionBits",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/utils.js",
+    "importStyle": "{mkSubmissionBits}",
+    "description": null,
+    "lineNumber": 55,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 107,
+    "kind": "variable",
+    "name": "B32_ALPHA",
+    "memberof": "src/utils.js",
+    "static": true,
+    "longname": "src/utils.js~B32_ALPHA",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/utils.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 59,
+    "undocument": true,
+    "type": {
+      "types": [
+        "string"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 108,
+    "kind": "function",
+    "name": "toAlphabet",
+    "memberof": "src/utils.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/utils.js~toAlphabet",
+    "access": "public",
+    "export": false,
+    "importPath": "sv-lib/src/utils.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 60,
+    "undocument": true,
+    "params": [
+      {
+        "name": "arr",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 109,
+    "kind": "function",
+    "name": "hexToBase32",
+    "memberof": "src/utils.js",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/utils.js~hexToBase32",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/utils.js",
+    "importStyle": "{hexToBase32}",
+    "description": "This will convert a hex string to Base32 in the bech32 format WITHOUT a checksum.",
+    "lineNumber": 78,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{string}\n The Base32 version of the hex string."
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "hex",
+        "description": "The hex string to convert to Base32 - can be an EthHex or plain hex string."
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": "The Base32 version of the hex string."
+    }
+  },
+  {
+    "kind": "index",
+    "content": "# sv-lib\n\nLibrary for supporting SecureVote Light apps\n\n## Usage\n\n`const SV = require('sv-lib');`\n\n### `SV.utils`\n\n`cleanEthHex`\n\nTakes a string that should be hex, and removes the `0x` header if present.\n\n`hexToBase32`\n\nTakes a hex string and returns the base32 conversion using the alphabet from the `bech32` standard; though doesn't include a checksum.\nThis is used in serializing democracy hash prefixes.\n\n**Note: does not conform to bech32 standard**\n\n### `SV.ballotBox`\n\n`flags`\n\nAn object with keys corresponding to the names for various flags. All flags are a power of 2 (so can be combined via bitwise OR).\n\n`mkPacked`\n\nTakes startTime, endTime, and submissionBits (should all be JS ints) and packs them for the SV Light Ballot Box.\n\n`mkSubmissionBits`\n\nTakes an array of flags (see SV.ballotBox.flags) and returns the submission bits. Also throws errors on badly constructed flags.\n\n`mkSignedBallotForProxy`\n\nTakes `ballotId`, `sequence`, `voteData`, `extra`, `privateKey`, and `opts = {}` and returns `{proxyReq, extra}` in the format required for `BBFarm.submitProxyVote(proxyReq, extra)`.\n\nthe `opts` param is optional.\n\n`genRange3VoteData`\n\nTakes an array of votes in range `[-3,3]` and returns a `bytes32` eth hex string (suitable for using directly with web3 Contracts)\n\n### `SV.const`\n\nUtility Constants:\n\n* `zeroAddr` - address that's all zeros\n* `zeroHash` - a `bytes32` string that's all zeros\n",
+    "longname": "/Users/maxkaye/src/sv/lib/README.md",
+    "name": "./README.md",
+    "static": true,
+    "access": "public"
+  },
+  {
+    "kind": "packageJSON",
+    "content": "{\n  \"name\": \"sv-lib\",\n  \"version\": \"0.1.9\",\n  \"description\": \"SecureVote Light supporting functionality\",\n  \"main\": \"src/index.js\",\n  \"homepage\": \"https://github.com/secure-vote/sv-lib#readme\",\n  \"author\": {\n    \"name\": \"Max Kaye\",\n    \"email\": \"max@secure.vote\"\n  },\n  \"bugs\": {\n    \"url\": \"https://github.com/secure-vote/sv-lib/issues\"\n  },\n  \"bundleDependencies\": false,\n  \"dependencies\": {\n    \"assert\": \"^1.4.1\",\n    \"axios\": \"^0.18.0\",\n    \"bs58\": \"^4.0.1\",\n    \"colors\": \"^1.3.0\",\n    \"eth-ens-namehash\": \"^2.0.8\",\n    \"eth-lib\": \"^0.2.8\",\n    \"ethereumjs-util\": \"^5.2.0\",\n    \"ramda\": \"^0.25.0\",\n    \"sha256\": \"^0.2.0\",\n    \"web3\": \"^1.0.0-beta.34\",\n    \"web3-eth-abi\": \"^1.0.0-beta.34\",\n    \"web3-eth-accounts\": \"^1.0.0-beta.34\",\n    \"web3-utils\": \"^1.0.0-beta.34\"\n  },\n  \"deprecated\": false,\n  \"keywords\": [\n    \"SecureVote\",\n    \"voting\",\n    \"crypto\",\n    \"blockchain\"\n  ],\n  \"license\": \"UNLICENSED\",\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git+https://github.com/secure-vote/sv-lib.git\"\n  },\n  \"devDependencies\": {\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-ecmascript-proposal-plugin\": \"^1.0.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"jest\": \"^23.4.1\",\n    \"minami\": \"^1.2.3\",\n    \"typescript\": \"^2.9.1\"\n  },\n  \"scripts\": {\n    \"test\": \"jest\",\n    \"docs\": \"rm -r docs && esdoc\"\n  }\n}\n",
+    "longname": "/Users/maxkaye/src/sv/lib/package.json",
+    "name": "package.json",
+    "static": true,
+    "access": "public"
+  }
+]
