@@ -126,3 +126,46 @@ module.exports.mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, pr
         extra
     }
 }
+
+/**
+ * Prepares the transaction data required from an array of votes
+ *
+ * @param {array} votesArray
+ *  Takes an array of numbers which represent the votes to be transformed
+ *  Format: [1, 2, -1]
+ *
+ * @returns {string}
+ *  Returns a string of the vote data
+ */
+module.exports.generateBallotTxData = votesArray => {
+  // Offset the votes and push them into a new array
+  let offsetVoteValues = [];
+  for (let i = 0; i < votesArray.length; i++) {
+    const nonOffsetValue = votesArray[i];
+    const offsetValue = nonOffsetValue + 3;
+    offsetVoteValues.push(offsetValue);
+  }
+
+  // Create an array of binary votes from the
+  let binaryArray = [];
+  for (var i = 0; i < offsetVoteValues.length; i++) {
+    const offsetValueForBinary = offsetVoteValues[i];
+    const unpaddedBinary = (offsetValueForBinary >>> 0).toString(2);
+    const paddedBinary = R.join('', R.repeat('0', 3 - unpaddedBinary.length)) + unpaddedBinary;
+    // let binaryValue = binaryOffset[offsetValueForBinary]
+    binaryArray.push(paddedBinary);
+  }
+  // Concatenate the votes
+  const binVotesUnpadded = R.join('', binaryArray);
+  // Pad with 0's
+  const binaryVotes = binVotesUnpadded + R.join('', R.repeat('0', 32 - binVotesUnpadded.length));
+  // Convert to bytes
+  const voteBytes = R.map(bStr => parseInt(bStr, 2), R.splitEvery(8, binaryVotes));
+
+  const delegateAddress = '0x0000000000000000000000000000000000000000';
+  const delegatePrefix = R.take(14 * 2, R.drop(2, delegateAddress));
+  const ballotHexString = Array.prototype.map.call(new Uint8Array(voteBytes), x => ('00' + x.toString(16)).slice(-2)).join('');
+  const ballotPlaintext = '0x' + ballotHexString + delegatePrefix;
+
+  return ballotPlaintext;
+};
