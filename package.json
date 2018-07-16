@@ -40,6 +40,15 @@
     "url": "git+https://github.com/secure-vote/sv-lib.git"
   },
   "devDependencies": {
+    "esdoc": "^1.1.0",
+    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
+    "esdoc-standard-plugin": "^1.0.0",
+    "jest": "^23.4.1",
+    "minami": "^1.2.3",
     "typescript": "^2.9.1"
+  },
+  "scripts": {
+    "test": "jest",
+    "docs": "rm -r docs && esdoc"
   }
 }

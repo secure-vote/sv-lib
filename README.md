@@ -39,6 +39,10 @@ Takes `ballotId`, `sequence`, `voteData`, `extra`, `privateKey`, and `opts = {}`
 
 the `opts` param is optional.
 
+`genRange3VoteData`
+
+Takes an array of votes in range `[-3,3]` and returns a `bytes32` eth hex string (suitable for using directly with web3 Contracts)
+
 ### `SV.const`
 
 Utility Constants:

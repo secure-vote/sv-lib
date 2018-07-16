@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/ballotBox.js | sv-lib</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="SecureVote Light supporting functionality"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="sv-lib"><meta property="twitter:description" content="SecureVote Light supporting functionality"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/secure-vote/sv-lib"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkPacked">mkPacked</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSignedBallotForProxy">mkSignedBallotForProxy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSubmissionBits">mkSubmissionBits</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethSignHash">ethSignHash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hashMsgRaw">hashMsgRaw</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashBSpec">checkBallotHashBSpec</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashGBallot">checkBallotHashGBallot</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkIfAddressIsEditor">checkIfAddressIsEditor</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBackendAddress">getBackendAddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBallotObjectFromIpfs">getBallotObjectFromIpfs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBallotObjectFromS3">getBallotObjectFromS3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBallotSpec">getBallotSpec</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCommunityBallotPrice">getCommunityBallotPrice</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getContractAddresses">getContractAddresses</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCurrentGasPrice">getCurrentGasPrice</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocBallots">getDemocBallots</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocInfo">getDemocInfo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocNthBallot">getDemocNthBallot</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initializeSvLight">initializeSvLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resolveEnsAddress">resolveEnsAddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-weiToCents">weiToCents</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cleanEthHex">cleanEthHex</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethAddrEq">ethAddrEq</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexToBase32">hexToBase32</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-flags">flags</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-mkPacked">mkPacked</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-mkSubmissionBits">mkSubmissionBits</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/ballotBox.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const R = require(&apos;ramda&apos;)
+const BN = require(&apos;bn.js&apos;)
+const assert = require(&apos;assert&apos;)
+const web3Utils = require(&apos;web3-utils&apos;)
+const svCrypto = require(&apos;./crypto&apos;)
+const Account = require(&apos;eth-lib/lib/account&apos;)
+
+/**
+ * This object tracks the flags used for SV ballot boxes. They determine the submission
+ * methods and whether ballots are tracked as binding, official, or testing.
+ *
+ * For more info see docs.secure.vote
+ */
+export const flags = {
+    // flags on submission methods
+    USE_ETH: 2**0,
+    USE_SIGNED: 2**1,
+    USE_NO_ENC: 2**2,
+    USE_ENC: 2**3,
+
+    // other ballot settings
+    IS_BINDING: 2**13,
+    IS_OFFICIAL: 2**14,
+    USE_TESTING: 2**15,
+}
+
+
+/**
+ * Creates a packed copy of start and end times with submissionBits
+ *
+ * @param {number} start
+ *  Start time in seconds since epoch
+ * @param {number} end
+ *  End time in seconds since epoch
+ * @param {number} submissionBits
+ *  Submission bits - can be created using mkSubmissionBits
+ * @returns {BN}
+ *  Returns a `bn.js` BigNum of the packed values.
+ *  Format: [submissionBits(16)][startTime(64)][endTime(64)]
+ */
+export const mkPacked = (start, end, submissionBits) =&gt; {
+    const s = new BN(start)
+    const e = new BN(end)
+    const sb = new BN(submissionBits)
+    return sb.shln(64).add(s).shln(64).add(e);
+}
+
+
+/**
+ * This combines flags into a finished submissionBits. It also does some validation.
+ * @param {*} toCombine
+ *  Array of all submission flags to combine. See SV.ballotBox.flags for flag options.
+ *  All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining).
+ * @returns {number}
+ *  A 16 bit integer of combined flags.
+ */
+export const mkSubmissionBits = (...toCombine) =&gt; {
+    if (Array.isArray(toCombine[0]) &amp;&amp; typeof toCombine[0][0] == &quot;number&quot;) {
+        console.warn(&quot;Warning: mkSubmissionBits does not take an Array&lt;number&gt; anymore.&quot;)
+        toCombine = toCombine[0];
+    }
+
+    const toRet = R.reduce((acc, i) =&gt; acc | i, 0, toCombine);
+    assert.equal(R.all(i =&gt; typeof i == &quot;number&quot;, toCombine), true, `Bad input to mkSubmissionBits. Input is required to be an array of numbers. Instead got: ${toCombine}`);
+    assert.equal(R.all(i =&gt; i === i | 0, toCombine), true, `Bad input to mkSubmissionBits. Input was not an array of integers. Instead got: ${toCombine}`);
+    assert.equal(toRet, R.sum(toCombine), `Bad input provided to mkSubmissionBits. Logical OR and sum sanity check failed. Input was: ${toCombine}`);
+    assert.equal(toRet &lt; 2**16, true, `Submission bits must fit into a 16 bit integer (i.e. less than 2^16). Result was: ${toRet}`);
+    return toRet;
+}
+
+
+/**
+ * Take the arguments and produce web3 data fitting the `submitProxyVote` method.
+ * @param {string} ballotId
+ *  a BN.js or Hex ballotId
+ * @param {number} sequence
+ *  the sequence number to use (0 &lt; sequence &lt; 2^32)
+ * @param {string} voteData
+ *  the vote data to use, should be 32 bytes hex encoded
+ * @param {string} extra
+ *  any extra data included with the vote (such as curve25519 pubkeys)
+ * @param {string} privateKey
+ *  the privkey used to sign
+ * @param {object?} opts
+ *  options:
+ *   - skipSequenceSizeCheck: boolean (will not throw if sequence is &gt;= 2^32)
+ * @returns {object}
+ *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`
+ */
+export const mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts = {}) =&gt; {
+    if (opts.skipSequenceSizeCheck !== true)
+        assert.equal(0 &lt; sequence &amp;&amp; sequence &lt; 2**32, true, &quot;sequence number out of bounds&quot;)
+    assert.equal(web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId), true, &quot;ballotId incorrect format (either not a BN or not hex)&quot;)
+    assert.equal(web3Utils.isHexStrict(voteData), true, &quot;vote data is not hex (strict)&quot;)
+    assert.equal(web3Utils.isHexStrict(extra), true, &quot;extra param is not hex (strict)&quot;)
+
+    const _ballotId = web3Utils.isBN(ballotId) ? web3Utils.padLeft(web3Utils.toHex(ballotId), 64) : ballotId
+
+    assert.equal(_ballotId.length, 66, &apos;ballotId incorrect length&apos;)
+    assert.equal(voteData.length, 66, &apos;voteData incorrect length&apos;)
+
+    const sequenceHex = web3Utils.padLeft(web3Utils.toHex(sequence), 8)
+
+    const messageHash = web3Utils.soliditySha3( {t: &apos;bytes31&apos;, v: web3Utils.padLeft(sequenceHex, &apos;62&apos;)}
+                                              , {t: &apos;bytes32&apos;, v: _ballotId}
+                                              , {t: &apos;bytes32&apos;, v: voteData}
+                                              , {t: &apos;bytes&apos;, v: extra}
+                                              )
+
+    const {v,r,s} = svCrypto.ethSignHash(messageHash, privateKey)
+
+    const vBytes = web3Utils.hexToBytes(v)
+    const midBytes = web3Utils.hexToBytes(web3Utils.padRight(&apos;0x&apos;, 54))
+    const sequenceBytes = web3Utils.hexToBytes(sequenceHex)
+    const packed2Bytes = R.concat(vBytes, R.concat(midBytes, sequenceBytes))
+    const packed2 = web3Utils.bytesToHex(packed2Bytes)
+
+    return {
+        proxyReq:
+            [ r
+            , s
+            , packed2
+            , _ballotId
+            , voteData
+            ],
+        extra
+    }
+}
+
+/**
+ * Prepares voteData for a Range3 ballot from an array of votes
+ *
+ * @param {array} votesArray
+ *  Takes an array of numbers which represent the votes to be transformed
+ *  Format: [1, 2, -1]
+ *
+ * @returns {string}
+ *  Returns an eth hex string of the vote data
+ */
+export const genRange3VoteData = votesArray =&gt; {
+    assert.equal(R.all(v =&gt; (v | 0) === v, votesArray), true, &quot;All array elements must be defined and integers.&quot;)
+    assert.equal(R.all(v =&gt; -3 &lt;= v &amp;&amp; v &lt;= 3, votesArray), true, &quot;Votes must be in range -3 to 3.&quot;)
+    assert.equal(votesArray.length &lt;= 85, true, &quot;Too many votes; maximum capacity of 32 bytes is 85 individual items.&quot;)
+
+    // Generate list of binary encoded votes. Read bottom to top.
+    const binaryVotes = R.compose(
+        // pad to 3 bits
+        R.map(vBin =&gt; R.join(&apos;&apos;, R.repeat(&apos;0&apos;, 3 - vBin.length)) + vBin),
+        // convert votes to binary
+        R.map(v =&gt; v.toString(2)),
+        // offset votes to be in range 0,6
+        R.map(v =&gt; v + 3)
+    )(votesArray)
+
+    // check we have converted votes to bitstring representation of length 3
+    assert.equal(R.all(bVote =&gt; bVote.length == 3, binaryVotes), true, &quot;Assertion failed: all binary-encoded votes should be 3 bits long&quot;)
+
+    // create the binary voteData
+    const rawBinVotes = R.join(&apos;&apos;, binaryVotes)
+    // and pad it with 0s to length 256 (32 bytes total)
+    const binVoteData = rawBinVotes + R.join(&apos;&apos;, R.repeat(&apos;0&apos;, 32*8 - rawBinVotes.length))
+    assert.equal(binVoteData.length, 256, &quot;Assertion failed: generated voteData bit string does not have length 256&quot;)
+    // Convert to bytes
+    const voteBytes = R.map(bStr =&gt; parseInt(bStr, 2), R.splitEvery(8, binVoteData));
+
+    // check bytes are in range
+    assert.equal(R.all(vByte =&gt; 0 &lt;= vByte &amp;&amp; vByte &lt;= 255, voteBytes), true, &quot;Assertion failed: voteBytes (byte array) had a byte out of bounds (&lt;0 or &gt;255)&quot;)
+
+    // generate final hex
+    const voteData = web3Utils.bytesToHex(voteBytes)
+    assert.equal(voteData.length, 66, &quot;Assertion failed: final hex was not 66 characters long (32 bytes)&quot;)
+
+    return voteData
+};
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

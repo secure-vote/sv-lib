@@ -17,7 +17,7 @@ const bb = require('./ballotBox');
  * @returns {string}
  *  the hex string.
  */
-module.exports.cleanEthHex = hex => {
+export const cleanEthHex = hex => {
     if (hex === "0x0") {
         return "00";
     }
@@ -44,15 +44,15 @@ module.exports.cleanEthHex = hex => {
  *
  * @returns {bool}
  */
-module.exports.ethAddrEq = (addr1, addr2) => {
+export const ethAddrEq = (addr1, addr2) => {
     const _clean = a => module.exports.cleanEthHex(a).toLowerCase()
     // throw a length check in there to ensure we have valid addresses
     return _clean(addr1) === _clean(addr2) && addr1.length === 42
 }
 
 
-module.exports.mkPacked = bb.mkPacked;
-module.exports.mkSubmissionBits = bb.mkSubmissionBits;
+export const mkPacked = bb.mkPacked;
+export const mkSubmissionBits = bb.mkSubmissionBits;
 
 
 // this is from the bech32 spec (Bitcoin)
@@ -75,7 +75,7 @@ const toAlphabet = arr => {
  * @returns {string}
  *  The Base32 version of the hex string.
  */
-module.exports.hexToBase32 = hex => {
+export const hexToBase32 = hex => {
     const _hex = cleanEthHex(hex);
 
     const buf = Buffer.from(_hex, 'hex');
