@@ -33,9 +33,11 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkPacked">mkPacked</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSignedBallotForProxy">mkSignedBallotForProxy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSubmissionBits">mkSubmissionBits</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-verifySignedBallotForProxy">verifySignedBallotForProxy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getNetwork">getNetwork</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-networkName">networkName</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethSignHash">ethSignHash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethVerifySig">ethVerifySig</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hashMsgRaw">hashMsgRaw</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashBSpec">checkBallotHashBSpec</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashGBallot">checkBallotHashGBallot</a></span></span></li>
@@ -67,6 +69,28 @@
 <div class="content" data-ice="content"><h1 data-ice="title">src/ballotBox.test.ts</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const bb = require(&apos;./ballotBox&apos;)
 const _const = require(&apos;./const&apos;)
+const web3Accts = require(&apos;web3-eth-accounts&apos;)
+
+test(&apos;create and verify proxy ballots&apos;, () =&gt; {
+    const privKey = &quot;0x0100000000000000000000000000000000000000000000000000000000000000&quot;
+    const acct = web3Accts.privateKeyToAccount(privKey)
+    const {address} = acct
+
+    const proxyVote = bb.mkSignedBallotForProxy(
+        &quot;0x0000000000000000053970000000000000000000000000000000000000000000&quot;, // some ballot id
+        1, // sequence num
+        &quot;0x4000000000000000000000000000000000000000000000000000000000000000&quot;, // some voteData
+        &quot;0x&quot;, // trivial extra
+        privKey
+    )
+
+    const verificationResp = bb.verifySignedBallotForProxy(proxyVote)
+
+    expect(verificationResp.address.toLowerCase()).toEqual(address.toLowerCase())
+    expect(verificationResp.verified).toEqual(true)
+})
+
+
 
 
 test(&apos;generates correct range3 voteData&apos;, () =&gt; {

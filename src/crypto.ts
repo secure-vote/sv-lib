@@ -1,6 +1,6 @@
-const Account = require('eth-lib/lib/account');
+const Account = require("eth-lib/lib/account");
 const Hash = require("eth-lib/lib/hash");
-const web3Utils = require('web3-utils');
+const web3Utils = require("web3-utils");
 
 /**
  * Like web3.eth.accounts.hashMessage without the envelope.
@@ -15,8 +15,7 @@ export const hashMsgRaw = data => {
     const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data;
     const msgBuffer = Buffer.from(msg);
     return Hash.keccak256s(msgBuffer);
-}
-
+};
 
 /**
  * Sign a message such that it can be verified with `ecrecover`.
@@ -40,5 +39,21 @@ export const ethSignHash = (messageHash, privateKey) => {
         r: vrs[1],
         s: vrs[2],
         signature
-    }
-}
+    };
+};
+
+export /**
+ *
+ * Operates `ecrecover` over the provided signature
+ *
+ * @param {string} messageHash This should be an Ethereum HexString
+ * @param {string[]} [v, r, s] Components for the secp256k1 signature
+ * @returns {{verified: bool, address: EthAddress}}
+ */
+const ethVerifySig = (messageHash: string, [v, r, s]: string[]) => {
+    const address = Account.recover(messageHash, Account.encodeSignature([v, r, s]));
+    return {
+        verified: true,
+        address
+    };
+};

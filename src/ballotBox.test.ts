@@ -1,5 +1,26 @@
 const bb = require('./ballotBox')
 const _const = require('./const')
+const Account = require('eth-lib/lib/account')
+
+
+test('create and verify proxy ballots', () => {
+    const privKey = "0x0100000000000000000000000000000000000000000000000000000000000000"
+    const acct = Account.fromPrivate(privKey)
+    const {address} = acct
+
+    const proxyVote = bb.mkSignedBallotForProxy(
+        "0x0000000000000000053970000000000000000000000000000000000000000000", // some ballot id
+        1, // sequence num
+        "0x4000000000000000000000000000000000000000000000000000000000000000", // some voteData
+        "0x", // trivial extra
+        privKey
+    )
+
+    const verificationResp = bb.verifySignedBallotForProxy(proxyVote)
+
+    expect(verificationResp.address.toLowerCase()).toEqual(address.toLowerCase())
+    expect(verificationResp.verified).toEqual(true)
+})
 
 
 test('generates correct range3 voteData', () => {

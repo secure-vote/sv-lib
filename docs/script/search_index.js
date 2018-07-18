@@ -36,6 +36,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "sv-lib/src/crypto.ts~ethverifysig",
+    "function/index.html#static-function-ethVerifySig",
+    "<span>ethVerifySig</span> <span class=\"search-result-import-path\">sv-lib/src/crypto.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/ballotbox.ts~flags",
     "variable/index.html#static-variable-flags",
     "<span>flags</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
@@ -165,6 +171,12 @@ window.esdocSearchIndex = [
     "sv-lib/src/light.ts~resolveensaddress",
     "function/index.html#static-function-resolveEnsAddress",
     "<span>resolveEnsAddress</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/ballotbox.ts~verifysignedballotforproxy",
+    "function/index.html#static-function-verifySignedBallotForProxy",
+    "<span>verifySignedBallotForProxy</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
     "function"
   ],
   [
@@ -501,6 +513,12 @@ window.esdocSearchIndex = [
     "src/light.ts",
     "file/src/light.ts.html",
     "src/light.ts",
+    "file"
+  ],
+  [
+    "src/types.ts",
+    "file/src/types.ts.html",
+    "src/types.ts",
     "file"
   ],
   [

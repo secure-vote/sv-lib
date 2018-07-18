@@ -33,9 +33,11 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkPacked">mkPacked</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSignedBallotForProxy">mkSignedBallotForProxy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSubmissionBits">mkSubmissionBits</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-verifySignedBallotForProxy">verifySignedBallotForProxy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getNetwork">getNetwork</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-networkName">networkName</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethSignHash">ethSignHash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethVerifySig">ethVerifySig</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hashMsgRaw">hashMsgRaw</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashBSpec">checkBallotHashBSpec</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashGBallot">checkBallotHashGBallot</a></span></span></li>
@@ -65,9 +67,9 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/crypto.ts</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const Account = require(&apos;eth-lib/lib/account&apos;);
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const Account = require(&quot;eth-lib/lib/account&quot;);
 const Hash = require(&quot;eth-lib/lib/hash&quot;);
-const web3Utils = require(&apos;web3-utils&apos;);
+const web3Utils = require(&quot;web3-utils&quot;);
 
 /**
  * Like web3.eth.accounts.hashMessage without the envelope.
@@ -82,8 +84,7 @@ export const hashMsgRaw = data =&gt; {
     const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data;
     const msgBuffer = Buffer.from(msg);
     return Hash.keccak256s(msgBuffer);
-}
-
+};
 
 /**
  * Sign a message such that it can be verified with `ecrecover`.
@@ -107,8 +108,24 @@ export const ethSignHash = (messageHash, privateKey) =&gt; {
         r: vrs[1],
         s: vrs[2],
         signature
-    }
-}
+    };
+};
+
+export /**
+ *
+ * Operates `ecrecover` over the provided signature
+ *
+ * @param {string} messageHash This should be an Ethereum HexString
+ * @param {string[]} [v, r, s] Components for the secp256k1 signature
+ * @returns {{verified: bool, address: EthAddress}}
+ */
+const ethVerifySig = (messageHash: string, [v, r, s]: string[]) =&gt; {
+    const address = Account.recover(messageHash, Account.encodeSignature([v, r, s]));
+    return {
+        verified: true,
+        address
+    };
+};
 </code></pre>
 
 </div>
