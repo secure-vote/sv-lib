@@ -69,11 +69,12 @@
 <div class="content" data-ice="content"><h1 data-ice="title">src/ballotBox.test.ts</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const bb = require(&apos;./ballotBox&apos;)
 const _const = require(&apos;./const&apos;)
-const web3Accts = require(&apos;web3-eth-accounts&apos;)
+const Account = require(&apos;eth-lib/lib/account&apos;)
+
 
 test(&apos;create and verify proxy ballots&apos;, () =&gt; {
     const privKey = &quot;0x0100000000000000000000000000000000000000000000000000000000000000&quot;
-    const acct = web3Accts.privateKeyToAccount(privKey)
+    const acct = Account.fromPrivate(privKey)
     const {address} = acct
 
     const proxyVote = bb.mkSignedBallotForProxy(
@@ -89,8 +90,6 @@ test(&apos;create and verify proxy ballots&apos;, () =&gt; {
     expect(verificationResp.address.toLowerCase()).toEqual(address.toLowerCase())
     expect(verificationResp.verified).toEqual(true)
 })
-
-
 
 
 test(&apos;generates correct range3 voteData&apos;, () =&gt; {
