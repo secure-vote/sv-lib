@@ -1,8 +1,9 @@
 {
   "name": "sv-lib",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "SecureVote Light supporting functionality",
-  "main": "src/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "homepage": "https://github.com/secure-vote/sv-lib#readme",
   "author": {
     "name": "Max Kaye",
@@ -51,6 +52,7 @@
     "typescript": "^2.9.2"
   },
   "scripts": {
+    "dev": "tsc -w",
     "test": "jest",
     "docs": "esdoc",
     "prepublish": "tsc && yarn docs"
