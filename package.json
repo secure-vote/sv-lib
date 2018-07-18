@@ -1,6 +1,6 @@
 {
   "name": "sv-lib",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "SecureVote Light supporting functionality",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
