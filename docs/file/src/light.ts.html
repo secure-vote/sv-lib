@@ -72,21 +72,21 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/light.ts</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const ENS = require(&apos;eth-ens-namehash&apos;);
-const Constants = require(&apos;./const&apos;);
-const axios = require(&apos;axios&apos;);
-const bs58 = require(&apos;bs58&apos;);
-const sha256 = require(&apos;sha256&apos;);
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import * as ENS from &apos;eth-ens-namehash&apos;;
+import * as Constants from &apos;./const&apos;;
+import { default as axios } from &apos;axios&apos;;
+import { default as bs58 } from &apos;bs58&apos;;
+import { default as sha256 } from &apos;sha256&apos;;
 
 // Lovely ABIs
-const ResolverAbi = require(&apos;./smart_contracts/SV_ENS_Resolver.abi.json&apos;);
-const IndexAbi = require(&apos;./smart_contracts/SVLightIndex.abi.json&apos;);
-const BackendAbi = require(&apos;./smart_contracts/SVLightIndexBackend.abi.json&apos;);
-const BBFarmAbi = require(&apos;./smart_contracts/BBFarm.abi.json&apos;);
-const PaymentsAbi = require(&apos;./smart_contracts/SVPayments.abi.json&apos;);
-const AuxAbi = require(&apos;./smart_contracts/AuxAbi.abi.json&apos;);
-const AuctionAbi = require(&apos;./smart_contracts/CommAuctionIface.abi.json&apos;);
-const ERC20Abi = require(&apos;./smart_contracts/ERC20.abi.json&apos;);
+import * as ResolverAbi from &apos;./smart_contracts/SV_ENS_Resolver.abi.json&apos;
+import * as IndexAbi from &apos;./smart_contracts/SVLightIndex.abi.json&apos;
+import * as BackendAbi from &apos;./smart_contracts/SVLightIndexBackend.abi.json&apos;
+import * as BBFarmAbi from &apos;./smart_contracts/BBFarm.abi.json&apos;
+import * as PaymentsAbi from &apos;./smart_contracts/SVPayments.abi.json&apos;
+import * as AuxAbi from &apos;./smart_contracts/AuxAbi.abi.json&apos;
+import * as AuctionAbi from &apos;./smart_contracts/CommAuctionIface.abi.json&apos;
+import * as ERC20Abi from &apos;./smart_contracts/ERC20.abi.json&apos;
 
 
 export const initializeSvLight = async svConfig =&gt; {

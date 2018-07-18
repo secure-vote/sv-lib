@@ -2,7 +2,8 @@
   "name": "sv-lib",
   "version": "0.1.14",
   "description": "SecureVote Light supporting functionality",
-  "main": "dist/index.js",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.es5.js",
   "types": "dist/index.d.ts",
   "homepage": "https://github.com/secure-vote/sv-lib#readme",
   "files": [
@@ -18,6 +19,8 @@
   },
   "bundleDependencies": false,
   "dependencies": {
+    "@types/bn.js": "^4.11.1",
+    "@types/ramda": "^0.25.35",
     "assert": "^1.4.1",
     "axios": "^0.18.0",
     "bs58": "^4.0.1",
@@ -47,25 +50,76 @@
   },
   "devDependencies": {
     "@types/jest": "^23.3.0",
+    "@types/node": "^10.0.3",
+    "commitizen": "^2.9.6",
+    "coveralls": "^3.0.0",
+    "cross-env": "^5.0.1",
+    "cz-conventional-changelog": "^2.0.0",
     "esdoc": "^1.1.0",
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-standard-plugin": "^1.0.0",
+    "husky": "^0.14.0",
     "jest": "^23.4.1",
+    "lint-staged": "^7.1.3",
+    "lodash.camelcase": "^4.3.0",
     "minami": "^1.2.3",
+    "prettier": "^1.13.4",
+    "prompt": "^1.0.0",
+    "replace-in-file": "^3.0.0-beta.2",
+    "rimraf": "^2.6.1",
+    "rollup": "^0.58.0",
+    "rollup-plugin-commonjs": "^9.1.3",
+    "rollup-plugin-json": "^3.0.0",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-typescript2": "^0.15.1",
+    "semantic-release": "^15.0.0",
     "ts-jest": "^23.0.1",
-    "typescript": "^2.9.2"
+    "ts-node": "^6.0.0",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.1.0",
+    "tslint-config-standard": "^7.0.0",
+    "typedoc": "^0.11.0",
+    "typescript": "^2.9.2",
+    "validate-commit-msg": "^2.12.2"
   },
   "scripts": {
     "dev": "tsc -w",
-    "test": "jest",
     "docs": "esdoc",
-    "prepublish": "tsc && yarn docs"
+    "prepublish": "tsc && yarn docs",
+    "lint": "tslint -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
+    "prebuild": "rimraf dist",
+    "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
+    "start": "rollup -c rollup.config.ts -w",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:prod": "npm run lint && npm run test -- --coverage --no-cache",
+    "report-coverage": "cat ./coverage/lcov.info | coveralls",
+    "commit": "git-cz",
+    "semantic-release": "semantic-release",
+    "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "{src,test}/**/*.ts": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    },
+    "validate-commit-msg": {
+      "types": "conventional-commit-types",
+      "helpMessage": "Use \"npm run commit\" instead, we use conventional-changelog format :) (https://github.com/commitizen/cz-cli)"
+    }
   },
   "jest": {
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
@@ -74,9 +128,22 @@
       "json",
       "node"
     ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 95,
+        "lines": 95,
+        "statements": 95
+      }
+    },
+    "collectCoverage": true,
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/dist"
     ]
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
   }
 }

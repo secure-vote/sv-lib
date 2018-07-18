@@ -552,6 +552,12 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/typings.d.ts",
+    "file/src/typings.d.ts.html",
+    "src/typings.d.ts",
+    "file"
+  ],
+  [
     "src/utils.ts",
     "file/src/utils.ts.html",
     "src/utils.ts",

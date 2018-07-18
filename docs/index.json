@@ -1578,7 +1578,7 @@
     "__docId__": 85,
     "kind": "file",
     "name": "src/light.ts",
-    "content": "const ENS = require('eth-ens-namehash');\nconst Constants = require('./const');\nconst axios = require('axios');\nconst bs58 = require('bs58');\nconst sha256 = require('sha256');\n\n// Lovely ABIs\nconst ResolverAbi = require('./smart_contracts/SV_ENS_Resolver.abi.json');\nconst IndexAbi = require('./smart_contracts/SVLightIndex.abi.json');\nconst BackendAbi = require('./smart_contracts/SVLightIndexBackend.abi.json');\nconst BBFarmAbi = require('./smart_contracts/BBFarm.abi.json');\nconst PaymentsAbi = require('./smart_contracts/SVPayments.abi.json');\nconst AuxAbi = require('./smart_contracts/AuxAbi.abi.json');\nconst AuctionAbi = require('./smart_contracts/CommAuctionIface.abi.json');\nconst ERC20Abi = require('./smart_contracts/ERC20.abi.json');\n\n\nexport const initializeSvLight = async svConfig => {\n  const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig;\n\n  const Web3 = require('web3');\n  const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider));\n\n  const resolver = new web3.eth.Contract(ResolverAbi, ensResolver);\n\n  // const indexAddress =\n  // console.log('indexAddress :', indexAddress);\n  const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexContractName));\n  const backendAddress = await getBackendAddress({ index });\n  const backend = new web3.eth.Contract(BackendAbi, backendAddress);\n  const aux = new web3.eth.Contract(AuxAbi, auxContract);\n  const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())\n\n  return {\n    svConfig,\n    web3,\n    resolver,\n    index,\n    backend,\n    aux,\n    payments\n  };\n};\n\nexport const resolveEnsAddress = async ({ resolver }, ensName) => {\n  return await resolver.methods.addr(ENS.hash(ensName)).call();\n};\n\nexport const getBackendAddress = async ({ index }) => {\n  return await index.methods.getBackend().call();\n};\n\nexport const getDemocInfo = async ({ backend, democHash }) => {\n  return await backend.methods.getDInfo(democHash).call();\n};\n\nexport const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {\n  // Destructure and set the variables that are needed\n  const { index, backend, aux, svConfig } = svNetwork;\n  const { democHash, nthBallot } = democBallotInfo;\n  const indexAddress = index._address;\n  const backendAddress = backend._address;\n  const archiveUrl = { svConfig };\n\n  const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(backendAddress, indexAddress, democHash, nthBallot).call();\n  // console.log('bbFarmAndBallotId :', bbFarmAndBallotId);\n\n  const { id, bbFarmAddress } = bbFarmAndBallotId;\n  const userEthAddress = '0x0000000000000000000000000000000000000000';\n  const ethBallotDetails = await aux.methods.getBallotDetails(id, bbFarmAddress, userEthAddress).call();\n\n  const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash);\n  // console.log('ballotSpec :', ballotSpec);\n  // .then(x => console.log('Then called', x))\n  // .catch(x => console.log('Caught error', x));\n\n  const ballotObject = { ...bbFarmAndBallotId, ...ethBallotDetails, data: { ...ballotSpec.data } };\n\n  return ballotObject;\n};\n\nexport const getBallotSpec = async (archiveUrl, ballotSpecHash): Promise<{data: any}> => {\n  // TODO refactor to be a bit more elegant\n  return new Promise<{data: any}>((res, rej) => {\n    let done = false;\n    const doRes = obj => {\n      if (!done) {\n        done = true;\n        res(obj);\n      }\n    };\n    getBallotObjectFromIpfs(ballotSpecHash).then(doRes);\n    setTimeout(() => {\n      if (!done) {\n        getBallotObjectFromS3(archiveUrl, ballotSpecHash)\n          .then(doRes)\n          .catch(rej);\n      }\n    }, 3500);\n  });\n};\n\nexport const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) => {\n  return axios.get(archiveUrl + ballotSpecHash + '.json');\n};\n\nexport const getBallotObjectFromIpfs = async ballotSpecHash => {\n  const ipfsUrl = 'https://ipfs.infura.io/api/v0/block/get?arg=';\n  const cidHex = '1220' + ballotSpecHash.substr(2);\n  const bytes = Buffer.from(cidHex, 'hex');\n  const cid = bs58.encode(bytes);\n  return await axios.get(ipfsUrl + cid);\n};\n\n// Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array\nexport const getDemocBallots = async ({ svNetwork, democHash }) => {\n  const { backend } = svNetwork;\n  const democInfo = await getDemocInfo({ backend, democHash });\n\n  // Throw an error if the democ info is not correct\n  const {erc20, owner} = democInfo\n  if (owner === '0x0000000000000000000000000000000000000000') {\n    throw new Error('Democracy Hash does not resolve to a democracy')\n  }\n\n  // TODO - Work out where / how to push an errored ballot\n  // Loop through and get all the ballots\n  const numBallots = democInfo.nBallots;\n  const ballotsArray = [];\n  for (let i = 0; i < numBallots; i++) {\n    ballotsArray[i] = await getDemocNthBallot({ svNetwork }, { democHash: democHash, nthBallot: i });\n  }\n\n  return ballotsArray;\n};\n\n/** Takes in the svNetwork object and returns all relevant addresses */\nexport const getContractAddresses = async ({svNetwork}) => {\n  const {index, resolver, backend, aux, svConfig} = svNetwork\n  const { delegationContractName, lookupAddress } = svConfig\n\n  return {\n    indexAddress: index._address,\n    backendAddress: backend._address,\n    auxAddress: aux._address,\n    lookupAddress: lookupAddress,\n    resolverAddress: resolver._address,\n    communityAuctionAddress: await index.methods.getCommAuction().call(),\n    delegationAddress: await resolveEnsAddress({ resolver }, delegationContractName),\n    paymentsAddress: await index.methods.getPayments().call(),\n  }\n}\n\nexport const weiToCents = async ({payments}, wei) => {\n  return await payments.methods.weiToCents(wei).call()\n}\n\nexport const getCommunityBallotPrice = async ({payments}, democHash) => {\n  return await payments.methods.getNextPrice(democHash).call()\n}\n\nexport const checkIfAddressIsEditor = async ({ svNetwork }, { userAddress, democHash }) => {\n  const {backend} = svNetwork\n  return await backend.methods.isDEditor(democHash, userAddress).call();\n};\n\n// Checks the current ethereum gas price and returns a couple of values\nexport const getCurrentGasPrice = async () => {\n  const gasStationInfo = await axios.get('https://ethgasstation.info/json/ethgasAPI.json')\n  const {data} = gasStationInfo\n\n  return {\n    safeLow: data.safeLow / 10,\n    average: data.average / 10,\n    fast: data.fast / 10,\n    fastest: data.fastest / 10,\n  }\n}\n// Checks the ballot hash against the ballot content\nexport const checkBallotHashBSpec = (ballotSpec, assertSpecHash) => {\n    let contentHash = '0x' + sha256(JSON.stringify(ballotSpec, null, 2));\n    if (assertSpecHash === contentHash) {\n      return true;\n    } else {\n      return false;\n    }\n}\n\n// Checks the ballot hash against a ballot global ballot object\n// Does this by destructuring the specHash and data out of it\nexport const checkBallotHashGBallot = (ballotObject) => {\n  const {data, specHash} = ballotObject\n  return checkBallotHashBSpec(data, specHash)\n}\n",
+    "content": "import * as ENS from 'eth-ens-namehash';\nimport * as Constants from './const';\nimport { default as axios } from 'axios';\nimport { default as bs58 } from 'bs58';\nimport { default as sha256 } from 'sha256';\n\n// Lovely ABIs\nimport * as ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'\nimport * as IndexAbi from './smart_contracts/SVLightIndex.abi.json'\nimport * as BackendAbi from './smart_contracts/SVLightIndexBackend.abi.json'\nimport * as BBFarmAbi from './smart_contracts/BBFarm.abi.json'\nimport * as PaymentsAbi from './smart_contracts/SVPayments.abi.json'\nimport * as AuxAbi from './smart_contracts/AuxAbi.abi.json'\nimport * as AuctionAbi from './smart_contracts/CommAuctionIface.abi.json'\nimport * as ERC20Abi from './smart_contracts/ERC20.abi.json'\n\n\nexport const initializeSvLight = async svConfig => {\n  const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig;\n\n  const Web3 = require('web3');\n  const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider));\n\n  const resolver = new web3.eth.Contract(ResolverAbi, ensResolver);\n\n  // const indexAddress =\n  // console.log('indexAddress :', indexAddress);\n  const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexContractName));\n  const backendAddress = await getBackendAddress({ index });\n  const backend = new web3.eth.Contract(BackendAbi, backendAddress);\n  const aux = new web3.eth.Contract(AuxAbi, auxContract);\n  const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())\n\n  return {\n    svConfig,\n    web3,\n    resolver,\n    index,\n    backend,\n    aux,\n    payments\n  };\n};\n\nexport const resolveEnsAddress = async ({ resolver }, ensName) => {\n  return await resolver.methods.addr(ENS.hash(ensName)).call();\n};\n\nexport const getBackendAddress = async ({ index }) => {\n  return await index.methods.getBackend().call();\n};\n\nexport const getDemocInfo = async ({ backend, democHash }) => {\n  return await backend.methods.getDInfo(democHash).call();\n};\n\nexport const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {\n  // Destructure and set the variables that are needed\n  const { index, backend, aux, svConfig } = svNetwork;\n  const { democHash, nthBallot } = democBallotInfo;\n  const indexAddress = index._address;\n  const backendAddress = backend._address;\n  const archiveUrl = { svConfig };\n\n  const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(backendAddress, indexAddress, democHash, nthBallot).call();\n  // console.log('bbFarmAndBallotId :', bbFarmAndBallotId);\n\n  const { id, bbFarmAddress } = bbFarmAndBallotId;\n  const userEthAddress = '0x0000000000000000000000000000000000000000';\n  const ethBallotDetails = await aux.methods.getBallotDetails(id, bbFarmAddress, userEthAddress).call();\n\n  const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash);\n  // console.log('ballotSpec :', ballotSpec);\n  // .then(x => console.log('Then called', x))\n  // .catch(x => console.log('Caught error', x));\n\n  const ballotObject = { ...bbFarmAndBallotId, ...ethBallotDetails, data: { ...ballotSpec.data } };\n\n  return ballotObject;\n};\n\nexport const getBallotSpec = async (archiveUrl, ballotSpecHash): Promise<{data: any}> => {\n  // TODO refactor to be a bit more elegant\n  return new Promise<{data: any}>((res, rej) => {\n    let done = false;\n    const doRes = obj => {\n      if (!done) {\n        done = true;\n        res(obj);\n      }\n    };\n    getBallotObjectFromIpfs(ballotSpecHash).then(doRes);\n    setTimeout(() => {\n      if (!done) {\n        getBallotObjectFromS3(archiveUrl, ballotSpecHash)\n          .then(doRes)\n          .catch(rej);\n      }\n    }, 3500);\n  });\n};\n\nexport const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) => {\n  return axios.get(archiveUrl + ballotSpecHash + '.json');\n};\n\nexport const getBallotObjectFromIpfs = async ballotSpecHash => {\n  const ipfsUrl = 'https://ipfs.infura.io/api/v0/block/get?arg=';\n  const cidHex = '1220' + ballotSpecHash.substr(2);\n  const bytes = Buffer.from(cidHex, 'hex');\n  const cid = bs58.encode(bytes);\n  return await axios.get(ipfsUrl + cid);\n};\n\n// Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array\nexport const getDemocBallots = async ({ svNetwork, democHash }) => {\n  const { backend } = svNetwork;\n  const democInfo = await getDemocInfo({ backend, democHash });\n\n  // Throw an error if the democ info is not correct\n  const {erc20, owner} = democInfo\n  if (owner === '0x0000000000000000000000000000000000000000') {\n    throw new Error('Democracy Hash does not resolve to a democracy')\n  }\n\n  // TODO - Work out where / how to push an errored ballot\n  // Loop through and get all the ballots\n  const numBallots = democInfo.nBallots;\n  const ballotsArray = [];\n  for (let i = 0; i < numBallots; i++) {\n    ballotsArray[i] = await getDemocNthBallot({ svNetwork }, { democHash: democHash, nthBallot: i });\n  }\n\n  return ballotsArray;\n};\n\n/** Takes in the svNetwork object and returns all relevant addresses */\nexport const getContractAddresses = async ({svNetwork}) => {\n  const {index, resolver, backend, aux, svConfig} = svNetwork\n  const { delegationContractName, lookupAddress } = svConfig\n\n  return {\n    indexAddress: index._address,\n    backendAddress: backend._address,\n    auxAddress: aux._address,\n    lookupAddress: lookupAddress,\n    resolverAddress: resolver._address,\n    communityAuctionAddress: await index.methods.getCommAuction().call(),\n    delegationAddress: await resolveEnsAddress({ resolver }, delegationContractName),\n    paymentsAddress: await index.methods.getPayments().call(),\n  }\n}\n\nexport const weiToCents = async ({payments}, wei) => {\n  return await payments.methods.weiToCents(wei).call()\n}\n\nexport const getCommunityBallotPrice = async ({payments}, democHash) => {\n  return await payments.methods.getNextPrice(democHash).call()\n}\n\nexport const checkIfAddressIsEditor = async ({ svNetwork }, { userAddress, democHash }) => {\n  const {backend} = svNetwork\n  return await backend.methods.isDEditor(democHash, userAddress).call();\n};\n\n// Checks the current ethereum gas price and returns a couple of values\nexport const getCurrentGasPrice = async () => {\n  const gasStationInfo = await axios.get('https://ethgasstation.info/json/ethgasAPI.json')\n  const {data} = gasStationInfo\n\n  return {\n    safeLow: data.safeLow / 10,\n    average: data.average / 10,\n    fast: data.fast / 10,\n    fastest: data.fastest / 10,\n  }\n}\n// Checks the ballot hash against the ballot content\nexport const checkBallotHashBSpec = (ballotSpec, assertSpecHash) => {\n    let contentHash = '0x' + sha256(JSON.stringify(ballotSpec, null, 2));\n    if (assertSpecHash === contentHash) {\n      return true;\n    } else {\n      return false;\n    }\n}\n\n// Checks the ballot hash against a ballot global ballot object\n// Does this by destructuring the specHash and data out of it\nexport const checkBallotHashGBallot = (ballotObject) => {\n  const {data, specHash} = ballotObject\n  return checkBallotHashBSpec(data, specHash)\n}\n",
     "static": true,
     "longname": "/Users/maxkaye/src/sv/lib/src/light.ts",
     "access": "public",
@@ -1587,279 +1587,6 @@
   },
   {
     "__docId__": 86,
-    "kind": "variable",
-    "name": "ENS",
-    "memberof": "src/light.ts",
-    "static": true,
-    "longname": "src/light.ts~ENS",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/light.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 1,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 87,
-    "kind": "variable",
-    "name": "Constants",
-    "memberof": "src/light.ts",
-    "static": true,
-    "longname": "src/light.ts~Constants",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/light.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 2,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 88,
-    "kind": "variable",
-    "name": "axios",
-    "memberof": "src/light.ts",
-    "static": true,
-    "longname": "src/light.ts~axios",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/light.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 3,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 89,
-    "kind": "variable",
-    "name": "bs58",
-    "memberof": "src/light.ts",
-    "static": true,
-    "longname": "src/light.ts~bs58",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/light.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 4,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 90,
-    "kind": "variable",
-    "name": "sha256",
-    "memberof": "src/light.ts",
-    "static": true,
-    "longname": "src/light.ts~sha256",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/light.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 5,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 91,
-    "kind": "variable",
-    "name": "ResolverAbi",
-    "memberof": "src/light.ts",
-    "static": true,
-    "longname": "src/light.ts~ResolverAbi",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/light.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 7,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 92,
-    "kind": "variable",
-    "name": "IndexAbi",
-    "memberof": "src/light.ts",
-    "static": true,
-    "longname": "src/light.ts~IndexAbi",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/light.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 8,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 93,
-    "kind": "variable",
-    "name": "BackendAbi",
-    "memberof": "src/light.ts",
-    "static": true,
-    "longname": "src/light.ts~BackendAbi",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/light.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 9,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 94,
-    "kind": "variable",
-    "name": "BBFarmAbi",
-    "memberof": "src/light.ts",
-    "static": true,
-    "longname": "src/light.ts~BBFarmAbi",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/light.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 10,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 95,
-    "kind": "variable",
-    "name": "PaymentsAbi",
-    "memberof": "src/light.ts",
-    "static": true,
-    "longname": "src/light.ts~PaymentsAbi",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/light.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 11,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 96,
-    "kind": "variable",
-    "name": "AuxAbi",
-    "memberof": "src/light.ts",
-    "static": true,
-    "longname": "src/light.ts~AuxAbi",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/light.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 12,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 97,
-    "kind": "variable",
-    "name": "AuctionAbi",
-    "memberof": "src/light.ts",
-    "static": true,
-    "longname": "src/light.ts~AuctionAbi",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/light.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 13,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 98,
-    "kind": "variable",
-    "name": "ERC20Abi",
-    "memberof": "src/light.ts",
-    "static": true,
-    "longname": "src/light.ts~ERC20Abi",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/light.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 14,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 99,
     "kind": "function",
     "name": "initializeSvLight",
     "memberof": "src/light.ts",
@@ -1872,7 +1599,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{initializeSvLight}",
     "description": null,
-    "lineNumber": 15,
+    "lineNumber": 11,
     "undocument": true,
     "params": [
       {
@@ -1889,7 +1616,7 @@
     }
   },
   {
-    "__docId__": 100,
+    "__docId__": 87,
     "kind": "function",
     "name": "resolveEnsAddress",
     "memberof": "src/light.ts",
@@ -1902,7 +1629,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{resolveEnsAddress}",
     "description": null,
-    "lineNumber": 37,
+    "lineNumber": 33,
     "undocument": true,
     "params": [
       {
@@ -1929,7 +1656,7 @@
     }
   },
   {
-    "__docId__": 101,
+    "__docId__": 88,
     "kind": "function",
     "name": "getBackendAddress",
     "memberof": "src/light.ts",
@@ -1942,7 +1669,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getBackendAddress}",
     "description": null,
-    "lineNumber": 40,
+    "lineNumber": 36,
     "undocument": true,
     "params": [
       {
@@ -1963,7 +1690,7 @@
     }
   },
   {
-    "__docId__": 102,
+    "__docId__": 89,
     "kind": "function",
     "name": "getDemocInfo",
     "memberof": "src/light.ts",
@@ -1976,7 +1703,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getDemocInfo}",
     "description": null,
-    "lineNumber": 43,
+    "lineNumber": 39,
     "undocument": true,
     "params": [
       {
@@ -1998,7 +1725,7 @@
     }
   },
   {
-    "__docId__": 103,
+    "__docId__": 90,
     "kind": "function",
     "name": "getDemocNthBallot",
     "memberof": "src/light.ts",
@@ -2011,7 +1738,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getDemocNthBallot}",
     "description": null,
-    "lineNumber": 46,
+    "lineNumber": 42,
     "undocument": true,
     "params": [
       {
@@ -2038,7 +1765,7 @@
     }
   },
   {
-    "__docId__": 104,
+    "__docId__": 91,
     "kind": "function",
     "name": "getBallotSpec",
     "memberof": "src/light.ts",
@@ -2051,7 +1778,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getBallotSpec}",
     "description": null,
-    "lineNumber": 65,
+    "lineNumber": 61,
     "undocument": true,
     "params": [
       {
@@ -2074,7 +1801,7 @@
     }
   },
   {
-    "__docId__": 105,
+    "__docId__": 92,
     "kind": "function",
     "name": "getBallotObjectFromS3",
     "memberof": "src/light.ts",
@@ -2087,7 +1814,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getBallotObjectFromS3}",
     "description": null,
-    "lineNumber": 85,
+    "lineNumber": 81,
     "undocument": true,
     "params": [
       {
@@ -2110,7 +1837,7 @@
     }
   },
   {
-    "__docId__": 106,
+    "__docId__": 93,
     "kind": "function",
     "name": "getBallotObjectFromIpfs",
     "memberof": "src/light.ts",
@@ -2123,7 +1850,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getBallotObjectFromIpfs}",
     "description": null,
-    "lineNumber": 88,
+    "lineNumber": 84,
     "undocument": true,
     "params": [
       {
@@ -2140,7 +1867,7 @@
     }
   },
   {
-    "__docId__": 107,
+    "__docId__": 94,
     "kind": "function",
     "name": "getDemocBallots",
     "memberof": "src/light.ts",
@@ -2153,7 +1880,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getDemocBallots}",
     "description": null,
-    "lineNumber": 96,
+    "lineNumber": 92,
     "undocument": true,
     "params": [
       {
@@ -2175,7 +1902,7 @@
     }
   },
   {
-    "__docId__": 108,
+    "__docId__": 95,
     "kind": "function",
     "name": "getContractAddresses",
     "memberof": "src/light.ts",
@@ -2188,7 +1915,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getContractAddresses}",
     "description": "Takes in the svNetwork object and returns all relevant addresses",
-    "lineNumber": 114,
+    "lineNumber": 110,
     "params": [
       {
         "name": "objectPattern",
@@ -2208,7 +1935,7 @@
     }
   },
   {
-    "__docId__": 109,
+    "__docId__": 96,
     "kind": "function",
     "name": "weiToCents",
     "memberof": "src/light.ts",
@@ -2221,7 +1948,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{weiToCents}",
     "description": null,
-    "lineNumber": 128,
+    "lineNumber": 124,
     "undocument": true,
     "params": [
       {
@@ -2248,7 +1975,7 @@
     }
   },
   {
-    "__docId__": 110,
+    "__docId__": 97,
     "kind": "function",
     "name": "getCommunityBallotPrice",
     "memberof": "src/light.ts",
@@ -2261,7 +1988,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getCommunityBallotPrice}",
     "description": null,
-    "lineNumber": 131,
+    "lineNumber": 127,
     "undocument": true,
     "params": [
       {
@@ -2288,7 +2015,7 @@
     }
   },
   {
-    "__docId__": 111,
+    "__docId__": 98,
     "kind": "function",
     "name": "checkIfAddressIsEditor",
     "memberof": "src/light.ts",
@@ -2301,7 +2028,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{checkIfAddressIsEditor}",
     "description": null,
-    "lineNumber": 134,
+    "lineNumber": 130,
     "undocument": true,
     "params": [
       {
@@ -2333,7 +2060,7 @@
     }
   },
   {
-    "__docId__": 112,
+    "__docId__": 99,
     "kind": "function",
     "name": "getCurrentGasPrice",
     "memberof": "src/light.ts",
@@ -2346,7 +2073,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getCurrentGasPrice}",
     "description": null,
-    "lineNumber": 139,
+    "lineNumber": 135,
     "undocument": true,
     "params": [],
     "return": {
@@ -2356,7 +2083,7 @@
     }
   },
   {
-    "__docId__": 113,
+    "__docId__": 100,
     "kind": "function",
     "name": "checkBallotHashBSpec",
     "memberof": "src/light.ts",
@@ -2369,7 +2096,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{checkBallotHashBSpec}",
     "description": null,
-    "lineNumber": 150,
+    "lineNumber": 146,
     "undocument": true,
     "params": [
       {
@@ -2392,7 +2119,7 @@
     }
   },
   {
-    "__docId__": 114,
+    "__docId__": 101,
     "kind": "function",
     "name": "checkBallotHashGBallot",
     "memberof": "src/light.ts",
@@ -2405,7 +2132,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{checkBallotHashGBallot}",
     "description": null,
-    "lineNumber": 161,
+    "lineNumber": 157,
     "undocument": true,
     "params": [
       {
@@ -2422,7 +2149,7 @@
     }
   },
   {
-    "__docId__": 115,
+    "__docId__": 102,
     "kind": "file",
     "name": "src/types.ts",
     "content": "\n\n\nexport type ProxyVote = {\n    // these should be `bytes32` hexstrings\n    proxyReq: [string, string, string, string, string]\n    // this is a `bytes` hexstring\n    extra: string\n}\n",
@@ -2433,7 +2160,18 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 116,
+    "__docId__": 103,
+    "kind": "file",
+    "name": "src/typings.d.ts",
+    "content": "declare module \"*.json\" {\n    const value: any;\n    export default value;\n}\n",
+    "static": true,
+    "longname": "/Users/maxkaye/src/sv/lib/src/typings.d.ts",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 104,
     "kind": "file",
     "name": "src/utils.ts",
     "content": "\nconst R = require('ramda');\nconst BN = require('bn.js');\nconst assert = require('assert');\n\n\nconst bb = require('./ballotBox');\n\n\n/**\n * This will take an Ethereum hex string (or a normal hex string) and\n * output a normal hex string (no '0x' header) or throw an error on a\n * bad hex string.\n *\n * @param {string} hex\n *\n * @returns {string}\n *  the hex string.\n */\nexport const cleanEthHex = hex => {\n    if (hex === \"0x0\") {\n        return \"00\";\n    }\n\n    // hex must be even - only exception above\n    if (hex.length % 2 !== 0) {\n        throw Error(`Bad hex string: ${hex}`);\n    }\n\n    // this covers the case hex==\"0x\" => \"\"\n    if (hex.slice(0, 2) === \"0x\") {\n        return hex.slice(2);\n    }\n\n    return hex;\n}\n\n\n/**\n * This compares ethereum addresses (taking into account case, etc)\n *\n * @param {string} addr1\n * @param {string} addr2\n *\n * @returns {bool}\n */\nexport const ethAddrEq = (addr1, addr2) => {\n    const _clean = a => module.exports.cleanEthHex(a).toLowerCase()\n    // throw a length check in there to ensure we have valid addresses\n    return _clean(addr1) === _clean(addr2) && addr1.length === 42\n}\n\n\n// this is from the bech32 spec (Bitcoin)\nconst B32_ALPHA = \"qpzry9x8gf2tvdw0s3jn54khce6mua7l\";\nconst toAlphabet = arr => {\n    var ret = \"\";\n    for (let i = 0; i < arr.length; i++) {\n        ret += B32_ALPHA.charAt(arr[i]);\n    }\n    return ret;\n}\n\n\n/**\n * This will convert a hex string to Base32 in the bech32 format WITHOUT a checksum.\n *\n * @param {string} hex\n *  The hex string to convert to Base32 - can be an EthHex or plain hex string.\n *\n * @returns {string}\n *  The Base32 version of the hex string.\n */\nexport const hexToBase32 = hex => {\n    const _hex = cleanEthHex(hex);\n\n    const buf = Buffer.from(_hex, 'hex');\n    const digits = [0];\n    let digitlength = 1;\n\n    let carry;\n    for (let i = 0; i < buf.length; ++i) {\n        carry = buf[i];\n        for (let j = 0; j < digitlength; ++j) {\n            carry += digits[j] * 256;\n            digits[j] = carry % 32;\n            carry = (carry / 32) | 0;\n        }\n\n        while (carry > 0) {\n            digits[digitlength] = carry % 32;\n            digitlength++;\n            carry = (carry / 32) | 0;\n        }\n    }\n\n    return toAlphabet(R.reverse(digits.slice(0,digitlength)));\n}\n",
@@ -2444,7 +2182,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 117,
+    "__docId__": 105,
     "kind": "variable",
     "name": "R",
     "memberof": "src/utils.ts",
@@ -2465,7 +2203,7 @@
     "ignore": true
   },
   {
-    "__docId__": 118,
+    "__docId__": 106,
     "kind": "variable",
     "name": "BN",
     "memberof": "src/utils.ts",
@@ -2486,7 +2224,7 @@
     "ignore": true
   },
   {
-    "__docId__": 119,
+    "__docId__": 107,
     "kind": "variable",
     "name": "assert",
     "memberof": "src/utils.ts",
@@ -2507,7 +2245,7 @@
     "ignore": true
   },
   {
-    "__docId__": 120,
+    "__docId__": 108,
     "kind": "variable",
     "name": "bb",
     "memberof": "src/utils.ts",
@@ -2528,7 +2266,7 @@
     "ignore": true
   },
   {
-    "__docId__": 121,
+    "__docId__": 109,
     "kind": "function",
     "name": "cleanEthHex",
     "memberof": "src/utils.ts",
@@ -2570,7 +2308,7 @@
     }
   },
   {
-    "__docId__": 122,
+    "__docId__": 110,
     "kind": "function",
     "name": "ethAddrEq",
     "memberof": "src/utils.ts",
@@ -2622,7 +2360,7 @@
     }
   },
   {
-    "__docId__": 123,
+    "__docId__": 111,
     "kind": "variable",
     "name": "B32_ALPHA",
     "memberof": "src/utils.ts",
@@ -2643,7 +2381,7 @@
     "ignore": true
   },
   {
-    "__docId__": 124,
+    "__docId__": 112,
     "kind": "function",
     "name": "toAlphabet",
     "memberof": "src/utils.ts",
@@ -2674,7 +2412,7 @@
     "ignore": true
   },
   {
-    "__docId__": 125,
+    "__docId__": 113,
     "kind": "function",
     "name": "hexToBase32",
     "memberof": "src/utils.ts",
@@ -2725,7 +2463,7 @@
   },
   {
     "kind": "packageJSON",
-    "content": "{\n  \"name\": \"sv-lib\",\n  \"version\": \"0.1.14\",\n  \"description\": \"SecureVote Light supporting functionality\",\n  \"main\": \"dist/index.js\",\n  \"types\": \"dist/index.d.ts\",\n  \"homepage\": \"https://github.com/secure-vote/sv-lib#readme\",\n  \"files\": [\n    \"./dist\",\n    \"./docs\"\n  ],\n  \"author\": {\n    \"name\": \"Max Kaye\",\n    \"email\": \"max@secure.vote\"\n  },\n  \"bugs\": {\n    \"url\": \"https://github.com/secure-vote/sv-lib/issues\"\n  },\n  \"bundleDependencies\": false,\n  \"dependencies\": {\n    \"assert\": \"^1.4.1\",\n    \"axios\": \"^0.18.0\",\n    \"bs58\": \"^4.0.1\",\n    \"colors\": \"^1.3.0\",\n    \"esdoc-typescript-plugin\": \"^1.0.1\",\n    \"eth-ens-namehash\": \"^2.0.8\",\n    \"eth-lib\": \"^0.2.8\",\n    \"ethereumjs-util\": \"^5.2.0\",\n    \"ramda\": \"^0.25.0\",\n    \"sha256\": \"^0.2.0\",\n    \"web3\": \"^1.0.0-beta.34\",\n    \"web3-eth-abi\": \"^1.0.0-beta.34\",\n    \"web3-eth-accounts\": \"^1.0.0-beta.34\",\n    \"web3-utils\": \"^1.0.0-beta.34\"\n  },\n  \"deprecated\": false,\n  \"keywords\": [\n    \"SecureVote\",\n    \"voting\",\n    \"crypto\",\n    \"blockchain\"\n  ],\n  \"license\": \"UNLICENSED\",\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git+https://github.com/secure-vote/sv-lib.git\"\n  },\n  \"devDependencies\": {\n    \"@types/jest\": \"^23.3.0\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-ecmascript-proposal-plugin\": \"^1.0.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"jest\": \"^23.4.1\",\n    \"minami\": \"^1.2.3\",\n    \"ts-jest\": \"^23.0.1\",\n    \"typescript\": \"^2.9.2\"\n  },\n  \"scripts\": {\n    \"dev\": \"tsc -w\",\n    \"test\": \"jest\",\n    \"docs\": \"esdoc\",\n    \"prepublish\": \"tsc && yarn docs\"\n  },\n  \"jest\": {\n    \"transform\": {\n      \"^.+\\\\.tsx?$\": \"ts-jest\"\n    },\n    \"testRegex\": \"(/__tests__/.*|(\\\\.|/)(test|spec))\\\\.(jsx?|tsx?)$\",\n    \"moduleFileExtensions\": [\n      \"ts\",\n      \"tsx\",\n      \"js\",\n      \"jsx\",\n      \"json\",\n      \"node\"\n    ],\n    \"testPathIgnorePatterns\": [\n      \"/node_modules/\",\n      \"/dist\"\n    ]\n  }\n}\n",
+    "content": "{\n  \"name\": \"sv-lib\",\n  \"version\": \"0.1.14\",\n  \"description\": \"SecureVote Light supporting functionality\",\n  \"main\": \"dist/index.js\",\n  \"types\": \"dist/index.d.ts\",\n  \"homepage\": \"https://github.com/secure-vote/sv-lib#readme\",\n  \"files\": [\n    \"./dist\",\n    \"./dist/*/\",\n    \"./docs\"\n  ],\n  \"author\": {\n    \"name\": \"Max Kaye\",\n    \"email\": \"max@secure.vote\"\n  },\n  \"bugs\": {\n    \"url\": \"https://github.com/secure-vote/sv-lib/issues\"\n  },\n  \"bundleDependencies\": false,\n  \"dependencies\": {\n    \"assert\": \"^1.4.1\",\n    \"axios\": \"^0.18.0\",\n    \"bs58\": \"^4.0.1\",\n    \"colors\": \"^1.3.0\",\n    \"esdoc-typescript-plugin\": \"^1.0.1\",\n    \"eth-ens-namehash\": \"^2.0.8\",\n    \"eth-lib\": \"^0.2.8\",\n    \"ethereumjs-util\": \"^5.2.0\",\n    \"ramda\": \"^0.25.0\",\n    \"sha256\": \"^0.2.0\",\n    \"web3\": \"^1.0.0-beta.34\",\n    \"web3-eth-abi\": \"^1.0.0-beta.34\",\n    \"web3-eth-accounts\": \"^1.0.0-beta.34\",\n    \"web3-utils\": \"^1.0.0-beta.34\"\n  },\n  \"deprecated\": false,\n  \"keywords\": [\n    \"SecureVote\",\n    \"voting\",\n    \"crypto\",\n    \"blockchain\"\n  ],\n  \"license\": \"UNLICENSED\",\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git+https://github.com/secure-vote/sv-lib.git\"\n  },\n  \"devDependencies\": {\n    \"@types/jest\": \"^23.3.0\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-ecmascript-proposal-plugin\": \"^1.0.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"jest\": \"^23.4.1\",\n    \"minami\": \"^1.2.3\",\n    \"ts-jest\": \"^23.0.1\",\n    \"typescript\": \"^2.9.2\"\n  },\n  \"scripts\": {\n    \"dev\": \"tsc -w\",\n    \"test\": \"jest\",\n    \"docs\": \"esdoc\",\n    \"prepublish\": \"tsc && yarn docs\"\n  },\n  \"jest\": {\n    \"transform\": {\n      \"^.+\\\\.tsx?$\": \"ts-jest\"\n    },\n    \"testRegex\": \"(/__tests__/.*|(\\\\.|/)(test|spec))\\\\.(jsx?|tsx?)$\",\n    \"moduleFileExtensions\": [\n      \"ts\",\n      \"tsx\",\n      \"js\",\n      \"jsx\",\n      \"json\",\n      \"node\"\n    ],\n    \"testPathIgnorePatterns\": [\n      \"/node_modules/\",\n      \"/dist\"\n    ]\n  }\n}\n",
     "longname": "/Users/maxkaye/src/sv/lib/package.json",
     "name": "package.json",
     "static": true,

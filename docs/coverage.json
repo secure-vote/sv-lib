@@ -1,6 +1,6 @@
 {
-  "coverage": "18.57%",
-  "expectCount": 70,
+  "coverage": "22.8%",
+  "expectCount": 57,
   "actualCount": 13,
   "files": {
     "src/ballotBox.test.ts": {
@@ -57,37 +57,24 @@
       ]
     },
     "src/light.ts": {
-      "expectCount": 29,
+      "expectCount": 16,
       "actualCount": 1,
       "undocumentLines": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        7,
-        8,
-        9,
-        10,
         11,
-        12,
-        13,
-        14,
-        15,
-        37,
-        40,
-        43,
-        46,
-        65,
-        85,
-        88,
-        96,
-        128,
-        131,
-        134,
-        139,
-        150,
-        161
+        33,
+        36,
+        39,
+        42,
+        61,
+        81,
+        84,
+        92,
+        124,
+        127,
+        130,
+        135,
+        146,
+        157
       ]
     },
     "src/utils.ts": {
