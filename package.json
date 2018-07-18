@@ -6,8 +6,8 @@
   "types": "dist/index.d.ts",
   "homepage": "https://github.com/secure-vote/sv-lib#readme",
   "files": [
-    "./dist/**/*",
-    "./docs/**/*"
+    "./dist",
+    "./docs"
   ],
   "author": {
     "name": "Max Kaye",
