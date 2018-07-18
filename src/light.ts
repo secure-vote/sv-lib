@@ -14,6 +14,7 @@ const AuxAbi = require('./smart_contracts/AuxAbi.abi.json');
 const AuctionAbi = require('./smart_contracts/CommAuctionIface.abi.json');
 const ERC20Abi = require('./smart_contracts/ERC20.abi.json');
 
+
 export const initializeSvLight = async svConfig => {
   const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig;
 
@@ -78,8 +79,9 @@ export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
   return ballotObject;
 };
 
-export const getBallotSpec = async (archiveUrl, ballotSpecHash) => {
-  return new Promise((res, rej) => {
+export const getBallotSpec = async (archiveUrl, ballotSpecHash): Promise<{data: any}> => {
+  // TODO refactor to be a bit more elegant
+  return new Promise<{data: any}>((res, rej) => {
     let done = false;
     const doRes = obj => {
       if (!done) {
@@ -92,9 +94,7 @@ export const getBallotSpec = async (archiveUrl, ballotSpecHash) => {
       if (!done) {
         getBallotObjectFromS3(archiveUrl, ballotSpecHash)
           .then(doRes)
-          .catch(error => {
-            rej(new Error(error));
-          });
+          .catch(rej);
       }
     }, 3500);
   });

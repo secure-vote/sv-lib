@@ -1,8 +1,11 @@
 {
     "compilerOptions": {
         "outDir": "./dist",
-        "allowJs": true,
-        "target": "es5"
+        "target": "es6",
+        "removeComments": false,
+        "module": "commonjs",
+        "declaration": true,
+        "lib": ["dom", "es6"]
     },
     "include": [
         "./src/**/*"

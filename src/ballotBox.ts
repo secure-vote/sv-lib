@@ -62,7 +62,7 @@ export const mkSubmissionBits = (...toCombine) => {
 
     const toRet = R.reduce((acc, i) => acc | i, 0, toCombine);
     assert.equal(R.all(i => typeof i == "number", toCombine), true, `Bad input to mkSubmissionBits. Input is required to be an array of numbers. Instead got: ${toCombine}`);
-    assert.equal(R.all(i => i === i | 0, toCombine), true, `Bad input to mkSubmissionBits. Input was not an array of integers. Instead got: ${toCombine}`);
+    assert.equal(R.all(i => i === (i | 0), toCombine), true, `Bad input to mkSubmissionBits. Input was not an array of integers. Instead got: ${toCombine}`);
     assert.equal(toRet, R.sum(toCombine), `Bad input provided to mkSubmissionBits. Logical OR and sum sanity check failed. Input was: ${toCombine}`);
     assert.equal(toRet < 2**16, true, `Submission bits must fit into a 16 bit integer (i.e. less than 2^16). Result was: ${toRet}`);
     return toRet;
@@ -87,7 +87,7 @@ export const mkSubmissionBits = (...toCombine) => {
  * @returns {object}
  *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`
  */
-export const mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts = {}) => {
+export const mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts:any = {}) => {
     if (opts.skipSequenceSizeCheck !== true)
         assert.equal(0 < sequence && sequence < 2**32, true, "sequence number out of bounds")
     assert.equal(web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId), true, "ballotId incorrect format (either not a BN or not hex)")

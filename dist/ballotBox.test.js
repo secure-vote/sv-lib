@@ -1,6 +1,6 @@
-var bb = require('./ballotBox');
-var _const = require('./const');
-test('generates correct range3 voteData', function () {
+const bb = require('./ballotBox');
+const _const = require('./const');
+test('generates correct range3 voteData', () => {
     // trivial case
     expect(bb.genRange3VoteData([])).toEqual(_const.zeroHash);
     // format for binary-no votes

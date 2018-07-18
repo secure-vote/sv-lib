@@ -51,14 +51,10 @@ export const ethAddrEq = (addr1, addr2) => {
 }
 
 
-export const mkPacked = bb.mkPacked;
-export const mkSubmissionBits = bb.mkSubmissionBits;
-
-
 // this is from the bech32 spec (Bitcoin)
 const B32_ALPHA = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
 const toAlphabet = arr => {
-    ret = "";
+    var ret = "";
     for (let i = 0; i < arr.length; i++) {
         ret += B32_ALPHA.charAt(arr[i]);
     }

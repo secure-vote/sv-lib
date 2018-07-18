@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <base data-ice="baseUrl" href="../../">
-  <title data-ice="title">src/light.js | sv-lib</title>
+  <title data-ice="title">src/ballotBox.ts | sv-lib</title>
   <link type="text/css" rel="stylesheet" href="css/style.css">
   <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
   <script src="script/prettify/prettify.js"></script>
@@ -64,201 +64,181 @@
 </div>
 </nav>
 
-<div class="content" data-ice="content"><h1 data-ice="title">src/light.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const ENS = require(&apos;eth-ens-namehash&apos;);
-const Constants = require(&apos;./const&apos;);
-const axios = require(&apos;axios&apos;);
-const bs58 = require(&apos;bs58&apos;);
-const sha256 = require(&apos;sha256&apos;);
+<div class="content" data-ice="content"><h1 data-ice="title">src/ballotBox.ts</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const R = require(&apos;ramda&apos;)
+const BN = require(&apos;bn.js&apos;)
+const assert = require(&apos;assert&apos;)
+const web3Utils = require(&apos;web3-utils&apos;)
+const svCrypto = require(&apos;./crypto&apos;)
+const Account = require(&apos;eth-lib/lib/account&apos;)
 
-// Lovely ABIs
-const ResolverAbi = require(&apos;./smart_contracts/SV_ENS_Resolver.abi.json&apos;);
-const IndexAbi = require(&apos;./smart_contracts/SVLightIndex.abi.json&apos;);
-const BackendAbi = require(&apos;./smart_contracts/SVLightIndexBackend.abi.json&apos;);
-const BBFarmAbi = require(&apos;./smart_contracts/BBFarm.abi.json&apos;);
-const PaymentsAbi = require(&apos;./smart_contracts/SVPayments.abi.json&apos;);
-const AuxAbi = require(&apos;./smart_contracts/AuxAbi.abi.json&apos;);
-const AuctionAbi = require(&apos;./smart_contracts/CommAuctionIface.abi.json&apos;);
-const ERC20Abi = require(&apos;./smart_contracts/ERC20.abi.json&apos;);
+/**
+ * This object tracks the flags used for SV ballot boxes. They determine the submission
+ * methods and whether ballots are tracked as binding, official, or testing.
+ *
+ * For more info see docs.secure.vote
+ */
+export const flags = {
+    // flags on submission methods
+    USE_ETH: 2**0,
+    USE_SIGNED: 2**1,
+    USE_NO_ENC: 2**2,
+    USE_ENC: 2**3,
 
-export const initializeSvLight = async svConfig =&gt; {
-  const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig;
-
-  const Web3 = require(&apos;web3&apos;);
-  const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider));
-
-  const resolver = new web3.eth.Contract(ResolverAbi, ensResolver);
-
-  // const indexAddress =
-  // console.log(&apos;indexAddress :&apos;, indexAddress);
-  const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexContractName));
-  const backendAddress = await getBackendAddress({ index });
-  const backend = new web3.eth.Contract(BackendAbi, backendAddress);
-  const aux = new web3.eth.Contract(AuxAbi, auxContract);
-  const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())
-
-  return {
-    svConfig,
-    web3,
-    resolver,
-    index,
-    backend,
-    aux,
-    payments
-  };
-};
-
-export const resolveEnsAddress = async ({ resolver }, ensName) =&gt; {
-  return await resolver.methods.addr(ENS.hash(ensName)).call();
-};
-
-export const getBackendAddress = async ({ index }) =&gt; {
-  return await index.methods.getBackend().call();
-};
-
-export const getDemocInfo = async ({ backend, democHash }) =&gt; {
-  return await backend.methods.getDInfo(democHash).call();
-};
-
-export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) =&gt; {
-  // Destructure and set the variables that are needed
-  const { index, backend, aux, svConfig } = svNetwork;
-  const { democHash, nthBallot } = democBallotInfo;
-  const indexAddress = index._address;
-  const backendAddress = backend._address;
-  const archiveUrl = { svConfig };
-
-  const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(backendAddress, indexAddress, democHash, nthBallot).call();
-  // console.log(&apos;bbFarmAndBallotId :&apos;, bbFarmAndBallotId);
-
-  const { id, bbFarmAddress } = bbFarmAndBallotId;
-  const userEthAddress = &apos;0x0000000000000000000000000000000000000000&apos;;
-  const ethBallotDetails = await aux.methods.getBallotDetails(id, bbFarmAddress, userEthAddress).call();
-
-  const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash);
-  // console.log(&apos;ballotSpec :&apos;, ballotSpec);
-  // .then(x =&gt; console.log(&apos;Then called&apos;, x))
-  // .catch(x =&gt; console.log(&apos;Caught error&apos;, x));
-
-  const ballotObject = { ...bbFarmAndBallotId, ...ethBallotDetails, data: { ...ballotSpec.data } };
-
-  return ballotObject;
-};
-
-export const getBallotSpec = async (archiveUrl, ballotSpecHash) =&gt; {
-  return new Promise((res, rej) =&gt; {
-    let done = false;
-    const doRes = obj =&gt; {
-      if (!done) {
-        done = true;
-        res(obj);
-      }
-    };
-    getBallotObjectFromIpfs(ballotSpecHash).then(doRes);
-    setTimeout(() =&gt; {
-      if (!done) {
-        getBallotObjectFromS3(archiveUrl, ballotSpecHash)
-          .then(doRes)
-          .catch(error =&gt; {
-            rej(new Error(error));
-          });
-      }
-    }, 3500);
-  });
-};
-
-export const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) =&gt; {
-  return axios.get(archiveUrl + ballotSpecHash + &apos;.json&apos;);
-};
-
-export const getBallotObjectFromIpfs = async ballotSpecHash =&gt; {
-  const ipfsUrl = &apos;https://ipfs.infura.io/api/v0/block/get?arg=&apos;;
-  const cidHex = &apos;1220&apos; + ballotSpecHash.substr(2);
-  const bytes = Buffer.from(cidHex, &apos;hex&apos;);
-  const cid = bs58.encode(bytes);
-  return await axios.get(ipfsUrl + cid);
-};
-
-// Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array
-export const getDemocBallots = async ({ svNetwork, democHash }) =&gt; {
-  const { backend } = svNetwork;
-  const democInfo = await getDemocInfo({ backend, democHash });
-
-  // Throw an error if the democ info is not correct
-  const {erc20, owner} = democInfo
-  if (owner === &apos;0x0000000000000000000000000000000000000000&apos;) {
-    throw new Error(&apos;Democracy Hash does not resolve to a democracy&apos;)
-  }
-
-  // TODO - Work out where / how to push an errored ballot
-  // Loop through and get all the ballots
-  const numBallots = democInfo.nBallots;
-  const ballotsArray = [];
-  for (let i = 0; i &lt; numBallots; i++) {
-    ballotsArray[i] = await getDemocNthBallot({ svNetwork }, { democHash: democHash, nthBallot: i });
-  }
-
-  return ballotsArray;
-};
-
-/** Takes in the svNetwork object and returns all relevant addresses */
-export const getContractAddresses = async ({svNetwork}) =&gt; {
-  const {index, resolver, backend, aux, svConfig} = svNetwork
-  const { delegationContractName, lookupAddress } = svConfig
-
-  return {
-    indexAddress: index._address,
-    backendAddress: backend._address,
-    auxAddress: aux._address,
-    lookupAddress: lookupAddress,
-    resolverAddress: resolver._address,
-    communityAuctionAddress: await index.methods.getCommAuction().call(),
-    delegationAddress: await resolveEnsAddress({ resolver }, delegationContractName),
-    paymentsAddress: await index.methods.getPayments().call(),
-  }
+    // other ballot settings
+    IS_BINDING: 2**13,
+    IS_OFFICIAL: 2**14,
+    USE_TESTING: 2**15,
 }
 
-export const weiToCents = async ({payments}, wei) =&gt; {
-  return await payments.methods.weiToCents(wei).call()
+
+/**
+ * Creates a packed copy of start and end times with submissionBits
+ *
+ * @param {number} start
+ *  Start time in seconds since epoch
+ * @param {number} end
+ *  End time in seconds since epoch
+ * @param {number} submissionBits
+ *  Submission bits - can be created using mkSubmissionBits
+ * @returns {BN}
+ *  Returns a `bn.js` BigNum of the packed values.
+ *  Format: [submissionBits(16)][startTime(64)][endTime(64)]
+ */
+export const mkPacked = (start, end, submissionBits) =&gt; {
+    const s = new BN(start)
+    const e = new BN(end)
+    const sb = new BN(submissionBits)
+    return sb.shln(64).add(s).shln(64).add(e);
 }
 
-export const getCommunityBallotPrice = async ({payments}, democHash) =&gt; {
-  return await payments.methods.getNextPrice(democHash).call()
+
+/**
+ * This combines flags into a finished submissionBits. It also does some validation.
+ * @param {*} toCombine
+ *  Array of all submission flags to combine. See SV.ballotBox.flags for flag options.
+ *  All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining).
+ * @returns {number}
+ *  A 16 bit integer of combined flags.
+ */
+export const mkSubmissionBits = (...toCombine) =&gt; {
+    if (Array.isArray(toCombine[0]) &amp;&amp; typeof toCombine[0][0] == &quot;number&quot;) {
+        console.warn(&quot;Warning: mkSubmissionBits does not take an Array&lt;number&gt; anymore.&quot;)
+        toCombine = toCombine[0];
+    }
+
+    const toRet = R.reduce((acc, i) =&gt; acc | i, 0, toCombine);
+    assert.equal(R.all(i =&gt; typeof i == &quot;number&quot;, toCombine), true, `Bad input to mkSubmissionBits. Input is required to be an array of numbers. Instead got: ${toCombine}`);
+    assert.equal(R.all(i =&gt; i === (i | 0), toCombine), true, `Bad input to mkSubmissionBits. Input was not an array of integers. Instead got: ${toCombine}`);
+    assert.equal(toRet, R.sum(toCombine), `Bad input provided to mkSubmissionBits. Logical OR and sum sanity check failed. Input was: ${toCombine}`);
+    assert.equal(toRet &lt; 2**16, true, `Submission bits must fit into a 16 bit integer (i.e. less than 2^16). Result was: ${toRet}`);
+    return toRet;
 }
 
-export const checkIfAddressIsEditor = async ({ svNetwork }, { userAddress, democHash }) =&gt; {
-  const {backend} = svNetwork
-  return await backend.methods.isDEditor(democHash, userAddress).call();
-};
 
-// Checks the current ethereum gas price and returns a couple of values
-export const getCurrentGasPrice = async () =&gt; {
-  const gasStationInfo = await axios.get(&apos;https://ethgasstation.info/json/ethgasAPI.json&apos;)
-  const {data} = gasStationInfo
+/**
+ * Take the arguments and produce web3 data fitting the `submitProxyVote` method.
+ * @param {string} ballotId
+ *  a BN.js or Hex ballotId
+ * @param {number} sequence
+ *  the sequence number to use (0 &lt; sequence &lt; 2^32)
+ * @param {string} voteData
+ *  the vote data to use, should be 32 bytes hex encoded
+ * @param {string} extra
+ *  any extra data included with the vote (such as curve25519 pubkeys)
+ * @param {string} privateKey
+ *  the privkey used to sign
+ * @param {object?} opts
+ *  options:
+ *   - skipSequenceSizeCheck: boolean (will not throw if sequence is &gt;= 2^32)
+ * @returns {object}
+ *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`
+ */
+export const mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts:any = {}) =&gt; {
+    if (opts.skipSequenceSizeCheck !== true)
+        assert.equal(0 &lt; sequence &amp;&amp; sequence &lt; 2**32, true, &quot;sequence number out of bounds&quot;)
+    assert.equal(web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId), true, &quot;ballotId incorrect format (either not a BN or not hex)&quot;)
+    assert.equal(web3Utils.isHexStrict(voteData), true, &quot;vote data is not hex (strict)&quot;)
+    assert.equal(web3Utils.isHexStrict(extra), true, &quot;extra param is not hex (strict)&quot;)
 
-  return {
-    safeLow: data.safeLow / 10,
-    average: data.average / 10,
-    fast: data.fast / 10,
-    fastest: data.fastest / 10,
-  }
-}
-// Checks the ballot hash against the ballot content
-export const checkBallotHashBSpec = (ballotSpec, assertSpecHash) =&gt; {
-    let contentHash = &apos;0x&apos; + sha256(JSON.stringify(ballotSpec, null, 2));
-    if (assertSpecHash === contentHash) {
-      return true;
-    } else {
-      return false;
+    const _ballotId = web3Utils.isBN(ballotId) ? web3Utils.padLeft(web3Utils.toHex(ballotId), 64) : ballotId
+
+    assert.equal(_ballotId.length, 66, &apos;ballotId incorrect length&apos;)
+    assert.equal(voteData.length, 66, &apos;voteData incorrect length&apos;)
+
+    const sequenceHex = web3Utils.padLeft(web3Utils.toHex(sequence), 8)
+
+    const messageHash = web3Utils.soliditySha3( {t: &apos;bytes31&apos;, v: web3Utils.padLeft(sequenceHex, &apos;62&apos;)}
+                                              , {t: &apos;bytes32&apos;, v: _ballotId}
+                                              , {t: &apos;bytes32&apos;, v: voteData}
+                                              , {t: &apos;bytes&apos;, v: extra}
+                                              )
+
+    const {v,r,s} = svCrypto.ethSignHash(messageHash, privateKey)
+
+    const vBytes = web3Utils.hexToBytes(v)
+    const midBytes = web3Utils.hexToBytes(web3Utils.padRight(&apos;0x&apos;, 54))
+    const sequenceBytes = web3Utils.hexToBytes(sequenceHex)
+    const packed2Bytes = R.concat(vBytes, R.concat(midBytes, sequenceBytes))
+    const packed2 = web3Utils.bytesToHex(packed2Bytes)
+
+    return {
+        proxyReq:
+            [ r
+            , s
+            , packed2
+            , _ballotId
+            , voteData
+            ],
+        extra
     }
 }
 
-// Checks the ballot hash against a ballot global ballot object
-// Does this by destructuring the specHash and data out of it
-export const checkBallotHashGBallot = (ballotObject) =&gt; {
-  const {data, specHash} = ballotObject
-  return checkBallotHashBSpec(data, specHash)
-}
+/**
+ * Prepares voteData for a Range3 ballot from an array of votes
+ *
+ * @param {array} votesArray
+ *  Takes an array of numbers which represent the votes to be transformed
+ *  Format: [1, 2, -1]
+ *
+ * @returns {string}
+ *  Returns an eth hex string of the vote data
+ */
+export const genRange3VoteData = votesArray =&gt; {
+    assert.equal(R.all(v =&gt; (v | 0) === v, votesArray), true, &quot;All array elements must be defined and integers.&quot;)
+    assert.equal(R.all(v =&gt; -3 &lt;= v &amp;&amp; v &lt;= 3, votesArray), true, &quot;Votes must be in range -3 to 3.&quot;)
+    assert.equal(votesArray.length &lt;= 85, true, &quot;Too many votes; maximum capacity of 32 bytes is 85 individual items.&quot;)
+
+    // Generate list of binary encoded votes. Read bottom to top.
+    const binaryVotes = R.compose(
+        // pad to 3 bits
+        R.map(vBin =&gt; R.join(&apos;&apos;, R.repeat(&apos;0&apos;, 3 - vBin.length)) + vBin),
+        // convert votes to binary
+        R.map(v =&gt; v.toString(2)),
+        // offset votes to be in range 0,6
+        R.map(v =&gt; v + 3)
+    )(votesArray)
+
+    // check we have converted votes to bitstring representation of length 3
+    assert.equal(R.all(bVote =&gt; bVote.length == 3, binaryVotes), true, &quot;Assertion failed: all binary-encoded votes should be 3 bits long&quot;)
+
+    // create the binary voteData
+    const rawBinVotes = R.join(&apos;&apos;, binaryVotes)
+    // and pad it with 0s to length 256 (32 bytes total)
+    const binVoteData = rawBinVotes + R.join(&apos;&apos;, R.repeat(&apos;0&apos;, 32*8 - rawBinVotes.length))
+    assert.equal(binVoteData.length, 256, &quot;Assertion failed: generated voteData bit string does not have length 256&quot;)
+    // Convert to bytes
+    const voteBytes = R.map(bStr =&gt; parseInt(bStr, 2), R.splitEvery(8, binVoteData));
+
+    // check bytes are in range
+    assert.equal(R.all(vByte =&gt; 0 &lt;= vByte &amp;&amp; vByte &lt;= 255, voteBytes), true, &quot;Assertion failed: voteBytes (byte array) had a byte out of bounds (&lt;0 or &gt;255)&quot;)
+
+    // generate final hex
+    const voteData = web3Utils.bytesToHex(voteBytes)
+    assert.equal(voteData.length, 66, &quot;Assertion failed: final hex was not 66 characters long (32 bytes)&quot;)
+
+    return voteData
+};
 </code></pre>
 
 </div>

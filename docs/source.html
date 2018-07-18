@@ -33,6 +33,8 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkPacked">mkPacked</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSignedBallotForProxy">mkSignedBallotForProxy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSubmissionBits">mkSubmissionBits</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getNetwork">getNetwork</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-networkName">networkName</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethSignHash">ethSignHash</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hashMsgRaw">hashMsgRaw</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashBSpec">checkBallotHashBSpec</a></span></span></li>
@@ -55,13 +57,14 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethAddrEq">ethAddrEq</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexToBase32">hexToBase32</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-flags">flags</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-mkPacked">mkPacked</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-mkSubmissionBits">mkSubmissionBits</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-networkVars">networkVars</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroAddr">zeroAddr</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroHash">zeroHash</a></span></span></li>
 </ul>
 </div>
 </nav>
 
-<div class="content" data-ice="content"><h1>Source <img data-ice="coverageBadge" src="./badge.svg"><span data-ice="totalCoverageCount" class="total-coverage-count">10/56</span></h1>
+<div class="content" data-ice="content"><h1>Source <img data-ice="coverageBadge" src="./badge.svg"><span data-ice="totalCoverageCount" class="total-coverage-count">11/62</span></h1>
 
 <table class="files-summary" data-ice="files" data-use-coverage="true">
   <thead>
@@ -77,44 +80,56 @@
   <tbody>
     
   <tr data-ice="file">
-      <td data-ice="filePath"><span><a href="file/src/ballotBox.js.html#errorLines=1,2,3,4,41,5,6">src/ballotBox.js</a></span></td>
+      <td data-ice="filePath"><span><a href="file/src/ballotBox.test.ts.html#errorLines=1,2">src/ballotBox.test.ts</a></span></td>
+      <td data-ice="identifier" class="identifiers">-</td>
+      <td class="coverage"><span data-ice="coverage">0 %</span><span data-ice="coverageCount" class="coverage-count">0/2</span></td>
+      <td style="display: none;" data-ice="size">1169 byte</td>
+      <td style="display: none;" data-ice="lines">28</td>
+      <td style="display: none;" data-ice="updated">2018-07-04 04:15:12 (UTC)</td>
+    </tr>
+<tr data-ice="file">
+      <td data-ice="filePath"><span><a href="file/src/ballotBox.ts.html#errorLines=1,2,3,4,5,6">src/ballotBox.ts</a></span></td>
       <td data-ice="identifier" class="identifiers"><span><a href="variable/index.html#static-variable-flags">flags</a></span>
 <span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span>
 <span><a href="function/index.html#static-function-mkPacked">mkPacked</a></span>
 <span><a href="function/index.html#static-function-mkSignedBallotForProxy">mkSignedBallotForProxy</a></span>
 <span><a href="function/index.html#static-function-mkSubmissionBits">mkSubmissionBits</a></span></td>
-      <td class="coverage"><span data-ice="coverage">36 %</span><span data-ice="coverageCount" class="coverage-count">4/11</span></td>
-      <td style="display: none;" data-ice="size">7220 byte</td>
+      <td class="coverage"><span data-ice="coverage">45 %</span><span data-ice="coverageCount" class="coverage-count">5/11</span></td>
+      <td style="display: none;" data-ice="size">7226 byte</td>
       <td style="display: none;" data-ice="lines">174</td>
-      <td style="display: none;" data-ice="updated">2018-07-02 05:55:16 (UTC)</td>
+      <td style="display: none;" data-ice="updated">2018-07-04 04:23:26 (UTC)</td>
     </tr>
 <tr data-ice="file">
-      <td data-ice="filePath"><span><a href="file/src/const.js.html">src/const.js</a></span></td>
-      <td data-ice="identifier" class="identifiers">-</td>
-      <td class="coverage"><span data-ice="coverage">-</span></td>
-      <td style="display: none;" data-ice="size">1741 byte</td>
-      <td style="display: none;" data-ice="lines">50</td>
-      <td style="display: none;" data-ice="updated">2018-07-02 04:23:19 (UTC)</td>
+      <td data-ice="filePath"><span><a href="file/src/const.ts.html#errorLines=1,2,3,57,63,80">src/const.ts</a></span></td>
+      <td data-ice="identifier" class="identifiers"><span><a href="function/index.html#static-function-getNetwork">getNetwork</a></span>
+<span><a href="function/index.html#static-function-networkName">networkName</a></span>
+<span><a href="variable/index.html#static-variable-networkVars">networkVars</a></span>
+<span><a href="variable/index.html#static-variable-zeroAddr">zeroAddr</a></span>
+<span><a href="variable/index.html#static-variable-zeroHash">zeroHash</a></span></td>
+      <td class="coverage"><span data-ice="coverage">0 %</span><span data-ice="coverageCount" class="coverage-count">0/6</span></td>
+      <td style="display: none;" data-ice="size">3953 byte</td>
+      <td style="display: none;" data-ice="lines">113</td>
+      <td style="display: none;" data-ice="updated">2018-07-04 04:14:34 (UTC)</td>
     </tr>
 <tr data-ice="file">
-      <td data-ice="filePath"><span><a href="file/src/crypto.js.html#errorLines=1,2,3">src/crypto.js</a></span></td>
+      <td data-ice="filePath"><span><a href="file/src/crypto.ts.html#errorLines=1,2,3">src/crypto.ts</a></span></td>
       <td data-ice="identifier" class="identifiers"><span><a href="function/index.html#static-function-ethSignHash">ethSignHash</a></span>
 <span><a href="function/index.html#static-function-hashMsgRaw">hashMsgRaw</a></span></td>
       <td class="coverage"><span data-ice="coverage">40 %</span><span data-ice="coverageCount" class="coverage-count">2/5</span></td>
       <td style="display: none;" data-ice="size">1339 byte</td>
       <td style="display: none;" data-ice="lines">44</td>
-      <td style="display: none;" data-ice="updated">2018-07-02 05:56:28 (UTC)</td>
+      <td style="display: none;" data-ice="updated">2018-07-04 04:23:58 (UTC)</td>
     </tr>
 <tr data-ice="file">
-      <td data-ice="filePath"><span><a href="file/src/index.js.html">src/index.js</a></span></td>
+      <td data-ice="filePath"><span><a href="file/src/index.ts.html">src/index.ts</a></span></td>
       <td data-ice="identifier" class="identifiers">-</td>
       <td class="coverage"><span data-ice="coverage">-</span></td>
-      <td style="display: none;" data-ice="size">176 byte</td>
-      <td style="display: none;" data-ice="lines">7</td>
-      <td style="display: none;" data-ice="updated">2018-07-02 05:37:22 (UTC)</td>
+      <td style="display: none;" data-ice="size">140 byte</td>
+      <td style="display: none;" data-ice="lines">5</td>
+      <td style="display: none;" data-ice="updated">2018-07-04 03:06:04 (UTC)</td>
     </tr>
 <tr data-ice="file">
-      <td data-ice="filePath"><span><a href="file/src/light.js.html#errorLines=1,10,103,107,11,116,12,13,14,15,154,158,162,168,17,180,191,2,3,4,44,48,5,52,56,8,81,9">src/light.js</a></span></td>
+      <td data-ice="filePath"><span><a href="file/src/light.ts.html#errorLines=1,10,11,12,128,13,131,134,139,14,15,150,161,2,3,37,4,40,43,46,5,65,7,8,85,88,9,96">src/light.ts</a></span></td>
       <td data-ice="identifier" class="identifiers"><span><a href="function/index.html#static-function-checkBallotHashBSpec">checkBallotHashBSpec</a></span>
 <span><a href="function/index.html#static-function-checkBallotHashGBallot">checkBallotHashGBallot</a></span>
 <span><a href="function/index.html#static-function-checkIfAddressIsEditor">checkIfAddressIsEditor</a></span>
@@ -132,21 +147,19 @@
 <span><a href="function/index.html#static-function-resolveEnsAddress">resolveEnsAddress</a></span>
 <span><a href="function/index.html#static-function-weiToCents">weiToCents</a></span></td>
       <td class="coverage"><span data-ice="coverage">3 %</span><span data-ice="coverageCount" class="coverage-count">1/29</span></td>
-      <td style="display: none;" data-ice="size">7025 byte</td>
+      <td style="display: none;" data-ice="size">7051 byte</td>
       <td style="display: none;" data-ice="lines">194</td>
-      <td style="display: none;" data-ice="updated">2018-07-02 05:57:23 (UTC)</td>
+      <td style="display: none;" data-ice="updated">2018-07-04 04:36:29 (UTC)</td>
     </tr>
 <tr data-ice="file">
-      <td data-ice="filePath"><span><a href="file/src/utils.js.html#errorLines=2,3,4,54,55,59,60,7">src/utils.js</a></span></td>
+      <td data-ice="filePath"><span><a href="file/src/utils.ts.html#errorLines=1,2,3,4,43,44">src/utils.ts</a></span></td>
       <td data-ice="identifier" class="identifiers"><span><a href="function/index.html#static-function-cleanEthHex">cleanEthHex</a></span>
 <span><a href="function/index.html#static-function-ethAddrEq">ethAddrEq</a></span>
-<span><a href="function/index.html#static-function-hexToBase32">hexToBase32</a></span>
-<span><a href="variable/index.html#static-variable-mkPacked">mkPacked</a></span>
-<span><a href="variable/index.html#static-variable-mkSubmissionBits">mkSubmissionBits</a></span></td>
-      <td class="coverage"><span data-ice="coverage">27 %</span><span data-ice="coverageCount" class="coverage-count">3/11</span></td>
-      <td style="display: none;" data-ice="size">2374 byte</td>
-      <td style="display: none;" data-ice="lines">102</td>
-      <td style="display: none;" data-ice="updated">2018-07-02 05:57:45 (UTC)</td>
+<span><a href="function/index.html#static-function-hexToBase32">hexToBase32</a></span></td>
+      <td class="coverage"><span data-ice="coverage">33 %</span><span data-ice="coverageCount" class="coverage-count">3/9</span></td>
+      <td style="display: none;" data-ice="size">2286 byte</td>
+      <td style="display: none;" data-ice="lines">98</td>
+      <td style="display: none;" data-ice="updated">2018-07-04 04:24:28 (UTC)</td>
     </tr>
 </tbody>
 </table>

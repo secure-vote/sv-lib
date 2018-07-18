@@ -2,8 +2,8 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <base data-ice="baseUrl" href="../">
-  <title data-ice="title">Variable | sv-lib</title>
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/light.ts | sv-lib</title>
   <link type="text/css" rel="stylesheet" href="css/style.css">
   <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
   <script src="script/prettify/prettify.js"></script>
@@ -64,305 +64,203 @@
 </div>
 </nav>
 
-<div class="content" data-ice="content"><h1 data-ice="title">Variable</h1>
-<div data-ice="summaries"><table class="summary" data-ice="summary">
-  <thead><tr><td data-ice="title" colspan="3">Static Public Summary</td></tr></thead>
-  <tbody>
-  
-  <tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-          
-          
-          
-          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-flags">flags</a></span></span><span class="code" data-ice="signature">: {&quot;USE_ETH&quot;: <span>*</span>, &quot;USE_SIGNED&quot;: <span>*</span>, &quot;USE_NO_ENC&quot;: <span>*</span>, &quot;USE_ENC&quot;: <span>*</span>, &quot;IS_BINDING&quot;: <span>*</span>, &quot;IS_OFFICIAL&quot;: <span>*</span>, &quot;USE_TESTING&quot;: <span>*</span>}</span>
-        </p>
-      </div>
-      <div>
-        
-        
-        <div data-ice="description"><p>This object tracks the flags used for SV ballot boxes.</p>
-</div>
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-<tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-          
-          
-          
-          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-networkVars">networkVars</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-<tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-          
-          
-          
-          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-zeroAddr">zeroAddr</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-<tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-          
-          
-          
-          <span class="code" data-ice="name"><span><a href="variable/index.html#static-variable-zeroHash">zeroHash</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-</tbody>
-</table>
-</div>
-<div data-ice="details"><h2 data-ice="title">Static Public </h2>
+<div class="content" data-ice="content"><h1 data-ice="title">src/light.ts</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const ENS = require(&apos;eth-ens-namehash&apos;);
+const Constants = require(&apos;./const&apos;);
+const axios = require(&apos;axios&apos;);
+const bs58 = require(&apos;bs58&apos;);
+const sha256 = require(&apos;sha256&apos;);
 
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-variable-flags">
-    <span class="access" data-ice="access">public</span>
-    
-    
-    
-    
-    
-    <span class="code" data-ice="name">flags</span><span class="code" data-ice="signature">: {&quot;USE_ETH&quot;: <span>*</span>, &quot;USE_SIGNED&quot;: <span>*</span>, &quot;USE_NO_ENC&quot;: <span>*</span>, &quot;USE_ENC&quot;: <span>*</span>, &quot;IS_BINDING&quot;: <span>*</span>, &quot;IS_OFFICIAL&quot;: <span>*</span>, &quot;USE_TESTING&quot;: <span>*</span>}</span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber13">source</a></span></span>
-    </span>
-  </h3>
+// Lovely ABIs
+const ResolverAbi = require(&apos;./smart_contracts/SV_ENS_Resolver.abi.json&apos;);
+const IndexAbi = require(&apos;./smart_contracts/SVLightIndex.abi.json&apos;);
+const BackendAbi = require(&apos;./smart_contracts/SVLightIndexBackend.abi.json&apos;);
+const BBFarmAbi = require(&apos;./smart_contracts/BBFarm.abi.json&apos;);
+const PaymentsAbi = require(&apos;./smart_contracts/SVPayments.abi.json&apos;);
+const AuxAbi = require(&apos;./smart_contracts/AuxAbi.abi.json&apos;);
+const AuctionAbi = require(&apos;./smart_contracts/CommAuctionIface.abi.json&apos;);
+const ERC20Abi = require(&apos;./smart_contracts/ERC20.abi.json&apos;);
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {flags} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber13">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
-  
-  
-  <div data-ice="description"><p>This object tracks the flags used for SV ballot boxes. They determine the submission
-methods and whether ballots are tracked as binding, official, or testing.</p>
-<p>For more info see docs.secure.vote</p>
-</div>
 
-  
+export const initializeSvLight = async svConfig =&gt; {
+  const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig;
 
-  <div data-ice="properties">
-</div>
+  const Web3 = require(&apos;web3&apos;);
+  const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider));
 
-  
+  const resolver = new web3.eth.Contract(ResolverAbi, ensResolver);
 
-  
+  // const indexAddress =
+  // console.log(&apos;indexAddress :&apos;, indexAddress);
+  const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexContractName));
+  const backendAddress = await getBackendAddress({ index });
+  const backend = new web3.eth.Contract(BackendAbi, backendAddress);
+  const aux = new web3.eth.Contract(AuxAbi, auxContract);
+  const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())
 
-  
+  return {
+    svConfig,
+    web3,
+    resolver,
+    index,
+    backend,
+    aux,
+    payments
+  };
+};
 
-  
+export const resolveEnsAddress = async ({ resolver }, ensName) =&gt; {
+  return await resolver.methods.addr(ENS.hash(ensName)).call();
+};
 
-  
+export const getBackendAddress = async ({ index }) =&gt; {
+  return await index.methods.getBackend().call();
+};
 
-  
+export const getDemocInfo = async ({ backend, democHash }) =&gt; {
+  return await backend.methods.getDInfo(democHash).call();
+};
 
-  
+export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) =&gt; {
+  // Destructure and set the variables that are needed
+  const { index, backend, aux, svConfig } = svNetwork;
+  const { democHash, nthBallot } = democBallotInfo;
+  const indexAddress = index._address;
+  const backendAddress = backend._address;
+  const archiveUrl = { svConfig };
 
-  
-  
-</div>
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-variable-networkVars">
-    <span class="access" data-ice="access">public</span>
-    
-    
-    
-    
-    
-    <span class="code" data-ice="name">networkVars</span><span class="code" data-ice="signature">: <span>*</span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/src/const.ts.html#lineNumber57">source</a></span></span>
-    </span>
-  </h3>
+  const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(backendAddress, indexAddress, democHash, nthBallot).call();
+  // console.log(&apos;bbFarmAndBallotId :&apos;, bbFarmAndBallotId);
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {networkVars} from &apos;<span><a href="file/src/const.ts.html#lineNumber57">sv-lib/src/const.ts</a></span>&apos;</code></pre></div>
-  
-  
-  
+  const { id, bbFarmAddress } = bbFarmAndBallotId;
+  const userEthAddress = &apos;0x0000000000000000000000000000000000000000&apos;;
+  const ethBallotDetails = await aux.methods.getBallotDetails(id, bbFarmAddress, userEthAddress).call();
 
-  
+  const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash);
+  // console.log(&apos;ballotSpec :&apos;, ballotSpec);
+  // .then(x =&gt; console.log(&apos;Then called&apos;, x))
+  // .catch(x =&gt; console.log(&apos;Caught error&apos;, x));
 
-  <div data-ice="properties">
-</div>
+  const ballotObject = { ...bbFarmAndBallotId, ...ethBallotDetails, data: { ...ballotSpec.data } };
 
-  
+  return ballotObject;
+};
 
-  
+export const getBallotSpec = async (archiveUrl, ballotSpecHash): Promise&lt;{data: any}&gt; =&gt; {
+  // TODO refactor to be a bit more elegant
+  return new Promise&lt;{data: any}&gt;((res, rej) =&gt; {
+    let done = false;
+    const doRes = obj =&gt; {
+      if (!done) {
+        done = true;
+        res(obj);
+      }
+    };
+    getBallotObjectFromIpfs(ballotSpecHash).then(doRes);
+    setTimeout(() =&gt; {
+      if (!done) {
+        getBallotObjectFromS3(archiveUrl, ballotSpecHash)
+          .then(doRes)
+          .catch(rej);
+      }
+    }, 3500);
+  });
+};
 
-  
+export const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) =&gt; {
+  return axios.get(archiveUrl + ballotSpecHash + &apos;.json&apos;);
+};
 
-  
+export const getBallotObjectFromIpfs = async ballotSpecHash =&gt; {
+  const ipfsUrl = &apos;https://ipfs.infura.io/api/v0/block/get?arg=&apos;;
+  const cidHex = &apos;1220&apos; + ballotSpecHash.substr(2);
+  const bytes = Buffer.from(cidHex, &apos;hex&apos;);
+  const cid = bs58.encode(bytes);
+  return await axios.get(ipfsUrl + cid);
+};
 
-  
+// Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array
+export const getDemocBallots = async ({ svNetwork, democHash }) =&gt; {
+  const { backend } = svNetwork;
+  const democInfo = await getDemocInfo({ backend, democHash });
 
-  
+  // Throw an error if the democ info is not correct
+  const {erc20, owner} = democInfo
+  if (owner === &apos;0x0000000000000000000000000000000000000000&apos;) {
+    throw new Error(&apos;Democracy Hash does not resolve to a democracy&apos;)
+  }
 
-  
+  // TODO - Work out where / how to push an errored ballot
+  // Loop through and get all the ballots
+  const numBallots = democInfo.nBallots;
+  const ballotsArray = [];
+  for (let i = 0; i &lt; numBallots; i++) {
+    ballotsArray[i] = await getDemocNthBallot({ svNetwork }, { democHash: democHash, nthBallot: i });
+  }
 
-  
-  
-</div>
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-variable-zeroAddr">
-    <span class="access" data-ice="access">public</span>
-    
-    
-    
-    
-    
-    <span class="code" data-ice="name">zeroAddr</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/src/const.ts.html#lineNumber1">source</a></span></span>
-    </span>
-  </h3>
+  return ballotsArray;
+};
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {zeroAddr} from &apos;<span><a href="file/src/const.ts.html#lineNumber1">sv-lib/src/const.ts</a></span>&apos;</code></pre></div>
-  
-  
-  
+/** Takes in the svNetwork object and returns all relevant addresses */
+export const getContractAddresses = async ({svNetwork}) =&gt; {
+  const {index, resolver, backend, aux, svConfig} = svNetwork
+  const { delegationContractName, lookupAddress } = svConfig
 
-  
+  return {
+    indexAddress: index._address,
+    backendAddress: backend._address,
+    auxAddress: aux._address,
+    lookupAddress: lookupAddress,
+    resolverAddress: resolver._address,
+    communityAuctionAddress: await index.methods.getCommAuction().call(),
+    delegationAddress: await resolveEnsAddress({ resolver }, delegationContractName),
+    paymentsAddress: await index.methods.getPayments().call(),
+  }
+}
 
-  <div data-ice="properties">
-</div>
+export const weiToCents = async ({payments}, wei) =&gt; {
+  return await payments.methods.weiToCents(wei).call()
+}
 
-  
+export const getCommunityBallotPrice = async ({payments}, democHash) =&gt; {
+  return await payments.methods.getNextPrice(democHash).call()
+}
 
-  
+export const checkIfAddressIsEditor = async ({ svNetwork }, { userAddress, democHash }) =&gt; {
+  const {backend} = svNetwork
+  return await backend.methods.isDEditor(democHash, userAddress).call();
+};
 
-  
+// Checks the current ethereum gas price and returns a couple of values
+export const getCurrentGasPrice = async () =&gt; {
+  const gasStationInfo = await axios.get(&apos;https://ethgasstation.info/json/ethgasAPI.json&apos;)
+  const {data} = gasStationInfo
 
-  
+  return {
+    safeLow: data.safeLow / 10,
+    average: data.average / 10,
+    fast: data.fast / 10,
+    fastest: data.fastest / 10,
+  }
+}
+// Checks the ballot hash against the ballot content
+export const checkBallotHashBSpec = (ballotSpec, assertSpecHash) =&gt; {
+    let contentHash = &apos;0x&apos; + sha256(JSON.stringify(ballotSpec, null, 2));
+    if (assertSpecHash === contentHash) {
+      return true;
+    } else {
+      return false;
+    }
+}
 
-  
+// Checks the ballot hash against a ballot global ballot object
+// Does this by destructuring the specHash and data out of it
+export const checkBallotHashGBallot = (ballotObject) =&gt; {
+  const {data, specHash} = ballotObject
+  return checkBallotHashBSpec(data, specHash)
+}
+</code></pre>
 
-  
-
-  
-
-  
-  
-</div>
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-variable-zeroHash">
-    <span class="access" data-ice="access">public</span>
-    
-    
-    
-    
-    
-    <span class="code" data-ice="name">zeroHash</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/src/const.ts.html#lineNumber2">source</a></span></span>
-    </span>
-  </h3>
-
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {zeroHash} from &apos;<span><a href="file/src/const.ts.html#lineNumber2">sv-lib/src/const.ts</a></span>&apos;</code></pre></div>
-  
-  
-  
-
-  
-
-  <div data-ice="properties">
-</div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-</div>
-</div>
 </div>
 
 <footer class="footer">

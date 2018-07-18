@@ -1,22 +1,41 @@
 {
-  "coverage": "17.85%",
-  "expectCount": 56,
-  "actualCount": 10,
+  "coverage": "17.74%",
+  "expectCount": 62,
+  "actualCount": 11,
   "files": {
-    "src/ballotBox.js": {
+    "src/ballotBox.test.ts": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        1,
+        2
+      ]
+    },
+    "src/ballotBox.ts": {
       "expectCount": 11,
-      "actualCount": 4,
+      "actualCount": 5,
       "undocumentLines": [
         1,
         2,
         3,
         4,
         5,
-        6,
-        41
+        6
       ]
     },
-    "src/crypto.js": {
+    "src/const.ts": {
+      "expectCount": 6,
+      "actualCount": 0,
+      "undocumentLines": [
+        1,
+        2,
+        3,
+        57,
+        63,
+        80
+      ]
+    },
+    "src/crypto.ts": {
       "expectCount": 5,
       "actualCount": 2,
       "undocumentLines": [
@@ -25,7 +44,7 @@
         3
       ]
     },
-    "src/light.js": {
+    "src/light.ts": {
       "expectCount": 29,
       "actualCount": 1,
       "undocumentLines": [
@@ -34,6 +53,7 @@
         3,
         4,
         5,
+        7,
         8,
         9,
         10,
@@ -42,35 +62,32 @@
         13,
         14,
         15,
-        17,
-        44,
-        48,
-        52,
-        56,
-        81,
-        103,
-        107,
-        116,
-        154,
-        158,
-        162,
-        168,
-        180,
-        191
+        37,
+        40,
+        43,
+        46,
+        65,
+        85,
+        88,
+        96,
+        128,
+        131,
+        134,
+        139,
+        150,
+        161
       ]
     },
-    "src/utils.js": {
-      "expectCount": 11,
+    "src/utils.ts": {
+      "expectCount": 9,
       "actualCount": 3,
       "undocumentLines": [
+        1,
         2,
         3,
         4,
-        7,
-        54,
-        55,
-        59,
-        60
+        43,
+        44
       ]
     }
   }

@@ -1,8 +1,21 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.zeroAddr = "0x0000000000000000000000000000000000000000";
-exports.zeroHash = "0x0000000000000000000000000000000000000000000000000000000000000000";
-const _raw_networkVars = {
+export const zeroAddr = "0x0000000000000000000000000000000000000000";
+export const zeroHash = "0x0000000000000000000000000000000000000000000000000000000000000000";
+
+type EthNetConf = {
+    indexContractName: string
+    auxContract: string
+    httpProvider: string
+    delegationContractName: string
+    ensResolver: string
+    ens: string
+    etherscanLink: string
+    name: string
+    archiveUrl: string
+    archivePushUrl: string
+    lookupAddress: string
+}
+
+const _raw_networkVars: {[netName: string]: EthNetConf} = {
     kovan: {
         indexContractName: "index.kov.sv",
         auxContract: "0x0d31706febd1b8177c722fe39432f3e47143ccd9",
@@ -49,21 +62,24 @@ const _raw_networkVars = {
         delegationContractName: "",
         ensResolver: "",
         ens: "",
-        etherscanLink: "https://gastracker.io/",
+        etherscanLink: "https://gastracker.io/",  // eth classic block explorer
         name: "Classic",
         archiveUrl: "https://archive.secure.vote/",
         archivePushUrl: "https://archive.push.secure.vote/",
         lookupAddress: ""
     },
 };
-exports.networkVars = new Proxy(_raw_networkVars, {
-    get: (obj, prop) => {
+
+export const networkVars = new Proxy(_raw_networkVars, {
+    get: (obj, prop: string) => {
         console.warn("Warning: const.networkVars is deprecated; please use const.getNetwork(..)");
         return obj[prop];
     }
 });
-exports.networkName = networkId => {
+
+export const networkName = networkId => {
     console.warn("Warning: const.networkName(..) is deprecated. Please use const.getNetwork(..).name");
+
     switch (networkId) {
         case 1:
             return "Mainnet";
@@ -79,20 +95,19 @@ exports.networkName = networkId => {
             return "Unknown";
     }
 };
-exports.getNetwork = (networkId, chainId) => {
+
+export const getNetwork = (networkId: number, chainId: number): EthNetConf => {
     switch (networkId) {
         case 1:
-            if (chainId === 1)
-                return _raw_networkVars.mainnet;
-            if (chainId === 61)
-                return _raw_networkVars.classic;
+            if (chainId === 1) return _raw_networkVars.mainnet
+            if (chainId === 61) return _raw_networkVars.classic
             break;
         case 3:
-            return _raw_networkVars.ropsten;
+            return _raw_networkVars.ropsten
         case 42:
-            return _raw_networkVars.kovan;
+            return _raw_networkVars.kovan
         default:
             break;
     }
-    throw Error(`Cannot find network with net_id ${networkId} and chainId ${chainId}`);
-};
+    throw Error(`Cannot find network with net_id ${networkId} and chainId ${chainId}`)
+}

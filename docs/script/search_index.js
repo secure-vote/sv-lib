@@ -1,171 +1,189 @@
 window.esdocSearchIndex = [
   [
-    "sv-lib/src/light.js~checkballothashbspec",
+    "sv-lib/src/light.ts~checkballothashbspec",
     "function/index.html#static-function-checkBallotHashBSpec",
-    "<span>checkBallotHashBSpec</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>checkBallotHashBSpec</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~checkballothashgballot",
+    "sv-lib/src/light.ts~checkballothashgballot",
     "function/index.html#static-function-checkBallotHashGBallot",
-    "<span>checkBallotHashGBallot</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>checkBallotHashGBallot</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~checkifaddressiseditor",
+    "sv-lib/src/light.ts~checkifaddressiseditor",
     "function/index.html#static-function-checkIfAddressIsEditor",
-    "<span>checkIfAddressIsEditor</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>checkIfAddressIsEditor</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/utils.js~cleanethhex",
+    "sv-lib/src/utils.ts~cleanethhex",
     "function/index.html#static-function-cleanEthHex",
-    "<span>cleanEthHex</span> <span class=\"search-result-import-path\">sv-lib/src/utils.js</span>",
+    "<span>cleanEthHex</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/utils.js~ethaddreq",
+    "sv-lib/src/utils.ts~ethaddreq",
     "function/index.html#static-function-ethAddrEq",
-    "<span>ethAddrEq</span> <span class=\"search-result-import-path\">sv-lib/src/utils.js</span>",
+    "<span>ethAddrEq</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/crypto.js~ethsignhash",
+    "sv-lib/src/crypto.ts~ethsignhash",
     "function/index.html#static-function-ethSignHash",
-    "<span>ethSignHash</span> <span class=\"search-result-import-path\">sv-lib/src/crypto.js</span>",
+    "<span>ethSignHash</span> <span class=\"search-result-import-path\">sv-lib/src/crypto.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/ballotbox.js~flags",
+    "sv-lib/src/ballotbox.ts~flags",
     "variable/index.html#static-variable-flags",
-    "<span>flags</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.js</span>",
+    "<span>flags</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
     "variable"
   ],
   [
-    "sv-lib/src/ballotbox.js~genrange3votedata",
+    "sv-lib/src/ballotbox.ts~genrange3votedata",
     "function/index.html#static-function-genRange3VoteData",
-    "<span>genRange3VoteData</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.js</span>",
+    "<span>genRange3VoteData</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~getbackendaddress",
+    "sv-lib/src/light.ts~getbackendaddress",
     "function/index.html#static-function-getBackendAddress",
-    "<span>getBackendAddress</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>getBackendAddress</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~getballotobjectfromipfs",
+    "sv-lib/src/light.ts~getballotobjectfromipfs",
     "function/index.html#static-function-getBallotObjectFromIpfs",
-    "<span>getBallotObjectFromIpfs</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>getBallotObjectFromIpfs</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~getballotobjectfroms3",
+    "sv-lib/src/light.ts~getballotobjectfroms3",
     "function/index.html#static-function-getBallotObjectFromS3",
-    "<span>getBallotObjectFromS3</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>getBallotObjectFromS3</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~getballotspec",
+    "sv-lib/src/light.ts~getballotspec",
     "function/index.html#static-function-getBallotSpec",
-    "<span>getBallotSpec</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>getBallotSpec</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~getcommunityballotprice",
+    "sv-lib/src/light.ts~getcommunityballotprice",
     "function/index.html#static-function-getCommunityBallotPrice",
-    "<span>getCommunityBallotPrice</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>getCommunityBallotPrice</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~getcontractaddresses",
+    "sv-lib/src/light.ts~getcontractaddresses",
     "function/index.html#static-function-getContractAddresses",
-    "<span>getContractAddresses</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>getContractAddresses</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~getcurrentgasprice",
+    "sv-lib/src/light.ts~getcurrentgasprice",
     "function/index.html#static-function-getCurrentGasPrice",
-    "<span>getCurrentGasPrice</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>getCurrentGasPrice</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~getdemocballots",
+    "sv-lib/src/light.ts~getdemocballots",
     "function/index.html#static-function-getDemocBallots",
-    "<span>getDemocBallots</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>getDemocBallots</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~getdemocinfo",
+    "sv-lib/src/light.ts~getdemocinfo",
     "function/index.html#static-function-getDemocInfo",
-    "<span>getDemocInfo</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>getDemocInfo</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~getdemocnthballot",
+    "sv-lib/src/light.ts~getdemocnthballot",
     "function/index.html#static-function-getDemocNthBallot",
-    "<span>getDemocNthBallot</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>getDemocNthBallot</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/crypto.js~hashmsgraw",
+    "sv-lib/src/const.ts~getnetwork",
+    "function/index.html#static-function-getNetwork",
+    "<span>getNetwork</span> <span class=\"search-result-import-path\">sv-lib/src/const.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/crypto.ts~hashmsgraw",
     "function/index.html#static-function-hashMsgRaw",
-    "<span>hashMsgRaw</span> <span class=\"search-result-import-path\">sv-lib/src/crypto.js</span>",
+    "<span>hashMsgRaw</span> <span class=\"search-result-import-path\">sv-lib/src/crypto.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/utils.js~hextobase32",
+    "sv-lib/src/utils.ts~hextobase32",
     "function/index.html#static-function-hexToBase32",
-    "<span>hexToBase32</span> <span class=\"search-result-import-path\">sv-lib/src/utils.js</span>",
+    "<span>hexToBase32</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~initializesvlight",
+    "sv-lib/src/light.ts~initializesvlight",
     "function/index.html#static-function-initializeSvLight",
-    "<span>initializeSvLight</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>initializeSvLight</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/ballotbox.js~mkpacked",
+    "sv-lib/src/ballotbox.ts~mkpacked",
     "function/index.html#static-function-mkPacked",
-    "<span>mkPacked</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.js</span>",
+    "<span>mkPacked</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/utils.js~mkpacked",
-    "variable/index.html#static-variable-mkPacked",
-    "<span>mkPacked</span> <span class=\"search-result-import-path\">sv-lib/src/utils.js</span>",
-    "variable"
-  ],
-  [
-    "sv-lib/src/ballotbox.js~mksignedballotforproxy",
+    "sv-lib/src/ballotbox.ts~mksignedballotforproxy",
     "function/index.html#static-function-mkSignedBallotForProxy",
-    "<span>mkSignedBallotForProxy</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.js</span>",
+    "<span>mkSignedBallotForProxy</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/ballotbox.js~mksubmissionbits",
+    "sv-lib/src/ballotbox.ts~mksubmissionbits",
     "function/index.html#static-function-mkSubmissionBits",
-    "<span>mkSubmissionBits</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.js</span>",
+    "<span>mkSubmissionBits</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/utils.js~mksubmissionbits",
-    "variable/index.html#static-variable-mkSubmissionBits",
-    "<span>mkSubmissionBits</span> <span class=\"search-result-import-path\">sv-lib/src/utils.js</span>",
+    "sv-lib/src/const.ts~networkname",
+    "function/index.html#static-function-networkName",
+    "<span>networkName</span> <span class=\"search-result-import-path\">sv-lib/src/const.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/const.ts~networkvars",
+    "variable/index.html#static-variable-networkVars",
+    "<span>networkVars</span> <span class=\"search-result-import-path\">sv-lib/src/const.ts</span>",
     "variable"
   ],
   [
-    "sv-lib/src/light.js~resolveensaddress",
+    "sv-lib/src/light.ts~resolveensaddress",
     "function/index.html#static-function-resolveEnsAddress",
-    "<span>resolveEnsAddress</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>resolveEnsAddress</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
-    "sv-lib/src/light.js~weitocents",
+    "sv-lib/src/light.ts~weitocents",
     "function/index.html#static-function-weiToCents",
-    "<span>weiToCents</span> <span class=\"search-result-import-path\">sv-lib/src/light.js</span>",
+    "<span>weiToCents</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
+  ],
+  [
+    "sv-lib/src/const.ts~zeroaddr",
+    "variable/index.html#static-variable-zeroAddr",
+    "<span>zeroAddr</span> <span class=\"search-result-import-path\">sv-lib/src/const.ts</span>",
+    "variable"
+  ],
+  [
+    "sv-lib/src/const.ts~zerohash",
+    "variable/index.html#static-variable-zeroHash",
+    "<span>zeroHash</span> <span class=\"search-result-import-path\">sv-lib/src/const.ts</span>",
+    "variable"
   ],
   [
     "src/.external-ecmascript.js~array",
@@ -450,39 +468,45 @@ window.esdocSearchIndex = [
     "external"
   ],
   [
-    "src/ballotbox.js",
-    "file/src/ballotBox.js.html",
-    "src/ballotBox.js",
+    "src/ballotbox.test.ts",
+    "file/src/ballotBox.test.ts.html",
+    "src/ballotBox.test.ts",
     "file"
   ],
   [
-    "src/const.js",
-    "file/src/const.js.html",
-    "src/const.js",
+    "src/ballotbox.ts",
+    "file/src/ballotBox.ts.html",
+    "src/ballotBox.ts",
     "file"
   ],
   [
-    "src/crypto.js",
-    "file/src/crypto.js.html",
-    "src/crypto.js",
+    "src/const.ts",
+    "file/src/const.ts.html",
+    "src/const.ts",
     "file"
   ],
   [
-    "src/index.js",
-    "file/src/index.js.html",
-    "src/index.js",
+    "src/crypto.ts",
+    "file/src/crypto.ts.html",
+    "src/crypto.ts",
     "file"
   ],
   [
-    "src/light.js",
-    "file/src/light.js.html",
-    "src/light.js",
+    "src/index.ts",
+    "file/src/index.ts.html",
+    "src/index.ts",
     "file"
   ],
   [
-    "src/utils.js",
-    "file/src/utils.js.html",
-    "src/utils.js",
+    "src/light.ts",
+    "file/src/light.ts.html",
+    "src/light.ts",
+    "file"
+  ],
+  [
+    "src/utils.ts",
+    "file/src/utils.ts.html",
+    "src/utils.ts",
     "file"
   ]
 ]
