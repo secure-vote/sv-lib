@@ -1,8 +1,4 @@
-const R = require('ramda')
-const BN = require('bn.js')
-const assert = require('assert')
-
-const bb = require('./ballotBox')
+import * as R from 'ramda'
 
 /**
  * This will take an Ethereum hex string (or a normal hex string) and

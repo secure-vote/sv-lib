@@ -1,6 +1,6 @@
 {
   "name": "sv-lib",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "SecureVote Light supporting functionality",
   "main": "dist/index.umd.js",
   "module": "dist/index.es5.js",
@@ -88,7 +88,7 @@
   "scripts": {
     "dev": "tsc -w",
     "docs": "esdoc",
-    "prepublish": "tsc && yarn docs",
+    "prepublish": "yarn build",
     "lint": "tslint -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf dist",
     "build": "tsc --module commonjs && rollup -c rollup.config.ts && esdoc # typedoc --out docs --target es6 --theme minimal --mode file src",

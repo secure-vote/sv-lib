@@ -1,6 +1,6 @@
 {
-  "coverage": "32.5%",
-  "expectCount": 40,
+  "coverage": "36.11%",
+  "expectCount": 36,
   "actualCount": 13,
   "files": {
     "src/ballotBox.ts": {
@@ -47,15 +47,11 @@
       ]
     },
     "src/utils.ts": {
-      "expectCount": 9,
+      "expectCount": 5,
       "actualCount": 3,
       "undocumentLines": [
-        1,
-        2,
-        3,
-        4,
-        43,
-        44
+        40,
+        41
       ]
     }
   }
