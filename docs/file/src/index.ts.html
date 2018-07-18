@@ -62,23 +62,18 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-networkVars">networkVars</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroAddr">zeroAddr</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroHash">zeroHash</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-_const">_const</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ballotBox">ballotBox</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-crypto">crypto</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-light">light</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-utils">utils</a></span></span></li>
 </ul>
 </div>
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/index.ts</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">export const ballotBox = require(&apos;./ballotBox&apos;)
-export const _const = require(&apos;./const&apos;)
-export const crypto = require(&apos;./crypto&apos;)
-export const light = require(&apos;./light&apos;)
-export const utils = require(&apos;./utils.js&apos;)
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import * as ballotBox from &apos;./ballotBox&apos;
+import * as _const from &apos;./const&apos;
+import * as crypto from &apos;./crypto&apos;
+import * as light from &apos;./light&apos;
+import * as utils from &apos;./utils.js&apos;
 
-module.exports.const = module.exports._const
+export default { ballotBox, crypto, light, utils, const: _const }
 </code></pre>
 
 </div>

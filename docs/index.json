@@ -566,82 +566,8 @@
   {
     "__docId__": 48,
     "kind": "file",
-    "name": "src/ballotBox.test.ts",
-    "content": "const bb = require('./ballotBox')\nconst _const = require('./const')\nconst Account = require('eth-lib/lib/account')\n\n\ntest('create and verify proxy ballots', () => {\n    const privKey = \"0x0100000000000000000000000000000000000000000000000000000000000000\"\n    const acct = Account.fromPrivate(privKey)\n    const {address} = acct\n\n    const proxyVote = bb.mkSignedBallotForProxy(\n        \"0x0000000000000000053970000000000000000000000000000000000000000000\", // some ballot id\n        1, // sequence num\n        \"0x4000000000000000000000000000000000000000000000000000000000000000\", // some voteData\n        \"0x\", // trivial extra\n        privKey\n    )\n\n    const verificationResp = bb.verifySignedBallotForProxy(proxyVote)\n\n    expect(verificationResp.address.toLowerCase()).toEqual(address.toLowerCase())\n    expect(verificationResp.verified).toEqual(true)\n})\n\n\ntest('generates correct range3 voteData', () => {\n    // trivial case\n    expect(bb.genRange3VoteData([])).toEqual(_const.zeroHash)\n\n    // format for binary-no votes\n    expect(bb.genRange3VoteData([-1])).toEqual(\"0x4000000000000000000000000000000000000000000000000000000000000000\")\n\n    // format for binary-yes votes\n    expect(bb.genRange3VoteData([1])).toEqual(\"0x8000000000000000000000000000000000000000000000000000000000000000\")\n\n    // more complex examples\n\n    // raw vote bits: 000 001 010 011 100 101 110\n    expect(bb.genRange3VoteData([-3,-2,-1,0,1,2,3])).toEqual(\"0x0539700000000000000000000000000000000000000000000000000000000000\")\n\n    // 000 000 010\n    expect(bb.genRange3VoteData([-3,-3,-1])).toEqual(\"0x0100000000000000000000000000000000000000000000000000000000000000\")\n\n    // 000 000 010 000 000 100\n    expect(bb.genRange3VoteData([-3,-3,-1,-3,-3,1])).toEqual(\"0x0101000000000000000000000000000000000000000000000000000000000000\")\n\n    // 000 000 100\n    expect(bb.genRange3VoteData([-3,-3,1])).toEqual(\"0x0200000000000000000000000000000000000000000000000000000000000000\")\n})\n",
-    "static": true,
-    "longname": "/Users/maxkaye/src/sv/lib/src/ballotBox.test.ts",
-    "access": "public",
-    "description": null,
-    "lineNumber": 1
-  },
-  {
-    "__docId__": 49,
-    "kind": "variable",
-    "name": "bb",
-    "memberof": "src/ballotBox.test.ts",
-    "static": true,
-    "longname": "src/ballotBox.test.ts~bb",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/ballotBox.test.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 1,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 50,
-    "kind": "variable",
-    "name": "_const",
-    "memberof": "src/ballotBox.test.ts",
-    "static": true,
-    "longname": "src/ballotBox.test.ts~_const",
-    "access": "private",
-    "export": false,
-    "importPath": "sv-lib/src/ballotBox.test.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 2,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 51,
-    "kind": "variable",
-    "name": "Account",
-    "memberof": "src/ballotBox.test.ts",
-    "static": true,
-    "longname": "src/ballotBox.test.ts~Account",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/ballotBox.test.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 3,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 52,
-    "kind": "file",
     "name": "src/ballotBox.ts",
-    "content": "import { ProxyVote } from \"./types\";\n\nconst R = require('ramda')\nconst BN = require('bn.js')\nconst assert = require('assert')\nconst web3Utils = require('web3-utils')\nconst svCrypto = require('./crypto')\nconst Account = require('eth-lib/lib/account')\n\n/**\n * This object tracks the flags used for SV ballot boxes. They determine the submission\n * methods and whether ballots are tracked as binding, official, or testing.\n *\n * For more info see docs.secure.vote\n */\nexport const flags = {\n    // flags on submission methods\n    USE_ETH: 2**0,\n    USE_SIGNED: 2**1,\n    USE_NO_ENC: 2**2,\n    USE_ENC: 2**3,\n\n    // other ballot settings\n    IS_BINDING: 2**13,\n    IS_OFFICIAL: 2**14,\n    USE_TESTING: 2**15,\n}\n\n\n/**\n * Creates a packed copy of start and end times with submissionBits\n *\n * @param {number} start\n *  Start time in seconds since epoch\n * @param {number} end\n *  End time in seconds since epoch\n * @param {number} submissionBits\n *  Submission bits - can be created using mkSubmissionBits\n * @returns {BN}\n *  Returns a `bn.js` BigNum of the packed values.\n *  Format: [submissionBits(16)][startTime(64)][endTime(64)]\n */\nexport const mkPacked = (start, end, submissionBits) => {\n    const s = new BN(start)\n    const e = new BN(end)\n    const sb = new BN(submissionBits)\n    return sb.shln(64).add(s).shln(64).add(e);\n}\n\n\n/**\n * This combines flags into a finished submissionBits. It also does some validation.\n * @param {*} toCombine\n *  Array of all submission flags to combine. See SV.ballotBox.flags for flag options.\n *  All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining).\n * @returns {number}\n *  A 16 bit integer of combined flags.\n */\nexport const mkSubmissionBits = (...toCombine) => {\n    if (Array.isArray(toCombine[0]) && typeof toCombine[0][0] == \"number\") {\n        console.warn(\"Warning: mkSubmissionBits does not take an Array<number> anymore.\")\n        toCombine = toCombine[0];\n    }\n\n    const toRet = R.reduce((acc, i) => acc | i, 0, toCombine);\n    assert.equal(R.all(i => typeof i == \"number\", toCombine), true, `Bad input to mkSubmissionBits. Input is required to be an array of numbers. Instead got: ${toCombine}`);\n    assert.equal(R.all(i => i === (i | 0), toCombine), true, `Bad input to mkSubmissionBits. Input was not an array of integers. Instead got: ${toCombine}`);\n    assert.equal(toRet, R.sum(toCombine), `Bad input provided to mkSubmissionBits. Logical OR and sum sanity check failed. Input was: ${toCombine}`);\n    assert.equal(toRet < 2**16, true, `Submission bits must fit into a 16 bit integer (i.e. less than 2^16). Result was: ${toRet}`);\n    return toRet;\n}\n\n\n/**\n * Take the arguments and produce web3 data fitting the `submitProxyVote` method.\n * @param {string} ballotId\n *  a BN.js or Hex ballotId\n * @param {number} sequence\n *  the sequence number to use (0 < sequence < 2^32)\n * @param {string} voteData\n *  the vote data to use, should be 32 bytes hex encoded\n * @param {string} extra\n *  any extra data included with the vote (such as curve25519 pubkeys)\n * @param {string} privateKey\n *  the privkey used to sign\n * @param {object?} opts\n *  options:\n *   - skipSequenceSizeCheck: boolean (will not throw if sequence is >= 2^32)\n * @returns {object}\n *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`\n */\nexport const mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts:any = {}): ProxyVote => {\n    if (opts.skipSequenceSizeCheck !== true)\n        assert.equal(0 < sequence && sequence < 2**32, true, \"sequence number out of bounds\")\n    assert.equal(web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId), true, \"ballotId incorrect format (either not a BN or not hex)\")\n    assert.equal(web3Utils.isHexStrict(voteData), true, \"vote data is not hex (strict)\")\n    assert.equal(web3Utils.isHexStrict(extra), true, \"extra param is not hex (strict)\")\n\n    const _ballotId = web3Utils.isBN(ballotId) ? web3Utils.padLeft(web3Utils.toHex(ballotId), 64) : ballotId\n\n    assert.equal(_ballotId.length, 66, 'ballotId incorrect length')\n    assert.equal(voteData.length, 66, 'voteData incorrect length')\n\n    const sequenceHex = web3Utils.padLeft(web3Utils.toHex(sequence), 8)\n\n    const messageHash = web3Utils.soliditySha3( {t: 'bytes31', v: web3Utils.padLeft(sequenceHex, '62')}\n                                              , {t: 'bytes32', v: _ballotId}\n                                              , {t: 'bytes32', v: voteData}\n                                              , {t: 'bytes', v: extra}\n                                              )\n\n    const {v,r,s} = svCrypto.ethSignHash(messageHash, privateKey)\n\n    const vBytes = web3Utils.hexToBytes(v)\n    const midBytes = web3Utils.hexToBytes(web3Utils.padRight('0x', 54))\n    const sequenceBytes = web3Utils.hexToBytes(sequenceHex)\n    const packed2Bytes = R.concat(vBytes, R.concat(midBytes, sequenceBytes))\n    const packed2 = web3Utils.bytesToHex(packed2Bytes)\n\n    return {\n        proxyReq:\n            [ r\n            , s\n            , packed2\n            , _ballotId\n            , voteData\n            ],\n        extra\n    }\n}\n\n\n/**\n * Verify a signed vote to be submitted via proxy as generated by `mkSignedBallotForProxy`\n *\n * @param {ProxyVote} proxyVote The ProxyVote object\n * @param {*} [opts={}] Not used currently; for future options\n * @returns {{verified: bool, address: EthAddress}}\n */\nexport const verifySignedBallotForProxy = (proxyVote: ProxyVote, opts:any = {}) => {\n    const {proxyReq: [r, s, packed2, ballotId, voteData], extra} = proxyVote\n\n    const p2Bytes = web3Utils.hexToBytes(packed2)\n    const v = web3Utils.bytesToHex(p2Bytes.slice(0, 1))\n    const seqNum = web3Utils.bytesToHex(p2Bytes.slice(27, 32))\n\n    const messageHash = web3Utils.soliditySha3( {t: 'bytes31', v: web3Utils.bytesToHex(p2Bytes.slice(1))}\n                                              , {t: 'bytes32', v: ballotId}\n                                              , {t: 'bytes32', v: voteData}\n                                              , {t: 'bytes', v: extra}\n                                              )\n\n    return svCrypto.ethVerifySig(messageHash, [v,r,s])\n}\n\n\n/**\n * Prepares voteData for a Range3 ballot from an array of votes\n *\n * @param {array} votesArray\n *  Takes an array of numbers which represent the votes to be transformed\n *  Format: [1, 2, -1]\n *\n * @returns {string}\n *  Returns an eth hex string of the vote data\n */\nexport const genRange3VoteData = votesArray => {\n    assert.equal(R.all(v => (v | 0) === v, votesArray), true, \"All array elements must be defined and integers.\")\n    assert.equal(R.all(v => -3 <= v && v <= 3, votesArray), true, \"Votes must be in range -3 to 3.\")\n    assert.equal(votesArray.length <= 85, true, \"Too many votes; maximum capacity of 32 bytes is 85 individual items.\")\n\n    // Generate list of binary encoded votes. Read bottom to top.\n    const binaryVotes = R.compose(\n        // pad to 3 bits\n        R.map(vBin => R.join('', R.repeat('0', 3 - vBin.length)) + vBin),\n        // convert votes to binary\n        R.map(v => v.toString(2)),\n        // offset votes to be in range 0,6\n        R.map(v => v + 3)\n    )(votesArray)\n\n    // check we have converted votes to bitstring representation of length 3\n    assert.equal(R.all(bVote => bVote.length == 3, binaryVotes), true, \"Assertion failed: all binary-encoded votes should be 3 bits long\")\n\n    // create the binary voteData\n    const rawBinVotes = R.join('', binaryVotes)\n    // and pad it with 0s to length 256 (32 bytes total)\n    const binVoteData = rawBinVotes + R.join('', R.repeat('0', 32*8 - rawBinVotes.length))\n    assert.equal(binVoteData.length, 256, \"Assertion failed: generated voteData bit string does not have length 256\")\n    // Convert to bytes\n    const voteBytes = R.map(bStr => parseInt(bStr, 2), R.splitEvery(8, binVoteData));\n\n    // check bytes are in range\n    assert.equal(R.all(vByte => 0 <= vByte && vByte <= 255, voteBytes), true, \"Assertion failed: voteBytes (byte array) had a byte out of bounds (<0 or >255)\")\n\n    // generate final hex\n    const voteData = web3Utils.bytesToHex(voteBytes)\n    assert.equal(voteData.length, 66, \"Assertion failed: final hex was not 66 characters long (32 bytes)\")\n\n    return voteData\n};\n",
+    "content": "import { ProxyVote } from './types'\n\nimport * as R from 'ramda'\nimport BN from 'bn.js'\nimport * as assert from 'assert'\nimport * as web3Utils from 'web3-utils'\nimport * as svCrypto from './crypto'\n\n/**\n * This object tracks the flags used for SV ballot boxes. They determine the submission\n * methods and whether ballots are tracked as binding, official, or testing.\n *\n * For more info see docs.secure.vote\n */\nexport const flags = {\n  // flags on submission methods\n  USE_ETH: 2 ** 0,\n  USE_SIGNED: 2 ** 1,\n  USE_NO_ENC: 2 ** 2,\n  USE_ENC: 2 ** 3,\n\n  // other ballot settings\n  IS_BINDING: 2 ** 13,\n  IS_OFFICIAL: 2 ** 14,\n  USE_TESTING: 2 ** 15\n}\n\n/**\n * Creates a packed copy of start and end times with submissionBits\n *\n * @param {number} start\n *  Start time in seconds since epoch\n * @param {number} end\n *  End time in seconds since epoch\n * @param {number} submissionBits\n *  Submission bits - can be created using mkSubmissionBits\n * @returns {BN}\n *  Returns a `bn.js` BigNum of the packed values.\n *  Format: [submissionBits(16)][startTime(64)][endTime(64)]\n */\nexport const mkPacked = (start, end, submissionBits) => {\n  const s = new BN(start)\n  const e = new BN(end)\n  const sb = new BN(submissionBits)\n  return sb\n    .shln(64)\n    .add(s)\n    .shln(64)\n    .add(e)\n}\n\n/**\n * This combines flags into a finished submissionBits. It also does some validation.\n * @param {*} toCombine\n *  Array of all submission flags to combine. See SV.ballotBox.flags for flag options.\n *  All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining).\n * @returns {number}\n *  A 16 bit integer of combined flags.\n */\nexport const mkSubmissionBits = (...toCombine) => {\n  if (Array.isArray(toCombine[0]) && typeof toCombine[0][0] == 'number') {\n    console.warn(\n      'Warning: mkSubmissionBits does not take an Array<number> anymore.'\n    )\n    toCombine = toCombine[0]\n  }\n\n  const toRet = R.reduce((acc, i) => acc | i, 0, toCombine)\n  assert.equal(\n    R.all(i => typeof i == 'number', toCombine),\n    true,\n    `Bad input to mkSubmissionBits. Input is required to be an array of numbers. Instead got: ${toCombine}`\n  )\n  assert.equal(\n    R.all(i => i === (i | 0), toCombine),\n    true,\n    `Bad input to mkSubmissionBits. Input was not an array of integers. Instead got: ${toCombine}`\n  )\n  assert.equal(\n    toRet,\n    R.sum(toCombine),\n    `Bad input provided to mkSubmissionBits. Logical OR and sum sanity check failed. Input was: ${toCombine}`\n  )\n  assert.equal(\n    toRet < 2 ** 16,\n    true,\n    `Submission bits must fit into a 16 bit integer (i.e. less than 2^16). Result was: ${toRet}`\n  )\n  return toRet\n}\n\n/**\n * Take the arguments and produce web3 data fitting the `submitProxyVote` method.\n * @param {string} ballotId\n *  a BN.js or Hex ballotId\n * @param {number} sequence\n *  the sequence number to use (0 < sequence < 2^32)\n * @param {string} voteData\n *  the vote data to use, should be 32 bytes hex encoded\n * @param {string} extra\n *  any extra data included with the vote (such as curve25519 pubkeys)\n * @param {string} privateKey\n *  the privkey used to sign\n * @param {object?} opts\n *  options:\n *   - skipSequenceSizeCheck: boolean (will not throw if sequence is >= 2^32)\n * @returns {object}\n *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`\n */\nexport const mkSignedBallotForProxy = (\n  ballotId,\n  sequence,\n  voteData,\n  extra,\n  privateKey,\n  opts: any = {}\n): ProxyVote => {\n  if (opts.skipSequenceSizeCheck !== true)\n    assert.equal(\n      0 < sequence && sequence < 2 ** 32,\n      true,\n      'sequence number out of bounds'\n    )\n  assert.equal(\n    web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId),\n    true,\n    'ballotId incorrect format (either not a BN or not hex)'\n  )\n  assert.equal(\n    web3Utils.isHexStrict(voteData),\n    true,\n    'vote data is not hex (strict)'\n  )\n  assert.equal(\n    web3Utils.isHexStrict(extra),\n    true,\n    'extra param is not hex (strict)'\n  )\n\n  const _ballotId = web3Utils.isBN(ballotId)\n    ? web3Utils.padLeft(web3Utils.toHex(ballotId), 64)\n    : ballotId\n\n  assert.equal(_ballotId.length, 66, 'ballotId incorrect length')\n  assert.equal(voteData.length, 66, 'voteData incorrect length')\n\n  const sequenceHex = web3Utils.padLeft(web3Utils.toHex(sequence), 8)\n\n  const messageHash = web3Utils.soliditySha3(\n    { t: 'bytes31', v: web3Utils.padLeft(sequenceHex, '62') },\n    { t: 'bytes32', v: _ballotId },\n    { t: 'bytes32', v: voteData },\n    { t: 'bytes', v: extra }\n  )\n\n  const { v, r, s } = svCrypto.ethSignHash(messageHash, privateKey)\n\n  const vBytes = web3Utils.hexToBytes(v)\n  const midBytes = web3Utils.hexToBytes(web3Utils.padRight('0x', 54))\n  const sequenceBytes = web3Utils.hexToBytes(sequenceHex)\n  const packed2Bytes = R.concat(vBytes, R.concat(midBytes, sequenceBytes))\n  const packed2 = web3Utils.bytesToHex(packed2Bytes)\n\n  return {\n    proxyReq: [r, s, packed2, _ballotId, voteData],\n    extra\n  }\n}\n\n/**\n * Verify a signed vote to be submitted via proxy as generated by `mkSignedBallotForProxy`\n *\n * @param {ProxyVote} proxyVote The ProxyVote object\n * @param {*} [opts={}] Not used currently; for future options\n * @returns {{verified: bool, address: EthAddress}}\n */\nexport const verifySignedBallotForProxy = (\n  proxyVote: ProxyVote,\n  opts: any = {}\n) => {\n  const {\n    proxyReq: [r, s, packed2, ballotId, voteData],\n    extra\n  } = proxyVote\n\n  const p2Bytes = web3Utils.hexToBytes(packed2)\n  const v = web3Utils.bytesToHex(p2Bytes.slice(0, 1))\n  const seqNum = web3Utils.bytesToHex(p2Bytes.slice(27, 32))\n\n  const messageHash = web3Utils.soliditySha3(\n    { t: 'bytes31', v: web3Utils.bytesToHex(p2Bytes.slice(1)) },\n    { t: 'bytes32', v: ballotId },\n    { t: 'bytes32', v: voteData },\n    { t: 'bytes', v: extra }\n  )\n\n  return svCrypto.ethVerifySig(messageHash, [v, r, s])\n}\n\n/**\n * Prepares voteData for a Range3 ballot from an array of votes\n *\n * @param {array} votesArray\n *  Takes an array of numbers which represent the votes to be transformed\n *  Format: [1, 2, -1]\n *\n * @returns {string}\n *  Returns an eth hex string of the vote data\n */\nexport const genRange3VoteData = (votesArray: number[]) => {\n  assert.equal(\n    R.all(v => (v | 0) === v, votesArray),\n    true,\n    'All array elements must be defined and integers.'\n  )\n  assert.equal(\n    R.all(v => -3 <= v && v <= 3, votesArray),\n    true,\n    'Votes must be in range -3 to 3.'\n  )\n  assert.equal(\n    votesArray.length <= 85,\n    true,\n    'Too many votes; maximum capacity of 32 bytes is 85 individual items.'\n  )\n\n  // Generate list of binary encoded votes. Read bottom to top.\n  const binaryVotes = R.compose(\n    // pad to 3 bits\n    R.map((vBin: string) => R.join('', R.repeat('0', 3 - vBin.length)) + vBin),\n    // convert votes to binary\n    R.map((v: number) => v.toString(2)),\n    // offset votes to be in range 0,6\n    R.map((v: number) => v + 3)\n  )(votesArray)\n\n  // check we have converted votes to bitstring representation of length 3\n  assert.equal(\n    R.all(bVote => bVote.length == 3, binaryVotes),\n    true,\n    'Assertion failed: all binary-encoded votes should be 3 bits long'\n  )\n\n  // create the binary voteData\n  const rawBinVotes = R.join('', binaryVotes)\n  // and pad it with 0s to length 256 (32 bytes total)\n  const binVoteData =\n    rawBinVotes + R.join('', R.repeat('0', 32 * 8 - rawBinVotes.length))\n  assert.equal(\n    binVoteData.length,\n    256,\n    'Assertion failed: generated voteData bit string does not have length 256'\n  )\n  // Convert to bytes\n  const voteBytes = R.map(\n    bStr => parseInt(bStr, 2),\n    R.splitEvery(8, binVoteData)\n  )\n\n  // check bytes are in range\n  assert.equal(\n    R.all(vByte => 0 <= vByte && vByte <= 255, voteBytes),\n    true,\n    'Assertion failed: voteBytes (byte array) had a byte out of bounds (<0 or >255)'\n  )\n\n  // generate final hex\n  const voteData = web3Utils.bytesToHex(voteBytes)\n  assert.equal(\n    voteData.length,\n    66,\n    'Assertion failed: final hex was not 66 characters long (32 bytes)'\n  )\n\n  return voteData\n}\n",
     "static": true,
     "longname": "/Users/maxkaye/src/sv/lib/src/ballotBox.ts",
     "access": "public",
@@ -649,133 +575,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 53,
-    "kind": "variable",
-    "name": "R",
-    "memberof": "src/ballotBox.ts",
-    "static": true,
-    "longname": "src/ballotBox.ts~R",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/ballotBox.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 1,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 54,
-    "kind": "variable",
-    "name": "BN",
-    "memberof": "src/ballotBox.ts",
-    "static": true,
-    "longname": "src/ballotBox.ts~BN",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/ballotBox.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 2,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 55,
-    "kind": "variable",
-    "name": "assert",
-    "memberof": "src/ballotBox.ts",
-    "static": true,
-    "longname": "src/ballotBox.ts~assert",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/ballotBox.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 3,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 56,
-    "kind": "variable",
-    "name": "web3Utils",
-    "memberof": "src/ballotBox.ts",
-    "static": true,
-    "longname": "src/ballotBox.ts~web3Utils",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/ballotBox.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 4,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 57,
-    "kind": "variable",
-    "name": "svCrypto",
-    "memberof": "src/ballotBox.ts",
-    "static": true,
-    "longname": "src/ballotBox.ts~svCrypto",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/ballotBox.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 5,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 58,
-    "kind": "variable",
-    "name": "Account",
-    "memberof": "src/ballotBox.ts",
-    "static": true,
-    "longname": "src/ballotBox.ts~Account",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/ballotBox.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 6,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 59,
+    "__docId__": 49,
     "kind": "variable",
     "name": "flags",
     "memberof": "src/ballotBox.ts",
@@ -786,7 +586,7 @@
     "importPath": "sv-lib/src/ballotBox.ts",
     "importStyle": "{flags}",
     "description": "This object tracks the flags used for SV ballot boxes. They determine the submission\nmethods and whether ballots are tracked as binding, official, or testing.\n\nFor more info see docs.secure.vote",
-    "lineNumber": 13,
+    "lineNumber": 12,
     "type": {
       "types": [
         "{\"USE_ETH\": *, \"USE_SIGNED\": *, \"USE_NO_ENC\": *, \"USE_ENC\": *, \"IS_BINDING\": *, \"IS_OFFICIAL\": *, \"USE_TESTING\": *}"
@@ -794,7 +594,7 @@
     }
   },
   {
-    "__docId__": 60,
+    "__docId__": 50,
     "kind": "function",
     "name": "mkPacked",
     "memberof": "src/ballotBox.ts",
@@ -807,7 +607,7 @@
     "importPath": "sv-lib/src/ballotBox.ts",
     "importStyle": "{mkPacked}",
     "description": "Creates a packed copy of start and end times with submissionBits",
-    "lineNumber": 37,
+    "lineNumber": 36,
     "unknown": [
       {
         "tagName": "@returns",
@@ -856,7 +656,7 @@
     }
   },
   {
-    "__docId__": 61,
+    "__docId__": 51,
     "kind": "function",
     "name": "mkSubmissionBits",
     "memberof": "src/ballotBox.ts",
@@ -869,7 +669,7 @@
     "importPath": "sv-lib/src/ballotBox.ts",
     "importStyle": "{mkSubmissionBits}",
     "description": "This combines flags into a finished submissionBits. It also does some validation.",
-    "lineNumber": 51,
+    "lineNumber": 54,
     "unknown": [
       {
         "tagName": "@returns",
@@ -898,7 +698,7 @@
     }
   },
   {
-    "__docId__": 62,
+    "__docId__": 52,
     "kind": "function",
     "name": "mkSignedBallotForProxy",
     "memberof": "src/ballotBox.ts",
@@ -911,7 +711,7 @@
     "importPath": "sv-lib/src/ballotBox.ts",
     "importStyle": "{mkSignedBallotForProxy}",
     "description": "Take the arguments and produce web3 data fitting the `submitProxyVote` method.",
-    "lineNumber": 81,
+    "lineNumber": 84,
     "unknown": [
       {
         "tagName": "@returns",
@@ -990,7 +790,7 @@
     }
   },
   {
-    "__docId__": 63,
+    "__docId__": 53,
     "kind": "function",
     "name": "verifySignedBallotForProxy",
     "memberof": "src/ballotBox.ts",
@@ -1044,7 +844,7 @@
     }
   },
   {
-    "__docId__": 64,
+    "__docId__": 54,
     "kind": "function",
     "name": "genRange3VoteData",
     "memberof": "src/ballotBox.ts",
@@ -1086,7 +886,7 @@
     }
   },
   {
-    "__docId__": 65,
+    "__docId__": 55,
     "kind": "file",
     "name": "src/const.ts",
     "content": "export const zeroAddr = \"0x0000000000000000000000000000000000000000\";\nexport const zeroHash = \"0x0000000000000000000000000000000000000000000000000000000000000000\";\n\ntype EthNetConf = {\n    indexContractName: string\n    auxContract: string\n    httpProvider: string\n    delegationContractName: string\n    ensResolver: string\n    ens: string\n    etherscanLink: string\n    name: string\n    archiveUrl: string\n    archivePushUrl: string\n    lookupAddress: string\n}\n\nconst _raw_networkVars: {[netName: string]: EthNetConf} = {\n    kovan: {\n        indexContractName: \"index.kov.sv\",\n        auxContract: \"0x0d31706febd1b8177c722fe39432f3e47143ccd9\",\n        httpProvider: \"https://kovan.eth.secure.vote/tokenvote-dev\",\n        delegationContractName: \"delegation-2018-06-19.kov.sv\",\n        ensResolver: \"0xc8c73829348cb15da4b0785a110017464fb8af51\",\n        ens: \"0xd6F4f22eeC158c434b17d01f62f5dF33b108Ae93\",\n        etherscanLink: \"https://kovan.etherscan.io/\",\n        name: \"Kovan\",\n        archiveUrl: \"https://archive.test.secure.vote/\",\n        archivePushUrl: \"https://archive.test.push.secure.vote/\",\n        lookupAddress: \"0x216265865e46D4c6FE506877EfAAE7dd7Ae2faCE\"\n    },\n    mainnet: {\n        indexContractName: \"index.tokenvote.eth\",\n        auxContract: \"0xff553fe4183f27e2165299b3fc0ae8c3b5c07084\",\n        httpProvider: \"https://mainnet.eth.secure.vote/tokenvote\",\n        delegationContractName: \"delegate.secvote.eth\",\n        ensResolver: \"0x5FfC014343cd971B7eb70732021E26C35B744cc4\",\n        ens: \"0x314159265dd8dbb310642f98f50c066173c1259b\",\n        etherscanLink: \"https://etherscan.io/\",\n        name: \"Mainnet\",\n        archiveUrl: \"https://archive.secure.vote/\",\n        archivePushUrl: \"https://archive.push.secure.vote/\",\n        lookupAddress: \"0x216265865e46D4c6FE506877EfAAE7dd7Ae2faCE\"\n    },\n    ropsten: {\n        indexContractName: \"\",\n        auxContract: \"\",\n        httpProvider: \"https://ropsten.eth.secure.vote/tokenvote-dev\",\n        delegationContractName: \"\",\n        ensResolver: \"\",\n        ens: \"\",\n        etherscanLink: \"https://ropsten.etherscan.io/\",\n        name: \"Ropsten\",\n        archiveUrl: \"https://archive.test.secure.vote/\",\n        archivePushUrl: \"https://archive.test.push.secure.vote/\",\n        lookupAddress: \"\"\n    },\n    classic: {\n        indexContractName: \"\",\n        auxContract: \"\",\n        httpProvider: \"https://classic.eth.secure.vote/tokenvote-dev\",\n        delegationContractName: \"\",\n        ensResolver: \"\",\n        ens: \"\",\n        etherscanLink: \"https://gastracker.io/\",  // eth classic block explorer\n        name: \"Classic\",\n        archiveUrl: \"https://archive.secure.vote/\",\n        archivePushUrl: \"https://archive.push.secure.vote/\",\n        lookupAddress: \"\"\n    },\n};\n\nexport const networkVars = new Proxy(_raw_networkVars, {\n    get: (obj, prop: string) => {\n        console.warn(\"Warning: const.networkVars is deprecated; please use const.getNetwork(..)\");\n        return obj[prop];\n    }\n});\n\nexport const networkName = networkId => {\n    console.warn(\"Warning: const.networkName(..) is deprecated. Please use const.getNetwork(..).name\");\n\n    switch (networkId) {\n        case 1:\n            return \"Mainnet\";\n        case 2:\n            return \"Morden\";\n        case 3:\n            return \"Ropsten\";\n        case 4:\n            return \"Rinkeby\";\n        case 42:\n            return \"Kovan\";\n        default:\n            return \"Unknown\";\n    }\n};\n\nexport const getNetwork = (networkId: number, chainId: number): EthNetConf => {\n    switch (networkId) {\n        case 1:\n            if (chainId === 1) return _raw_networkVars.mainnet\n            if (chainId === 61) return _raw_networkVars.classic\n            break;\n        case 3:\n            return _raw_networkVars.ropsten\n        case 42:\n            return _raw_networkVars.kovan\n        default:\n            break;\n    }\n    throw Error(`Cannot find network with net_id ${networkId} and chainId ${chainId}`)\n}\n",
@@ -1097,7 +897,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 66,
+    "__docId__": 56,
     "kind": "variable",
     "name": "zeroAddr",
     "memberof": "src/const.ts",
@@ -1117,7 +917,7 @@
     }
   },
   {
-    "__docId__": 67,
+    "__docId__": 57,
     "kind": "variable",
     "name": "zeroHash",
     "memberof": "src/const.ts",
@@ -1137,7 +937,7 @@
     }
   },
   {
-    "__docId__": 68,
+    "__docId__": 58,
     "kind": "variable",
     "name": "_raw_networkVars",
     "memberof": "src/const.ts",
@@ -1158,7 +958,7 @@
     "ignore": true
   },
   {
-    "__docId__": 69,
+    "__docId__": 59,
     "kind": "variable",
     "name": "networkVars",
     "memberof": "src/const.ts",
@@ -1178,7 +978,7 @@
     }
   },
   {
-    "__docId__": 70,
+    "__docId__": 60,
     "kind": "function",
     "name": "networkName",
     "memberof": "src/const.ts",
@@ -1208,7 +1008,7 @@
     }
   },
   {
-    "__docId__": 71,
+    "__docId__": 61,
     "kind": "function",
     "name": "getNetwork",
     "memberof": "src/const.ts",
@@ -1244,10 +1044,10 @@
     }
   },
   {
-    "__docId__": 72,
+    "__docId__": 62,
     "kind": "file",
     "name": "src/crypto.ts",
-    "content": "const Account = require(\"eth-lib/lib/account\");\nconst Hash = require(\"eth-lib/lib/hash\");\nconst web3Utils = require(\"web3-utils\");\n\n/**\n * Like web3.eth.accounts.hashMessage without the envelope.\n *\n * @param {string} data\n *  A message to hash - if it is hex it'll be UTF8 decoded.\n *\n * @returns {string}\n *  The hashed message (using keccak256)\n */\nexport const hashMsgRaw = data => {\n    const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data;\n    const msgBuffer = Buffer.from(msg);\n    return Hash.keccak256s(msgBuffer);\n};\n\n/**\n * Sign a message such that it can be verified with `ecrecover`.\n * Similar to `web3.eth.accounts.sign` except that we sign the hash directly.\n *\n * @param {string} messageHash\n *  Hash of a message, as returned by `web3.utils.soliditySha3` or similar.\n * @param {string} privateKey\n *  Privkey to sign with.\n *\n * @returns {{messageHash: string, r: string, s: string, v: string}}\n */\nexport const ethSignHash = (messageHash, privateKey) => {\n    // near identical to web3-eth-accounts (web3 v1)\n    // the main difference is we don't envelop the data.\n    const signature = Account.sign(messageHash, privateKey);\n    const vrs = Account.decodeSignature(signature);\n    return {\n        messageHash,\n        v: vrs[0],\n        r: vrs[1],\n        s: vrs[2],\n        signature\n    };\n};\n\nexport /**\n *\n * Operates `ecrecover` over the provided signature\n *\n * @param {string} messageHash This should be an Ethereum HexString\n * @param {string[]} [v, r, s] Components for the secp256k1 signature\n * @returns {{verified: bool, address: EthAddress}}\n */\nconst ethVerifySig = (messageHash: string, [v, r, s]: string[]) => {\n    const address = Account.recover(messageHash, Account.encodeSignature([v, r, s]));\n    return {\n        verified: true,\n        address\n    };\n};\n",
+    "content": "import * as Account from 'eth-lib/lib/account'\nimport * as Hash from 'eth-lib/lib/hash'\nimport * as web3Utils from 'web3-utils'\n\n/**\n * Like web3.eth.accounts.hashMessage without the envelope.\n *\n * @param {*} data\n *  A message to hash - if it is hex it'll be UTF8 decoded.\n *\n * @returns {*}\n *  The hashed message (using keccak256)\n */\nexport const hashMsgRaw = (data: string | number[]): string => {\n  const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data\n  const msgBuffer = Buffer.from(msg)\n  return Hash.keccak256s(msgBuffer)\n}\n\n/**\n * Sign a message such that it can be verified with `ecrecover`.\n * Similar to `web3.eth.accounts.sign` except that we sign the hash directly.\n *\n * @param {*} messageHash\n *  Hash of a message, as returned by `web3.utils.soliditySha3` or similar.\n * @param {*} privateKey\n *  Privkey to sign with.\n *\n * @returns {{messageHash: string, r: string, s: string, v: string}}\n */\nexport const ethSignHash = (messageHash: string, privateKey: string) => {\n  // near identical to web3-eth-accounts (web3 v1)\n  // the main difference is we don't envelop the data.\n  const signature = Account.sign(messageHash, privateKey)\n  const vrs = Account.decodeSignature(signature)\n  return {\n    messageHash,\n    v: vrs[0],\n    r: vrs[1],\n    s: vrs[2],\n    signature\n  }\n}\n\nexport /**\n *\n * Operates `ecrecover` over the provided signature\n *\n * @param {string} messageHash This should be an Ethereum HexString\n * @param {string[]} [v, r, s] Components for the secp256k1 signature\n * @returns {{verified: bool, address: EthAddress}}\n */\nconst ethVerifySig = (messageHash: string, [v, r, s]: string[]) => {\n  const address = Account.recover(\n    messageHash,\n    Account.encodeSignature([v, r, s])\n  )\n  return {\n    verified: true,\n    address\n  }\n}\n",
     "static": true,
     "longname": "/Users/maxkaye/src/sv/lib/src/crypto.ts",
     "access": "public",
@@ -1255,70 +1055,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 73,
-    "kind": "variable",
-    "name": "Account",
-    "memberof": "src/crypto.ts",
-    "static": true,
-    "longname": "src/crypto.ts~Account",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/crypto.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 1,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 74,
-    "kind": "variable",
-    "name": "Hash",
-    "memberof": "src/crypto.ts",
-    "static": true,
-    "longname": "src/crypto.ts~Hash",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/crypto.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 2,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 75,
-    "kind": "variable",
-    "name": "web3Utils",
-    "memberof": "src/crypto.ts",
-    "static": true,
-    "longname": "src/crypto.ts~web3Utils",
-    "access": "public",
-    "export": false,
-    "importPath": "sv-lib/src/crypto.ts",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 3,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 76,
+    "__docId__": 63,
     "kind": "function",
     "name": "hashMsgRaw",
     "memberof": "src/crypto.ts",
@@ -1335,14 +1072,14 @@
     "unknown": [
       {
         "tagName": "@returns",
-        "tagValue": "{string}\n The hashed message (using keccak256)"
+        "tagValue": "{*}\n The hashed message (using keccak256)"
       }
     ],
     "params": [
       {
         "nullable": null,
         "types": [
-          "string"
+          "*"
         ],
         "spread": false,
         "optional": false,
@@ -1353,14 +1090,14 @@
     "return": {
       "nullable": null,
       "types": [
-        "string"
+        "*"
       ],
       "spread": false,
       "description": "The hashed message (using keccak256)"
     }
   },
   {
-    "__docId__": 77,
+    "__docId__": 64,
     "kind": "function",
     "name": "ethSignHash",
     "memberof": "src/crypto.ts",
@@ -1384,7 +1121,7 @@
       {
         "nullable": null,
         "types": [
-          "string"
+          "*"
         ],
         "spread": false,
         "optional": false,
@@ -1394,7 +1131,7 @@
       {
         "nullable": null,
         "types": [
-          "string"
+          "*"
         ],
         "spread": false,
         "optional": false,
@@ -1412,7 +1149,7 @@
     }
   },
   {
-    "__docId__": 78,
+    "__docId__": 65,
     "kind": "function",
     "name": "ethVerifySig",
     "memberof": "src/crypto.ts",
@@ -1464,10 +1201,10 @@
     }
   },
   {
-    "__docId__": 79,
+    "__docId__": 66,
     "kind": "file",
     "name": "src/index.ts",
-    "content": "export const ballotBox = require('./ballotBox')\nexport const _const = require('./const')\nexport const crypto = require('./crypto')\nexport const light = require('./light')\nexport const utils = require('./utils.js')\n\nmodule.exports.const = module.exports._const\n",
+    "content": "import * as ballotBox from './ballotBox'\nimport * as _const from './const'\nimport * as crypto from './crypto'\nimport * as light from './light'\nimport * as utils from './utils.js'\n\nexport default { ballotBox, crypto, light, utils, const: _const }\n",
     "static": true,
     "longname": "/Users/maxkaye/src/sv/lib/src/index.ts",
     "access": "public",
@@ -1475,110 +1212,10 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 80,
-    "kind": "variable",
-    "name": "ballotBox",
-    "memberof": "src/index.ts",
-    "static": true,
-    "longname": "src/index.ts~ballotBox",
-    "access": "public",
-    "export": true,
-    "importPath": "sv-lib/src/index.ts",
-    "importStyle": "{ballotBox}",
-    "description": null,
-    "lineNumber": 1,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    }
-  },
-  {
-    "__docId__": 81,
-    "kind": "variable",
-    "name": "_const",
-    "memberof": "src/index.ts",
-    "static": true,
-    "longname": "src/index.ts~_const",
-    "access": "private",
-    "export": true,
-    "importPath": "sv-lib/src/index.ts",
-    "importStyle": "{_const}",
-    "description": null,
-    "lineNumber": 2,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    }
-  },
-  {
-    "__docId__": 82,
-    "kind": "variable",
-    "name": "crypto",
-    "memberof": "src/index.ts",
-    "static": true,
-    "longname": "src/index.ts~crypto",
-    "access": "public",
-    "export": true,
-    "importPath": "sv-lib/src/index.ts",
-    "importStyle": "{crypto}",
-    "description": null,
-    "lineNumber": 3,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    }
-  },
-  {
-    "__docId__": 83,
-    "kind": "variable",
-    "name": "light",
-    "memberof": "src/index.ts",
-    "static": true,
-    "longname": "src/index.ts~light",
-    "access": "public",
-    "export": true,
-    "importPath": "sv-lib/src/index.ts",
-    "importStyle": "{light}",
-    "description": null,
-    "lineNumber": 4,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    }
-  },
-  {
-    "__docId__": 84,
-    "kind": "variable",
-    "name": "utils",
-    "memberof": "src/index.ts",
-    "static": true,
-    "longname": "src/index.ts~utils",
-    "access": "public",
-    "export": true,
-    "importPath": "sv-lib/src/index.ts",
-    "importStyle": "{utils}",
-    "description": null,
-    "lineNumber": 5,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    }
-  },
-  {
-    "__docId__": 85,
+    "__docId__": 67,
     "kind": "file",
     "name": "src/light.ts",
-    "content": "import * as ENS from 'eth-ens-namehash';\nimport * as Constants from './const';\nimport { default as axios } from 'axios';\nimport { default as bs58 } from 'bs58';\nimport { default as sha256 } from 'sha256';\n\n// Lovely ABIs\nimport * as ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'\nimport * as IndexAbi from './smart_contracts/SVLightIndex.abi.json'\nimport * as BackendAbi from './smart_contracts/SVLightIndexBackend.abi.json'\nimport * as BBFarmAbi from './smart_contracts/BBFarm.abi.json'\nimport * as PaymentsAbi from './smart_contracts/SVPayments.abi.json'\nimport * as AuxAbi from './smart_contracts/AuxAbi.abi.json'\nimport * as AuctionAbi from './smart_contracts/CommAuctionIface.abi.json'\nimport * as ERC20Abi from './smart_contracts/ERC20.abi.json'\n\n\nexport const initializeSvLight = async svConfig => {\n  const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig;\n\n  const Web3 = require('web3');\n  const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider));\n\n  const resolver = new web3.eth.Contract(ResolverAbi, ensResolver);\n\n  // const indexAddress =\n  // console.log('indexAddress :', indexAddress);\n  const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexContractName));\n  const backendAddress = await getBackendAddress({ index });\n  const backend = new web3.eth.Contract(BackendAbi, backendAddress);\n  const aux = new web3.eth.Contract(AuxAbi, auxContract);\n  const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())\n\n  return {\n    svConfig,\n    web3,\n    resolver,\n    index,\n    backend,\n    aux,\n    payments\n  };\n};\n\nexport const resolveEnsAddress = async ({ resolver }, ensName) => {\n  return await resolver.methods.addr(ENS.hash(ensName)).call();\n};\n\nexport const getBackendAddress = async ({ index }) => {\n  return await index.methods.getBackend().call();\n};\n\nexport const getDemocInfo = async ({ backend, democHash }) => {\n  return await backend.methods.getDInfo(democHash).call();\n};\n\nexport const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {\n  // Destructure and set the variables that are needed\n  const { index, backend, aux, svConfig } = svNetwork;\n  const { democHash, nthBallot } = democBallotInfo;\n  const indexAddress = index._address;\n  const backendAddress = backend._address;\n  const archiveUrl = { svConfig };\n\n  const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(backendAddress, indexAddress, democHash, nthBallot).call();\n  // console.log('bbFarmAndBallotId :', bbFarmAndBallotId);\n\n  const { id, bbFarmAddress } = bbFarmAndBallotId;\n  const userEthAddress = '0x0000000000000000000000000000000000000000';\n  const ethBallotDetails = await aux.methods.getBallotDetails(id, bbFarmAddress, userEthAddress).call();\n\n  const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash);\n  // console.log('ballotSpec :', ballotSpec);\n  // .then(x => console.log('Then called', x))\n  // .catch(x => console.log('Caught error', x));\n\n  const ballotObject = { ...bbFarmAndBallotId, ...ethBallotDetails, data: { ...ballotSpec.data } };\n\n  return ballotObject;\n};\n\nexport const getBallotSpec = async (archiveUrl, ballotSpecHash): Promise<{data: any}> => {\n  // TODO refactor to be a bit more elegant\n  return new Promise<{data: any}>((res, rej) => {\n    let done = false;\n    const doRes = obj => {\n      if (!done) {\n        done = true;\n        res(obj);\n      }\n    };\n    getBallotObjectFromIpfs(ballotSpecHash).then(doRes);\n    setTimeout(() => {\n      if (!done) {\n        getBallotObjectFromS3(archiveUrl, ballotSpecHash)\n          .then(doRes)\n          .catch(rej);\n      }\n    }, 3500);\n  });\n};\n\nexport const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) => {\n  return axios.get(archiveUrl + ballotSpecHash + '.json');\n};\n\nexport const getBallotObjectFromIpfs = async ballotSpecHash => {\n  const ipfsUrl = 'https://ipfs.infura.io/api/v0/block/get?arg=';\n  const cidHex = '1220' + ballotSpecHash.substr(2);\n  const bytes = Buffer.from(cidHex, 'hex');\n  const cid = bs58.encode(bytes);\n  return await axios.get(ipfsUrl + cid);\n};\n\n// Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array\nexport const getDemocBallots = async ({ svNetwork, democHash }) => {\n  const { backend } = svNetwork;\n  const democInfo = await getDemocInfo({ backend, democHash });\n\n  // Throw an error if the democ info is not correct\n  const {erc20, owner} = democInfo\n  if (owner === '0x0000000000000000000000000000000000000000') {\n    throw new Error('Democracy Hash does not resolve to a democracy')\n  }\n\n  // TODO - Work out where / how to push an errored ballot\n  // Loop through and get all the ballots\n  const numBallots = democInfo.nBallots;\n  const ballotsArray = [];\n  for (let i = 0; i < numBallots; i++) {\n    ballotsArray[i] = await getDemocNthBallot({ svNetwork }, { democHash: democHash, nthBallot: i });\n  }\n\n  return ballotsArray;\n};\n\n/** Takes in the svNetwork object and returns all relevant addresses */\nexport const getContractAddresses = async ({svNetwork}) => {\n  const {index, resolver, backend, aux, svConfig} = svNetwork\n  const { delegationContractName, lookupAddress } = svConfig\n\n  return {\n    indexAddress: index._address,\n    backendAddress: backend._address,\n    auxAddress: aux._address,\n    lookupAddress: lookupAddress,\n    resolverAddress: resolver._address,\n    communityAuctionAddress: await index.methods.getCommAuction().call(),\n    delegationAddress: await resolveEnsAddress({ resolver }, delegationContractName),\n    paymentsAddress: await index.methods.getPayments().call(),\n  }\n}\n\nexport const weiToCents = async ({payments}, wei) => {\n  return await payments.methods.weiToCents(wei).call()\n}\n\nexport const getCommunityBallotPrice = async ({payments}, democHash) => {\n  return await payments.methods.getNextPrice(democHash).call()\n}\n\nexport const checkIfAddressIsEditor = async ({ svNetwork }, { userAddress, democHash }) => {\n  const {backend} = svNetwork\n  return await backend.methods.isDEditor(democHash, userAddress).call();\n};\n\n// Checks the current ethereum gas price and returns a couple of values\nexport const getCurrentGasPrice = async () => {\n  const gasStationInfo = await axios.get('https://ethgasstation.info/json/ethgasAPI.json')\n  const {data} = gasStationInfo\n\n  return {\n    safeLow: data.safeLow / 10,\n    average: data.average / 10,\n    fast: data.fast / 10,\n    fastest: data.fastest / 10,\n  }\n}\n// Checks the ballot hash against the ballot content\nexport const checkBallotHashBSpec = (ballotSpec, assertSpecHash) => {\n    let contentHash = '0x' + sha256(JSON.stringify(ballotSpec, null, 2));\n    if (assertSpecHash === contentHash) {\n      return true;\n    } else {\n      return false;\n    }\n}\n\n// Checks the ballot hash against a ballot global ballot object\n// Does this by destructuring the specHash and data out of it\nexport const checkBallotHashGBallot = (ballotObject) => {\n  const {data, specHash} = ballotObject\n  return checkBallotHashBSpec(data, specHash)\n}\n",
+    "content": "import NH from 'eth-ens-namehash'\nimport axios from 'axios'\nimport * as bs58 from 'bs58'\nimport sha256 from 'sha256'\n\n// Lovely ABIs\nimport * as ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'\nimport * as IndexAbi from './smart_contracts/SVLightIndex.abi.json'\nimport * as BackendAbi from './smart_contracts/SVLightIndexBackend.abi.json'\nimport * as BBFarmAbi from './smart_contracts/BBFarm.abi.json'\nimport * as PaymentsAbi from './smart_contracts/SVPayments.abi.json'\nimport * as AuxAbi from './smart_contracts/AuxAbi.abi.json'\nimport * as AuctionAbi from './smart_contracts/CommAuctionIface.abi.json'\n// import * as ERC20Abi from './smart_contracts/ERC20.abi.json'\n\nexport const initializeSvLight = async svConfig => {\n  const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig\n\n  const Web3 = require('web3')\n  const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))\n\n  const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)\n\n  // const indexAddress =\n  // console.log('indexAddress :', indexAddress);\n  const index = new web3.eth.Contract(\n    IndexAbi,\n    await resolveEnsAddress({ resolver }, indexContractName)\n  )\n  const backendAddress = await getBackendAddress({ index })\n  const backend = new web3.eth.Contract(BackendAbi, backendAddress)\n  const aux = new web3.eth.Contract(AuxAbi, auxContract)\n  const payments = new web3.eth.Contract(\n    PaymentsAbi,\n    await index.methods.getPayments().call()\n  )\n\n  return {\n    svConfig,\n    web3,\n    resolver,\n    index,\n    backend,\n    aux,\n    payments\n  }\n}\n\nexport const resolveEnsAddress = async ({ resolver }, ensName) => {\n  return await resolver.methods.addr(NH.hash(ensName)).call()\n}\n\nexport const getBackendAddress = async ({ index }) => {\n  return await index.methods.getBackend().call()\n}\n\nexport const getDemocInfo = async ({ backend, democHash }) => {\n  return await backend.methods.getDInfo(democHash).call()\n}\n\nexport const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {\n  // Destructure and set the variables that are needed\n  const { index, backend, aux, svConfig } = svNetwork\n  const { democHash, nthBallot } = democBallotInfo\n  const indexAddress = index._address\n  const backendAddress = backend._address\n  const archiveUrl = { svConfig }\n\n  const bbFarmAndBallotId = await aux.methods\n    .getBBFarmAddressAndBallotId(\n      backendAddress,\n      indexAddress,\n      democHash,\n      nthBallot\n    )\n    .call()\n  // console.log('bbFarmAndBallotId :', bbFarmAndBallotId);\n\n  const { id, bbFarmAddress } = bbFarmAndBallotId\n  const userEthAddress = '0x0000000000000000000000000000000000000000'\n  const ethBallotDetails = await aux.methods\n    .getBallotDetails(id, bbFarmAddress, userEthAddress)\n    .call()\n\n  const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)\n  // console.log('ballotSpec :', ballotSpec);\n  // .then(x => console.log('Then called', x))\n  // .catch(x => console.log('Caught error', x));\n\n  const ballotObject = {\n    ...bbFarmAndBallotId,\n    ...ethBallotDetails,\n    data: { ...ballotSpec.data }\n  }\n\n  return ballotObject\n}\n\nexport const getBallotSpec = async (\n  archiveUrl,\n  ballotSpecHash\n): Promise<{ data: any }> => {\n  // TODO refactor to be a bit more elegant\n  return new Promise<{ data: any }>((res, rej) => {\n    let done = false\n    const doRes = obj => {\n      if (!done) {\n        done = true\n        res(obj)\n      }\n    }\n    getBallotObjectFromIpfs(ballotSpecHash).then(doRes)\n    setTimeout(() => {\n      if (!done) {\n        getBallotObjectFromS3(archiveUrl, ballotSpecHash)\n          .then(doRes)\n          .catch(rej)\n      }\n    }, 3500)\n  })\n}\n\nexport const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) => {\n  return axios.get(archiveUrl + ballotSpecHash + '.json')\n}\n\nexport const getBallotObjectFromIpfs = async ballotSpecHash => {\n  const ipfsUrl = 'https://ipfs.infura.io/api/v0/block/get?arg='\n  const cidHex = '1220' + ballotSpecHash.substr(2)\n  const bytes = Buffer.from(cidHex, 'hex')\n  const cid = bs58.encode(bytes)\n  return await axios.get(ipfsUrl + cid)\n}\n\n// Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array\nexport const getDemocBallots = async ({ svNetwork, democHash }) => {\n  const { backend } = svNetwork\n  const democInfo = await getDemocInfo({ backend, democHash })\n\n  // Throw an error if the democ info is not correct\n  const { erc20, owner } = democInfo\n  if (owner === '0x0000000000000000000000000000000000000000') {\n    throw new Error('Democracy Hash does not resolve to a democracy')\n  }\n\n  // TODO - Work out where / how to push an errored ballot\n  // Loop through and get all the ballots\n  const numBallots = democInfo.nBallots\n  const ballotsArray = []\n  for (let i = 0; i < numBallots; i++) {\n    ballotsArray[i] = await getDemocNthBallot(\n      { svNetwork },\n      { democHash: democHash, nthBallot: i }\n    )\n  }\n\n  return ballotsArray\n}\n\n/** Takes in the svNetwork object and returns all relevant addresses */\nexport const getContractAddresses = async ({ svNetwork }) => {\n  const { index, resolver, backend, aux, svConfig } = svNetwork\n  const { delegationContractName, lookupAddress } = svConfig\n\n  return {\n    indexAddress: index._address,\n    backendAddress: backend._address,\n    auxAddress: aux._address,\n    lookupAddress: lookupAddress,\n    resolverAddress: resolver._address,\n    communityAuctionAddress: await index.methods.getCommAuction().call(),\n    delegationAddress: await resolveEnsAddress(\n      { resolver },\n      delegationContractName\n    ),\n    paymentsAddress: await index.methods.getPayments().call()\n  }\n}\n\nexport const weiToCents = async ({ payments }, wei) => {\n  return await payments.methods.weiToCents(wei).call()\n}\n\nexport const getCommunityBallotPrice = async ({ payments }, democHash) => {\n  return await payments.methods.getNextPrice(democHash).call()\n}\n\nexport const checkIfAddressIsEditor = async (\n  { svNetwork },\n  { userAddress, democHash }\n) => {\n  const { backend } = svNetwork\n  return await backend.methods.isDEditor(democHash, userAddress).call()\n}\n\n// Checks the current ethereum gas price and returns a couple of values\nexport const getCurrentGasPrice = async () => {\n  const gasStationInfo = await axios.get(\n    'https://ethgasstation.info/json/ethgasAPI.json'\n  )\n  const { data } = gasStationInfo\n\n  return {\n    safeLow: data.safeLow / 10,\n    average: data.average / 10,\n    fast: data.fast / 10,\n    fastest: data.fastest / 10\n  }\n}\n// Checks the ballot hash against the ballot content\nexport const checkBallotHashBSpec = (ballotSpec, assertSpecHash) => {\n  let contentHash = '0x' + sha256(JSON.stringify(ballotSpec, null, 2))\n  if (assertSpecHash === contentHash) {\n    return true\n  } else {\n    return false\n  }\n}\n\n// Checks the ballot hash against a ballot global ballot object\n// Does this by destructuring the specHash and data out of it\nexport const checkBallotHashGBallot = ballotObject => {\n  const { data, specHash } = ballotObject\n  return checkBallotHashBSpec(data, specHash)\n}\n",
     "static": true,
     "longname": "/Users/maxkaye/src/sv/lib/src/light.ts",
     "access": "public",
@@ -1586,7 +1223,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 86,
+    "__docId__": 68,
     "kind": "function",
     "name": "initializeSvLight",
     "memberof": "src/light.ts",
@@ -1599,7 +1236,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{initializeSvLight}",
     "description": null,
-    "lineNumber": 11,
+    "lineNumber": 12,
     "undocument": true,
     "params": [
       {
@@ -1616,7 +1253,7 @@
     }
   },
   {
-    "__docId__": 87,
+    "__docId__": 69,
     "kind": "function",
     "name": "resolveEnsAddress",
     "memberof": "src/light.ts",
@@ -1629,7 +1266,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{resolveEnsAddress}",
     "description": null,
-    "lineNumber": 33,
+    "lineNumber": 34,
     "undocument": true,
     "params": [
       {
@@ -1656,7 +1293,7 @@
     }
   },
   {
-    "__docId__": 88,
+    "__docId__": 70,
     "kind": "function",
     "name": "getBackendAddress",
     "memberof": "src/light.ts",
@@ -1669,7 +1306,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getBackendAddress}",
     "description": null,
-    "lineNumber": 36,
+    "lineNumber": 37,
     "undocument": true,
     "params": [
       {
@@ -1690,7 +1327,7 @@
     }
   },
   {
-    "__docId__": 89,
+    "__docId__": 71,
     "kind": "function",
     "name": "getDemocInfo",
     "memberof": "src/light.ts",
@@ -1703,7 +1340,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getDemocInfo}",
     "description": null,
-    "lineNumber": 39,
+    "lineNumber": 40,
     "undocument": true,
     "params": [
       {
@@ -1725,7 +1362,7 @@
     }
   },
   {
-    "__docId__": 90,
+    "__docId__": 72,
     "kind": "function",
     "name": "getDemocNthBallot",
     "memberof": "src/light.ts",
@@ -1738,7 +1375,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getDemocNthBallot}",
     "description": null,
-    "lineNumber": 42,
+    "lineNumber": 43,
     "undocument": true,
     "params": [
       {
@@ -1765,7 +1402,7 @@
     }
   },
   {
-    "__docId__": 91,
+    "__docId__": 73,
     "kind": "function",
     "name": "getBallotSpec",
     "memberof": "src/light.ts",
@@ -1778,7 +1415,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getBallotSpec}",
     "description": null,
-    "lineNumber": 61,
+    "lineNumber": 70,
     "undocument": true,
     "params": [
       {
@@ -1801,7 +1438,7 @@
     }
   },
   {
-    "__docId__": 92,
+    "__docId__": 74,
     "kind": "function",
     "name": "getBallotObjectFromS3",
     "memberof": "src/light.ts",
@@ -1814,7 +1451,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getBallotObjectFromS3}",
     "description": null,
-    "lineNumber": 81,
+    "lineNumber": 90,
     "undocument": true,
     "params": [
       {
@@ -1837,7 +1474,7 @@
     }
   },
   {
-    "__docId__": 93,
+    "__docId__": 75,
     "kind": "function",
     "name": "getBallotObjectFromIpfs",
     "memberof": "src/light.ts",
@@ -1850,7 +1487,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getBallotObjectFromIpfs}",
     "description": null,
-    "lineNumber": 84,
+    "lineNumber": 93,
     "undocument": true,
     "params": [
       {
@@ -1867,7 +1504,7 @@
     }
   },
   {
-    "__docId__": 94,
+    "__docId__": 76,
     "kind": "function",
     "name": "getDemocBallots",
     "memberof": "src/light.ts",
@@ -1880,7 +1517,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getDemocBallots}",
     "description": null,
-    "lineNumber": 92,
+    "lineNumber": 101,
     "undocument": true,
     "params": [
       {
@@ -1902,7 +1539,7 @@
     }
   },
   {
-    "__docId__": 95,
+    "__docId__": 77,
     "kind": "function",
     "name": "getContractAddresses",
     "memberof": "src/light.ts",
@@ -1915,7 +1552,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getContractAddresses}",
     "description": "Takes in the svNetwork object and returns all relevant addresses",
-    "lineNumber": 110,
+    "lineNumber": 119,
     "params": [
       {
         "name": "objectPattern",
@@ -1935,7 +1572,7 @@
     }
   },
   {
-    "__docId__": 96,
+    "__docId__": 78,
     "kind": "function",
     "name": "weiToCents",
     "memberof": "src/light.ts",
@@ -1948,7 +1585,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{weiToCents}",
     "description": null,
-    "lineNumber": 124,
+    "lineNumber": 133,
     "undocument": true,
     "params": [
       {
@@ -1975,7 +1612,7 @@
     }
   },
   {
-    "__docId__": 97,
+    "__docId__": 79,
     "kind": "function",
     "name": "getCommunityBallotPrice",
     "memberof": "src/light.ts",
@@ -1988,7 +1625,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getCommunityBallotPrice}",
     "description": null,
-    "lineNumber": 127,
+    "lineNumber": 136,
     "undocument": true,
     "params": [
       {
@@ -2015,7 +1652,7 @@
     }
   },
   {
-    "__docId__": 98,
+    "__docId__": 80,
     "kind": "function",
     "name": "checkIfAddressIsEditor",
     "memberof": "src/light.ts",
@@ -2028,7 +1665,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{checkIfAddressIsEditor}",
     "description": null,
-    "lineNumber": 130,
+    "lineNumber": 139,
     "undocument": true,
     "params": [
       {
@@ -2060,7 +1697,7 @@
     }
   },
   {
-    "__docId__": 99,
+    "__docId__": 81,
     "kind": "function",
     "name": "getCurrentGasPrice",
     "memberof": "src/light.ts",
@@ -2073,7 +1710,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getCurrentGasPrice}",
     "description": null,
-    "lineNumber": 135,
+    "lineNumber": 144,
     "undocument": true,
     "params": [],
     "return": {
@@ -2083,7 +1720,7 @@
     }
   },
   {
-    "__docId__": 100,
+    "__docId__": 82,
     "kind": "function",
     "name": "checkBallotHashBSpec",
     "memberof": "src/light.ts",
@@ -2096,7 +1733,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{checkBallotHashBSpec}",
     "description": null,
-    "lineNumber": 146,
+    "lineNumber": 155,
     "undocument": true,
     "params": [
       {
@@ -2119,7 +1756,7 @@
     }
   },
   {
-    "__docId__": 101,
+    "__docId__": 83,
     "kind": "function",
     "name": "checkBallotHashGBallot",
     "memberof": "src/light.ts",
@@ -2132,7 +1769,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{checkBallotHashGBallot}",
     "description": null,
-    "lineNumber": 157,
+    "lineNumber": 166,
     "undocument": true,
     "params": [
       {
@@ -2149,7 +1786,7 @@
     }
   },
   {
-    "__docId__": 102,
+    "__docId__": 84,
     "kind": "file",
     "name": "src/types.ts",
     "content": "\n\n\nexport type ProxyVote = {\n    // these should be `bytes32` hexstrings\n    proxyReq: [string, string, string, string, string]\n    // this is a `bytes` hexstring\n    extra: string\n}\n",
@@ -2160,10 +1797,10 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 103,
+    "__docId__": 85,
     "kind": "file",
     "name": "src/typings.d.ts",
-    "content": "declare module \"*.json\" {\n    const value: any;\n    export default value;\n}\n",
+    "content": "declare module \"*.json\" {\n    const value: any;\n    export default value;\n}\n\ndeclare module 'web3-utils';\n",
     "static": true,
     "longname": "/Users/maxkaye/src/sv/lib/src/typings.d.ts",
     "access": "public",
@@ -2171,10 +1808,10 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 104,
+    "__docId__": 86,
     "kind": "file",
     "name": "src/utils.ts",
-    "content": "\nconst R = require('ramda');\nconst BN = require('bn.js');\nconst assert = require('assert');\n\n\nconst bb = require('./ballotBox');\n\n\n/**\n * This will take an Ethereum hex string (or a normal hex string) and\n * output a normal hex string (no '0x' header) or throw an error on a\n * bad hex string.\n *\n * @param {string} hex\n *\n * @returns {string}\n *  the hex string.\n */\nexport const cleanEthHex = hex => {\n    if (hex === \"0x0\") {\n        return \"00\";\n    }\n\n    // hex must be even - only exception above\n    if (hex.length % 2 !== 0) {\n        throw Error(`Bad hex string: ${hex}`);\n    }\n\n    // this covers the case hex==\"0x\" => \"\"\n    if (hex.slice(0, 2) === \"0x\") {\n        return hex.slice(2);\n    }\n\n    return hex;\n}\n\n\n/**\n * This compares ethereum addresses (taking into account case, etc)\n *\n * @param {string} addr1\n * @param {string} addr2\n *\n * @returns {bool}\n */\nexport const ethAddrEq = (addr1, addr2) => {\n    const _clean = a => module.exports.cleanEthHex(a).toLowerCase()\n    // throw a length check in there to ensure we have valid addresses\n    return _clean(addr1) === _clean(addr2) && addr1.length === 42\n}\n\n\n// this is from the bech32 spec (Bitcoin)\nconst B32_ALPHA = \"qpzry9x8gf2tvdw0s3jn54khce6mua7l\";\nconst toAlphabet = arr => {\n    var ret = \"\";\n    for (let i = 0; i < arr.length; i++) {\n        ret += B32_ALPHA.charAt(arr[i]);\n    }\n    return ret;\n}\n\n\n/**\n * This will convert a hex string to Base32 in the bech32 format WITHOUT a checksum.\n *\n * @param {string} hex\n *  The hex string to convert to Base32 - can be an EthHex or plain hex string.\n *\n * @returns {string}\n *  The Base32 version of the hex string.\n */\nexport const hexToBase32 = hex => {\n    const _hex = cleanEthHex(hex);\n\n    const buf = Buffer.from(_hex, 'hex');\n    const digits = [0];\n    let digitlength = 1;\n\n    let carry;\n    for (let i = 0; i < buf.length; ++i) {\n        carry = buf[i];\n        for (let j = 0; j < digitlength; ++j) {\n            carry += digits[j] * 256;\n            digits[j] = carry % 32;\n            carry = (carry / 32) | 0;\n        }\n\n        while (carry > 0) {\n            digits[digitlength] = carry % 32;\n            digitlength++;\n            carry = (carry / 32) | 0;\n        }\n    }\n\n    return toAlphabet(R.reverse(digits.slice(0,digitlength)));\n}\n",
+    "content": "const R = require('ramda')\nconst BN = require('bn.js')\nconst assert = require('assert')\n\nconst bb = require('./ballotBox')\n\n/**\n * This will take an Ethereum hex string (or a normal hex string) and\n * output a normal hex string (no '0x' header) or throw an error on a\n * bad hex string.\n *\n * @param {string} hex\n *\n * @returns {string}\n *  the hex string.\n */\nexport const cleanEthHex = (hex: string) => {\n  if (hex === '0x0') {\n    return '00'\n  }\n\n  // hex must be even - only exception above\n  if (hex.length % 2 !== 0) {\n    throw Error(`Bad hex string: ${hex}`)\n  }\n\n  // this covers the case hex==\"0x\" => \"\"\n  if (hex.slice(0, 2) === '0x') {\n    return hex.slice(2)\n  }\n\n  return hex\n}\n\n/**\n * This compares ethereum addresses (taking into account case, etc)\n *\n * @param {string} addr1\n * @param {string} addr2\n *\n * @returns {bool}\n */\nexport const ethAddrEq = (addr1: string, addr2: string) => {\n  const _clean = a => module.exports.cleanEthHex(a).toLowerCase()\n  // throw a length check in there to ensure we have valid addresses\n  return _clean(addr1) === _clean(addr2) && addr1.length === 42\n}\n\n// this is from the bech32 spec (Bitcoin)\nconst B32_ALPHA = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l'\nconst toAlphabet = (arr: number[]) => {\n  var ret = ''\n  for (let i = 0; i < arr.length; i++) {\n    ret += B32_ALPHA.charAt(arr[i])\n  }\n  return ret\n}\n\n/**\n * This will convert a hex string to Base32 in the bech32 format WITHOUT a checksum.\n *\n * @param {string} hex\n *  The hex string to convert to Base32 - can be an EthHex or plain hex string.\n *\n * @returns {string}\n *  The Base32 version of the hex string.\n */\nexport const hexToBase32 = (hex: string) => {\n  const _hex = cleanEthHex(hex)\n\n  const buf = Buffer.from(_hex, 'hex')\n  const digits = [0]\n  let digitlength = 1\n\n  let carry\n  for (let i = 0; i < buf.length; ++i) {\n    carry = buf[i]\n    for (let j = 0; j < digitlength; ++j) {\n      carry += digits[j] * 256\n      digits[j] = carry % 32\n      carry = (carry / 32) | 0\n    }\n\n    while (carry > 0) {\n      digits[digitlength] = carry % 32\n      digitlength++\n      carry = (carry / 32) | 0\n    }\n  }\n\n  return toAlphabet(R.reverse(digits.slice(0, digitlength)))\n}\n",
     "static": true,
     "longname": "/Users/maxkaye/src/sv/lib/src/utils.ts",
     "access": "public",
@@ -2182,7 +1819,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 105,
+    "__docId__": 87,
     "kind": "variable",
     "name": "R",
     "memberof": "src/utils.ts",
@@ -2203,7 +1840,7 @@
     "ignore": true
   },
   {
-    "__docId__": 106,
+    "__docId__": 88,
     "kind": "variable",
     "name": "BN",
     "memberof": "src/utils.ts",
@@ -2224,7 +1861,7 @@
     "ignore": true
   },
   {
-    "__docId__": 107,
+    "__docId__": 89,
     "kind": "variable",
     "name": "assert",
     "memberof": "src/utils.ts",
@@ -2245,7 +1882,7 @@
     "ignore": true
   },
   {
-    "__docId__": 108,
+    "__docId__": 90,
     "kind": "variable",
     "name": "bb",
     "memberof": "src/utils.ts",
@@ -2266,7 +1903,7 @@
     "ignore": true
   },
   {
-    "__docId__": 109,
+    "__docId__": 91,
     "kind": "function",
     "name": "cleanEthHex",
     "memberof": "src/utils.ts",
@@ -2308,7 +1945,7 @@
     }
   },
   {
-    "__docId__": 110,
+    "__docId__": 92,
     "kind": "function",
     "name": "ethAddrEq",
     "memberof": "src/utils.ts",
@@ -2360,7 +1997,7 @@
     }
   },
   {
-    "__docId__": 111,
+    "__docId__": 93,
     "kind": "variable",
     "name": "B32_ALPHA",
     "memberof": "src/utils.ts",
@@ -2381,7 +2018,7 @@
     "ignore": true
   },
   {
-    "__docId__": 112,
+    "__docId__": 94,
     "kind": "function",
     "name": "toAlphabet",
     "memberof": "src/utils.ts",
@@ -2412,7 +2049,7 @@
     "ignore": true
   },
   {
-    "__docId__": 113,
+    "__docId__": 95,
     "kind": "function",
     "name": "hexToBase32",
     "memberof": "src/utils.ts",
@@ -2463,7 +2100,7 @@
   },
   {
     "kind": "packageJSON",
-    "content": "{\n  \"name\": \"sv-lib\",\n  \"version\": \"0.1.14\",\n  \"description\": \"SecureVote Light supporting functionality\",\n  \"main\": \"dist/index.js\",\n  \"types\": \"dist/index.d.ts\",\n  \"homepage\": \"https://github.com/secure-vote/sv-lib#readme\",\n  \"files\": [\n    \"./dist\",\n    \"./dist/*/\",\n    \"./docs\"\n  ],\n  \"author\": {\n    \"name\": \"Max Kaye\",\n    \"email\": \"max@secure.vote\"\n  },\n  \"bugs\": {\n    \"url\": \"https://github.com/secure-vote/sv-lib/issues\"\n  },\n  \"bundleDependencies\": false,\n  \"dependencies\": {\n    \"assert\": \"^1.4.1\",\n    \"axios\": \"^0.18.0\",\n    \"bs58\": \"^4.0.1\",\n    \"colors\": \"^1.3.0\",\n    \"esdoc-typescript-plugin\": \"^1.0.1\",\n    \"eth-ens-namehash\": \"^2.0.8\",\n    \"eth-lib\": \"^0.2.8\",\n    \"ethereumjs-util\": \"^5.2.0\",\n    \"ramda\": \"^0.25.0\",\n    \"sha256\": \"^0.2.0\",\n    \"web3\": \"^1.0.0-beta.34\",\n    \"web3-eth-abi\": \"^1.0.0-beta.34\",\n    \"web3-eth-accounts\": \"^1.0.0-beta.34\",\n    \"web3-utils\": \"^1.0.0-beta.34\"\n  },\n  \"deprecated\": false,\n  \"keywords\": [\n    \"SecureVote\",\n    \"voting\",\n    \"crypto\",\n    \"blockchain\"\n  ],\n  \"license\": \"UNLICENSED\",\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git+https://github.com/secure-vote/sv-lib.git\"\n  },\n  \"devDependencies\": {\n    \"@types/jest\": \"^23.3.0\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-ecmascript-proposal-plugin\": \"^1.0.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"jest\": \"^23.4.1\",\n    \"minami\": \"^1.2.3\",\n    \"ts-jest\": \"^23.0.1\",\n    \"typescript\": \"^2.9.2\"\n  },\n  \"scripts\": {\n    \"dev\": \"tsc -w\",\n    \"test\": \"jest\",\n    \"docs\": \"esdoc\",\n    \"prepublish\": \"tsc && yarn docs\"\n  },\n  \"jest\": {\n    \"transform\": {\n      \"^.+\\\\.tsx?$\": \"ts-jest\"\n    },\n    \"testRegex\": \"(/__tests__/.*|(\\\\.|/)(test|spec))\\\\.(jsx?|tsx?)$\",\n    \"moduleFileExtensions\": [\n      \"ts\",\n      \"tsx\",\n      \"js\",\n      \"jsx\",\n      \"json\",\n      \"node\"\n    ],\n    \"testPathIgnorePatterns\": [\n      \"/node_modules/\",\n      \"/dist\"\n    ]\n  }\n}\n",
+    "content": "{\n  \"name\": \"sv-lib\",\n  \"version\": \"0.1.15\",\n  \"description\": \"SecureVote Light supporting functionality\",\n  \"main\": \"dist/index.umd.js\",\n  \"module\": \"dist/index.es5.js\",\n  \"types\": \"dist/index.d.ts\",\n  \"homepage\": \"https://github.com/secure-vote/sv-lib#readme\",\n  \"files\": [\n    \"./dist\",\n    \"./docs\"\n  ],\n  \"author\": {\n    \"name\": \"Max Kaye\",\n    \"email\": \"max@secure.vote\"\n  },\n  \"bugs\": {\n    \"url\": \"https://github.com/secure-vote/sv-lib/issues\"\n  },\n  \"bundleDependencies\": false,\n  \"dependencies\": {\n    \"@types/bn.js\": \"^4.11.1\",\n    \"@types/bs58\": \"^3.0.30\",\n    \"@types/ramda\": \"^0.25.35\",\n    \"assert\": \"^1.4.1\",\n    \"axios\": \"^0.18.0\",\n    \"bs58\": \"^4.0.1\",\n    \"colors\": \"^1.3.0\",\n    \"esdoc-typescript-plugin\": \"^1.0.1\",\n    \"eth-ens-namehash\": \"^2.0.8\",\n    \"eth-lib\": \"^0.2.8\",\n    \"ethereumjs-util\": \"^5.2.0\",\n    \"ramda\": \"^0.25.0\",\n    \"sha256\": \"^0.2.0\",\n    \"web3\": \"^1.0.0-beta.34\",\n    \"web3-eth-abi\": \"^1.0.0-beta.34\",\n    \"web3-eth-accounts\": \"^1.0.0-beta.34\",\n    \"web3-utils\": \"^1.0.0-beta.34\"\n  },\n  \"deprecated\": false,\n  \"keywords\": [\n    \"SecureVote\",\n    \"voting\",\n    \"crypto\",\n    \"blockchain\"\n  ],\n  \"license\": \"UNLICENSED\",\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git+https://github.com/secure-vote/sv-lib.git\"\n  },\n  \"devDependencies\": {\n    \"@types/jest\": \"^23.3.0\",\n    \"@types/node\": \"^10.0.3\",\n    \"commitizen\": \"^2.9.6\",\n    \"coveralls\": \"^3.0.0\",\n    \"cross-env\": \"^5.0.1\",\n    \"cz-conventional-changelog\": \"^2.0.0\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-ecmascript-proposal-plugin\": \"^1.0.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"husky\": \"^0.14.0\",\n    \"jest\": \"^23.4.1\",\n    \"lint-staged\": \"^7.1.3\",\n    \"lodash.camelcase\": \"^4.3.0\",\n    \"minami\": \"^1.2.3\",\n    \"prettier\": \"^1.13.4\",\n    \"prompt\": \"^1.0.0\",\n    \"replace-in-file\": \"^3.0.0-beta.2\",\n    \"rimraf\": \"^2.6.1\",\n    \"rollup\": \"^0.58.0\",\n    \"rollup-plugin-commonjs\": \"^9.1.3\",\n    \"rollup-plugin-json\": \"^3.0.0\",\n    \"rollup-plugin-node-builtins\": \"^2.1.2\",\n    \"rollup-plugin-node-resolve\": \"^3.3.0\",\n    \"rollup-plugin-sourcemaps\": \"^0.4.2\",\n    \"rollup-plugin-typescript2\": \"^0.15.1\",\n    \"semantic-release\": \"^15.0.0\",\n    \"ts-jest\": \"^23.0.1\",\n    \"ts-node\": \"^6.0.0\",\n    \"tslint\": \"^5.11.0\",\n    \"tslint-config-prettier\": \"^1.1.0\",\n    \"tslint-config-standard\": \"^7.0.0\",\n    \"typedoc\": \"^0.11.0\",\n    \"typescript\": \"^3.0.0-rc\",\n    \"validate-commit-msg\": \"^2.12.2\"\n  },\n  \"scripts\": {\n    \"dev\": \"tsc -w\",\n    \"docs\": \"esdoc\",\n    \"prepublish\": \"tsc && yarn docs\",\n    \"lint\": \"tslint -t codeFrame 'src/**/*.ts' 'test/**/*.ts'\",\n    \"prebuild\": \"rimraf dist\",\n    \"build\": \"tsc --module commonjs && rollup -c rollup.config.ts && esdoc # typedoc --out docs --target es6 --theme minimal --mode file src\",\n    \"start\": \"rollup -c rollup.config.ts -w\",\n    \"test\": \"jest\",\n    \"test:watch\": \"jest --watch\",\n    \"test:prod\": \"npm run lint && npm run test -- --coverage --no-cache\",\n    \"report-coverage\": \"cat ./coverage/lcov.info | coveralls\",\n    \"commit\": \"git-cz\",\n    \"semantic-release\": \"semantic-release\",\n    \"semantic-release-prepare\": \"ts-node tools/semantic-release-prepare\",\n    \"precommit\": \"lint-staged\"\n  },\n  \"lint-staged\": {\n    \"{src,test}/**/*.ts\": [\n      \"prettier --write\",\n      \"git add\"\n    ]\n  },\n  \"config\": {\n    \"commitizen\": {\n      \"path\": \"node_modules/cz-conventional-changelog\"\n    },\n    \"validate-commit-msg\": {\n      \"types\": \"conventional-commit-types\",\n      \"helpMessage\": \"Use \\\"npm run commit\\\" instead, we use conventional-changelog format :) (https://github.com/commitizen/cz-cli)\"\n    }\n  },\n  \"jest\": {\n    \"transform\": {\n      \"^.+\\\\.tsx?$\": \"ts-jest\"\n    },\n    \"testRegex\": \"(/__tests__/.*|\\\\.(test|spec))\\\\.(ts|tsx|js)$\",\n    \"moduleFileExtensions\": [\n      \"ts\",\n      \"tsx\",\n      \"js\",\n      \"jsx\",\n      \"json\",\n      \"node\"\n    ],\n    \"coverageThreshold\": {\n      \"global\": {\n        \"branches\": 90,\n        \"functions\": 95,\n        \"lines\": 95,\n        \"statements\": 95\n      }\n    },\n    \"collectCoverage\": true,\n    \"testPathIgnorePatterns\": [\n      \"/node_modules/\",\n      \"/dist\"\n    ]\n  },\n  \"prettier\": {\n    \"semi\": false,\n    \"singleQuote\": true\n  }\n}\n",
     "longname": "/Users/maxkaye/src/sv/lib/package.json",
     "name": "package.json",
     "static": true,

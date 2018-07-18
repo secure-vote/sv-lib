@@ -1,17 +1,5 @@
 window.esdocSearchIndex = [
   [
-    "sv-lib/src/index.ts~_const",
-    "variable/index.html#static-variable-_const",
-    "<span>_const</span> <span class=\"search-result-import-path\">sv-lib/src/index.ts</span>",
-    "variable"
-  ],
-  [
-    "sv-lib/src/index.ts~ballotbox",
-    "variable/index.html#static-variable-ballotBox",
-    "<span>ballotBox</span> <span class=\"search-result-import-path\">sv-lib/src/index.ts</span>",
-    "variable"
-  ],
-  [
     "sv-lib/src/light.ts~checkballothashbspec",
     "function/index.html#static-function-checkBallotHashBSpec",
     "<span>checkBallotHashBSpec</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
@@ -34,12 +22,6 @@ window.esdocSearchIndex = [
     "function/index.html#static-function-cleanEthHex",
     "<span>cleanEthHex</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
     "function"
-  ],
-  [
-    "sv-lib/src/index.ts~crypto",
-    "variable/index.html#static-variable-crypto",
-    "<span>crypto</span> <span class=\"search-result-import-path\">sv-lib/src/index.ts</span>",
-    "variable"
   ],
   [
     "sv-lib/src/utils.ts~ethaddreq",
@@ -156,12 +138,6 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
-    "sv-lib/src/index.ts~light",
-    "variable/index.html#static-variable-light",
-    "<span>light</span> <span class=\"search-result-import-path\">sv-lib/src/index.ts</span>",
-    "variable"
-  ],
-  [
     "sv-lib/src/ballotbox.ts~mkpacked",
     "function/index.html#static-function-mkPacked",
     "<span>mkPacked</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
@@ -196,12 +172,6 @@ window.esdocSearchIndex = [
     "function/index.html#static-function-resolveEnsAddress",
     "<span>resolveEnsAddress</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
-  ],
-  [
-    "sv-lib/src/index.ts~utils",
-    "variable/index.html#static-variable-utils",
-    "<span>utils</span> <span class=\"search-result-import-path\">sv-lib/src/index.ts</span>",
-    "variable"
   ],
   [
     "sv-lib/src/ballotbox.ts~verifysignedballotforproxy",
@@ -508,12 +478,6 @@ window.esdocSearchIndex = [
     "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined",
     "src/.external-ecmascript.js~undefined",
     "external"
-  ],
-  [
-    "src/ballotbox.test.ts",
-    "file/src/ballotBox.test.ts.html",
-    "src/ballotBox.test.ts",
-    "file"
   ],
   [
     "src/ballotbox.ts",

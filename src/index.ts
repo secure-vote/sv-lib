@@ -1,7 +1,7 @@
-export const ballotBox = require('./ballotBox')
-export const _const = require('./const')
-export const crypto = require('./crypto')
-export const light = require('./light')
-export const utils = require('./utils.js')
+import * as ballotBox from './ballotBox'
+import * as _const from './const'
+import * as crypto from './crypto'
+import * as light from './light'
+import * as utils from './utils.js'
 
-module.exports.const = module.exports._const
+export default { ballotBox, crypto, light, utils, const: _const }

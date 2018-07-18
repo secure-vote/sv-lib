@@ -1,28 +1,12 @@
 {
-  "coverage": "22.8%",
-  "expectCount": 57,
+  "coverage": "32.5%",
+  "expectCount": 40,
   "actualCount": 13,
   "files": {
-    "src/ballotBox.test.ts": {
-      "expectCount": 3,
-      "actualCount": 0,
-      "undocumentLines": [
-        1,
-        2,
-        3
-      ]
-    },
     "src/ballotBox.ts": {
-      "expectCount": 12,
+      "expectCount": 6,
       "actualCount": 6,
-      "undocumentLines": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6
-      ]
+      "undocumentLines": []
     },
     "src/const.ts": {
       "expectCount": 6,
@@ -37,44 +21,29 @@
       ]
     },
     "src/crypto.ts": {
-      "expectCount": 6,
+      "expectCount": 3,
       "actualCount": 3,
-      "undocumentLines": [
-        1,
-        2,
-        3
-      ]
-    },
-    "src/index.ts": {
-      "expectCount": 5,
-      "actualCount": 0,
-      "undocumentLines": [
-        1,
-        2,
-        3,
-        4,
-        5
-      ]
+      "undocumentLines": []
     },
     "src/light.ts": {
       "expectCount": 16,
       "actualCount": 1,
       "undocumentLines": [
-        11,
-        33,
-        36,
-        39,
-        42,
-        61,
-        81,
-        84,
-        92,
-        124,
-        127,
-        130,
-        135,
-        146,
-        157
+        12,
+        34,
+        37,
+        40,
+        43,
+        70,
+        90,
+        93,
+        101,
+        133,
+        136,
+        139,
+        144,
+        155,
+        166
       ]
     },
     "src/utils.ts": {

@@ -1,14 +1,14 @@
-const Account = require('eth-lib/lib/account')
-const Hash = require('eth-lib/lib/hash')
-const web3Utils = require('web3-utils')
+import * as Account from 'eth-lib/lib/account'
+import * as Hash from 'eth-lib/lib/hash'
+import * as web3Utils from 'web3-utils'
 
 /**
  * Like web3.eth.accounts.hashMessage without the envelope.
  *
- * @param {} data
+ * @param {*} data
  *  A message to hash - if it is hex it'll be UTF8 decoded.
  *
- * @returns {}
+ * @returns {*}
  *  The hashed message (using keccak256)
  */
 export const hashMsgRaw = (data: string | number[]): string => {
@@ -21,9 +21,9 @@ export const hashMsgRaw = (data: string | number[]): string => {
  * Sign a message such that it can be verified with `ecrecover`.
  * Similar to `web3.eth.accounts.sign` except that we sign the hash directly.
  *
- * @param {} messageHash
+ * @param {*} messageHash
  *  Hash of a message, as returned by `web3.utils.soliditySha3` or similar.
- * @param {} privateKey
+ * @param {*} privateKey
  *  Privkey to sign with.
  *
  * @returns {{messageHash: string, r: string, s: string, v: string}}

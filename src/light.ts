@@ -1,8 +1,7 @@
-import * as ENS from 'eth-ens-namehash'
-import * as Constants from './const'
-import { default as axios } from 'axios'
-import { default as bs58 } from 'bs58'
-import { default as sha256 } from 'sha256'
+import NH from 'eth-ens-namehash'
+import axios from 'axios'
+import * as bs58 from 'bs58'
+import sha256 from 'sha256'
 
 // Lovely ABIs
 import * as ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'
@@ -12,7 +11,7 @@ import * as BBFarmAbi from './smart_contracts/BBFarm.abi.json'
 import * as PaymentsAbi from './smart_contracts/SVPayments.abi.json'
 import * as AuxAbi from './smart_contracts/AuxAbi.abi.json'
 import * as AuctionAbi from './smart_contracts/CommAuctionIface.abi.json'
-import * as ERC20Abi from './smart_contracts/ERC20.abi.json'
+// import * as ERC20Abi from './smart_contracts/ERC20.abi.json'
 
 export const initializeSvLight = async svConfig => {
   const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig
@@ -48,7 +47,7 @@ export const initializeSvLight = async svConfig => {
 }
 
 export const resolveEnsAddress = async ({ resolver }, ensName) => {
-  return await resolver.methods.addr(ENS.hash(ensName)).call()
+  return await resolver.methods.addr(NH.hash(ensName)).call()
 }
 
 export const getBackendAddress = async ({ index }) => {

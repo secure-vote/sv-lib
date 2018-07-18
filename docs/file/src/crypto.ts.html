@@ -62,59 +62,54 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-networkVars">networkVars</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroAddr">zeroAddr</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroHash">zeroHash</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-_const">_const</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ballotBox">ballotBox</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-crypto">crypto</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-light">light</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-utils">utils</a></span></span></li>
 </ul>
 </div>
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/crypto.ts</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const Account = require(&quot;eth-lib/lib/account&quot;);
-const Hash = require(&quot;eth-lib/lib/hash&quot;);
-const web3Utils = require(&quot;web3-utils&quot;);
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import * as Account from &apos;eth-lib/lib/account&apos;
+import * as Hash from &apos;eth-lib/lib/hash&apos;
+import * as web3Utils from &apos;web3-utils&apos;
 
 /**
  * Like web3.eth.accounts.hashMessage without the envelope.
  *
- * @param {string} data
+ * @param {*} data
  *  A message to hash - if it is hex it&apos;ll be UTF8 decoded.
  *
- * @returns {string}
+ * @returns {*}
  *  The hashed message (using keccak256)
  */
-export const hashMsgRaw = data =&gt; {
-    const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data;
-    const msgBuffer = Buffer.from(msg);
-    return Hash.keccak256s(msgBuffer);
-};
+export const hashMsgRaw = (data: string | number[]): string =&gt; {
+  const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data
+  const msgBuffer = Buffer.from(msg)
+  return Hash.keccak256s(msgBuffer)
+}
 
 /**
  * Sign a message such that it can be verified with `ecrecover`.
  * Similar to `web3.eth.accounts.sign` except that we sign the hash directly.
  *
- * @param {string} messageHash
+ * @param {*} messageHash
  *  Hash of a message, as returned by `web3.utils.soliditySha3` or similar.
- * @param {string} privateKey
+ * @param {*} privateKey
  *  Privkey to sign with.
  *
  * @returns {{messageHash: string, r: string, s: string, v: string}}
  */
-export const ethSignHash = (messageHash, privateKey) =&gt; {
-    // near identical to web3-eth-accounts (web3 v1)
-    // the main difference is we don&apos;t envelop the data.
-    const signature = Account.sign(messageHash, privateKey);
-    const vrs = Account.decodeSignature(signature);
-    return {
-        messageHash,
-        v: vrs[0],
-        r: vrs[1],
-        s: vrs[2],
-        signature
-    };
-};
+export const ethSignHash = (messageHash: string, privateKey: string) =&gt; {
+  // near identical to web3-eth-accounts (web3 v1)
+  // the main difference is we don&apos;t envelop the data.
+  const signature = Account.sign(messageHash, privateKey)
+  const vrs = Account.decodeSignature(signature)
+  return {
+    messageHash,
+    v: vrs[0],
+    r: vrs[1],
+    s: vrs[2],
+    signature
+  }
+}
 
 export /**
  *
@@ -125,12 +120,15 @@ export /**
  * @returns {{verified: bool, address: EthAddress}}
  */
 const ethVerifySig = (messageHash: string, [v, r, s]: string[]) =&gt; {
-    const address = Account.recover(messageHash, Account.encodeSignature([v, r, s]));
-    return {
-        verified: true,
-        address
-    };
-};
+  const address = Account.recover(
+    messageHash,
+    Account.encodeSignature([v, r, s])
+  )
+  return {
+    verified: true,
+    address
+  }
+}
 </code></pre>
 
 </div>
