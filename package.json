@@ -52,6 +52,7 @@
   "devDependencies": {
     "@types/jest": "^23.3.0",
     "@types/node": "^10.5.2",
+    "buffer": "^5.1.0",
     "commitizen": "^2.9.6",
     "coveralls": "^3.0.0",
     "cross-env": "^5.0.1",
