@@ -111,13 +111,25 @@ export const mkPacked = (start, end, submissionBits) =&gt; {
   const max64Bit = new BN(&apos;ffffffffffffffff&apos;, 16)
 
   const s = new BN(start)
-  assert.equal(s.lte(max64Bit) &amp;&amp; s.gtn(0), true, &quot;start time must be &gt;0 and &lt;2^64&quot;)
+  assert.equal(
+    s.lte(max64Bit) &amp;&amp; s.gtn(0),
+    true,
+    &apos;start time must be &gt;0 and &lt;2^64&apos;
+  )
 
   const e = new BN(end)
-  assert.equal(e.lte(max64Bit) &amp;&amp; e.gtn(0), true, &quot;end time must be &gt;0 and &lt;2^64&quot;)
+  assert.equal(
+    e.lte(max64Bit) &amp;&amp; e.gtn(0),
+    true,
+    &apos;end time must be &gt;0 and &lt;2^64&apos;
+  )
 
   const sb = new BN(submissionBits)
-  assert.equal(sb.ltn(2**16) &amp;&amp; sb.gtn(0), true, &quot;submission bits must be &gt;0 and &lt;2^16&quot;)  // note: submission bits of 0 is invalid
+  assert.equal(
+    sb.ltn(2 ** 16) &amp;&amp; sb.gtn(0),
+    true,
+    &apos;submission bits must be &gt;0 and &lt;2^16&apos;
+  ) // note: submission bits of 0 is invalid
 
   return sb
     .shln(64)
