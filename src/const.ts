@@ -129,3 +129,5 @@ export const getNetwork = (networkId: number, chainId: number): EthNetConf => {
         `Cannot find network with net_id ${networkId} and chainId ${chainId}`
     )
 }
+
+export const Ed25519DelegatePrefix = 'SV-ED-ETH'

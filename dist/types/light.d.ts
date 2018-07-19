@@ -64,3 +64,5 @@ export declare const checkBallotHashBSpec: (ballotSpec: any, assertSpecHash: any
 export declare const checkBallotHashGBallot: (ballotObject: any) => boolean;
 export declare const getSingularCleanAbi: (requestedAbiName: any, methodName: any) => any;
 export declare const getUnsafeEd25519delegations: (pubKey: string, svNetwork: any) => Promise<any>;
+export declare const prepareEd25519Delegation: (sk: string, svNetwork: any) => string;
+export declare const verifyEd25519Delegation: (delegation: string, signature: any[]) => void;

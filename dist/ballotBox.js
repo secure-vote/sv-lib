@@ -234,7 +234,7 @@ export var prepareWeb3BBVoteTx = function (_a, _b) {
                     assert.equal(web3Utils.isAddress(userAddress), true, 'User address supplied is not a valid ethereum address.');
                     assert.equal(voteData.length, 66, 'Assertion failed: final hex was not 66 characters long (32 bytes)');
                     BBFarmContract = new web3.eth.Contract(BBFarmAbi, bbFarm);
-                    submitVote = BBFarmContract.methods.submitVote(ballotId, voteData, "0x");
+                    submitVote = BBFarmContract.methods.submitVote(ballotId, voteData, '0x');
                     return [4 /*yield*/, submitVote.estimateGas()];
                 case 1:
                     gasEstimate = _c.sent();
@@ -265,7 +265,8 @@ export var castProxyVote = function (request, svConfig) { return __awaiter(_this
                 var svApiUrl = svConfig.svApiUrl;
                 var proxyVotePath = '/sv/light/submitProxyVote';
                 var requestUrl = "" + svApiUrl + proxyVotePath;
-                axios.post(requestUrl, request)
+                axios
+                    .post(requestUrl, request)
                     .then(function (response) {
                     var data = response.data;
                     resolve(data);

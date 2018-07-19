@@ -30,7 +30,6 @@
   <ul>
     
   <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-castProxyVote">castProxyVote</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createEd25519SelfDelegation">createEd25519SelfDelegation</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkPacked">mkPacked</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSignedBallotForProxy">mkSignedBallotForProxy</a></span></span></li>
@@ -58,12 +57,15 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getSingularCleanAbi">getSingularCleanAbi</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUnsafeEd25519delegations">getUnsafeEd25519delegations</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initializeSvLight">initializeSvLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-prepareEd25519Delegation">prepareEd25519Delegation</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resolveEnsAddress">resolveEnsAddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-verifyEd25519Delegation">verifyEd25519Delegation</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-weiToCents">weiToCents</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cleanEthHex">cleanEthHex</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethAddrEq">ethAddrEq</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexToBase32">hexToBase32</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-flags">flags</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Ed25519DelegatePrefix">Ed25519DelegatePrefix</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-networkVars">networkVars</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroAddr">zeroAddr</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroHash">zeroHash</a></span></span></li>
@@ -72,10 +74,12 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/light.ts</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import * as NH from &apos;eth-ens-namehash&apos;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import NH from &apos;eth-ens-namehash&apos;
 import axios from &apos;axios&apos;
 import * as bs58 from &apos;bs58&apos;
 import sha256 from &apos;sha256&apos;
+import * as SvConsts from &apos;./const&apos;
+import * as SvUtils from &apos;./utils&apos;
 
 // Lovely ABIs
 import ResolverAbi from &apos;./smart_contracts/SV_ENS_Resolver.abi.json&apos;
@@ -95,6 +99,8 @@ export const initializeSvLight = async svConfig =&gt; {
         httpProvider,
         auxContract
     } = svConfig
+
+    console.log(&apos;Initialising!&apos;)
 
     const Web3 = require(&apos;web3&apos;)
     const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
@@ -127,6 +133,7 @@ export const initializeSvLight = async svConfig =&gt; {
 }
 
 export const resolveEnsAddress = async ({ resolver }, ensName) =&gt; {
+    console.log(NH)
     return await resolver.methods.addr(NH.hash(ensName)).call()
 }
 
@@ -327,10 +334,7 @@ export const getSingularCleanAbi = (requestedAbiName, methodName) =&gt; {
 }
 
 // Returns the Ed25519 delegations
-export const getUnsafeEd25519delegations = async (
-    pubKey: string,
-    svNetwork: any
-) =&gt; {
+export const getUnsafeEd25519delegations = async (pubKey: string, svNetwork: any) =&gt; {
     // TODO - Some assertions and stuff..
 
     const { web3, svConfig } = svNetwork
@@ -350,7 +354,21 @@ export const getUnsafeEd25519delegations = async (
     return delegations
 }
 
-// export const verifyEd25519Delegation =
+export const prepareEd25519Delegation = (sk: string, web3: any) =&gt; {
+    const account = web3.eth.accounts.privateKeyToAccount(sk)
+    const address = account.address
+
+    // Delegate prefix (SV-ED-ETH)
+    const prefix = web3.utils.toHex(SvConsts.Ed25519DelegatePrefix)
+    const nonce = web3.utils.randomHex(3)
+    const trimmedAddress = SvUtils.cleanEthHex(address)
+
+    return `${prefix}${nonce}${trimmedAddress}`
+}
+
+export const verifyEd25519Delegation = (delegation: string, signature: any[]) =&gt; {
+
+} 
 </code></pre>
 
 </div>

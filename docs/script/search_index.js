@@ -1,5 +1,11 @@
 window.esdocSearchIndex = [
   [
+    "sv-lib/src/const.ts~ed25519delegateprefix",
+    "variable/index.html#static-variable-Ed25519DelegatePrefix",
+    "<span>Ed25519DelegatePrefix</span> <span class=\"search-result-import-path\">sv-lib/src/const.ts</span>",
+    "variable"
+  ],
+  [
     "sv-lib/src/ballotbox.ts~castproxyvote",
     "function/index.html#static-function-castProxyVote",
     "<span>castProxyVote</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
@@ -27,12 +33,6 @@ window.esdocSearchIndex = [
     "sv-lib/src/utils.ts~cleanethhex",
     "function/index.html#static-function-cleanEthHex",
     "<span>cleanEthHex</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
-    "function"
-  ],
-  [
-    "sv-lib/src/ballotbox.ts~createed25519selfdelegation",
-    "function/index.html#static-function-createEd25519SelfDelegation",
-    "<span>createEd25519SelfDelegation</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
     "function"
   ],
   [
@@ -192,6 +192,12 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "sv-lib/src/light.ts~prepareed25519delegation",
+    "function/index.html#static-function-prepareEd25519Delegation",
+    "<span>prepareEd25519Delegation</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/ballotbox.ts~prepareweb3bbvotetx",
     "function/index.html#static-function-prepareWeb3BBVoteTx",
     "<span>prepareWeb3BBVoteTx</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
@@ -201,6 +207,12 @@ window.esdocSearchIndex = [
     "sv-lib/src/light.ts~resolveensaddress",
     "function/index.html#static-function-resolveEnsAddress",
     "<span>resolveEnsAddress</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/light.ts~verifyed25519delegation",
+    "function/index.html#static-function-verifyEd25519Delegation",
+    "<span>verifyEd25519Delegation</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [

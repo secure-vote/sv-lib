@@ -20,4 +20,5 @@ export declare const networkVars: {
 };
 export declare const networkName: (networkId: any) => "Kovan" | "Mainnet" | "Ropsten" | "Morden" | "Rinkeby" | "Unknown";
 export declare const getNetwork: (networkId: number, chainId: number) => EthNetConf;
+export declare const Ed25519DelegatePrefix = "SV-ED-ETH";
 export {};

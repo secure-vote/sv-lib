@@ -1,7 +1,9 @@
-import * as NH from 'eth-ens-namehash'
+import NH from 'eth-ens-namehash'
 import axios from 'axios'
 import * as bs58 from 'bs58'
 import sha256 from 'sha256'
+import * as SvConsts from './const'
+import * as SvUtils from './utils'
 
 // Lovely ABIs
 import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'
@@ -24,7 +26,6 @@ export const initializeSvLight = async svConfig => {
 
     const Web3 = require('web3')
     const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
-    console.log('IndexAbi :', IndexAbi)
     const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
 
     // const indexAddress =
@@ -276,4 +277,26 @@ export const getUnsafeEd25519delegations = async (
     return delegations
 }
 
-// export const verifyEd25519Delegation =
+export const prepareEd25519Delegation = (sk: string, svNetwork: any) => {
+    const { web3 } = svNetwork
+    const account = web3.eth.accounts.privateKeyToAccount(sk)
+    const address = account.address
+
+    // Delegate prefix (SV-ED-ETH)
+    const prefix = web3.utils.toHex(SvConsts.Ed25519DelegatePrefix)
+
+    let nonce = null
+    do {
+        nonce = web3.utils.randomHex(3).substr(2, 6)
+    } while (nonce.length !== 6)
+
+    console.log('nonce :', nonce)
+    const trimmedAddress = SvUtils.cleanEthHex(address)
+
+    return `${prefix}${nonce}${trimmedAddress}`
+}
+
+export const verifyEd25519Delegation = (
+    delegation: string,
+    signature: any[]
+) => {}

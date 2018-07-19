@@ -102,4 +102,5 @@ export var getNetwork = function (networkId, chainId) {
     }
     throw Error("Cannot find network with net_id " + networkId + " and chainId " + chainId);
 };
+export var Ed25519DelegatePrefix = 'SV-ED-ETH';
 //# sourceMappingURL=const.js.map

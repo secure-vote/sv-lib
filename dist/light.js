@@ -45,10 +45,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
-import * as NH from 'eth-ens-namehash';
+import NH from 'eth-ens-namehash';
 import axios from 'axios';
 import * as bs58 from 'bs58';
 import sha256 from 'sha256';
+import * as SvConsts from './const';
+import * as SvUtils from './utils';
 // Lovely ABIs
 import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json';
 import IndexAbi from './smart_contracts/SVLightIndex.abi.json';
@@ -67,7 +69,6 @@ export var initializeSvLight = function (svConfig) { return __awaiter(_this, voi
                 indexContractName = svConfig.indexContractName, ensResolver = svConfig.ensResolver, httpProvider = svConfig.httpProvider, auxContract = svConfig.auxContract;
                 Web3 = require('web3');
                 web3 = new Web3(new Web3.providers.HttpProvider(httpProvider));
-                console.log('IndexAbi :', IndexAbi);
                 resolver = new web3.eth.Contract(ResolverAbi, ensResolver);
                 _b = (_a = web3.eth.Contract).bind;
                 _c = [void 0, IndexAbi];
@@ -386,5 +387,20 @@ export var getUnsafeEd25519delegations = function (pubKey, svNetwork) { return _
         }
     });
 }); };
-// export const verifyEd25519Delegation =
+export var prepareEd25519Delegation = function (sk, svNetwork) {
+    var web3 = svNetwork.web3;
+    var account = web3.eth.accounts.privateKeyToAccount(sk);
+    var address = account.address;
+    // Delegate prefix (SV-ED-ETH)
+    var prefix = web3.utils.toHex(SvConsts.Ed25519DelegatePrefix);
+    var nonce = null;
+    do {
+        nonce = web3.utils.randomHex(3).substr(2, 6);
+    } while (nonce.length !== 6);
+    console.log('nonce :', nonce);
+    var trimmedAddress = SvUtils.cleanEthHex(address);
+    return "" + prefix + nonce + trimmedAddress;
+};
+export var verifyEd25519Delegation = function (delegation, signature) {
+};
 //# sourceMappingURL=light.js.map

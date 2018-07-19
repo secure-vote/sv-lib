@@ -30,7 +30,6 @@
   <ul>
     
   <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-castProxyVote">castProxyVote</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createEd25519SelfDelegation">createEd25519SelfDelegation</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkPacked">mkPacked</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSignedBallotForProxy">mkSignedBallotForProxy</a></span></span></li>
@@ -58,12 +57,15 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getSingularCleanAbi">getSingularCleanAbi</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUnsafeEd25519delegations">getUnsafeEd25519delegations</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initializeSvLight">initializeSvLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-prepareEd25519Delegation">prepareEd25519Delegation</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resolveEnsAddress">resolveEnsAddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-verifyEd25519Delegation">verifyEd25519Delegation</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-weiToCents">weiToCents</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cleanEthHex">cleanEthHex</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethAddrEq">ethAddrEq</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexToBase32">hexToBase32</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-flags">flags</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Ed25519DelegatePrefix">Ed25519DelegatePrefix</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-networkVars">networkVars</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroAddr">zeroAddr</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroHash">zeroHash</a></span></span></li>
@@ -89,6 +91,7 @@ type EthNetConf = {
     archivePushUrl: string
     lookupAddress: string
     unsafeEd25519DelegationAddr: string
+    svApiUrl: string
 }
 
 const _raw_networkVars: { [netName: string]: EthNetConf } = {
@@ -104,6 +107,7 @@ const _raw_networkVars: { [netName: string]: EthNetConf } = {
         archiveUrl: &apos;https://archive.test.secure.vote/&apos;,
         archivePushUrl: &apos;https://archive.test.push.secure.vote/&apos;,
         lookupAddress: &apos;0x216265865e46D4c6FE506877EfAAE7dd7Ae2faCE&apos;,
+        svApiUrl: &apos;https://dev.api.secure.vote&apos;,
         unsafeEd25519DelegationAddr:
             &apos;0x005645072d7c244476e3099619a6089245b6a958&apos;
     },
@@ -119,6 +123,7 @@ const _raw_networkVars: { [netName: string]: EthNetConf } = {
         archiveUrl: &apos;https://archive.secure.vote/&apos;,
         archivePushUrl: &apos;https://archive.push.secure.vote/&apos;,
         lookupAddress: &apos;0x216265865e46D4c6FE506877EfAAE7dd7Ae2faCE&apos;,
+        svApiUrl: &apos;&apos;,
         unsafeEd25519DelegationAddr: &apos;&apos;
     },
     ropsten: {
@@ -133,6 +138,7 @@ const _raw_networkVars: { [netName: string]: EthNetConf } = {
         archiveUrl: &apos;https://archive.test.secure.vote/&apos;,
         archivePushUrl: &apos;https://archive.test.push.secure.vote/&apos;,
         lookupAddress: &apos;&apos;,
+        svApiUrl: &apos;&apos;,
         unsafeEd25519DelegationAddr: &apos;&apos;
     },
     classic: {
@@ -147,6 +153,7 @@ const _raw_networkVars: { [netName: string]: EthNetConf } = {
         archiveUrl: &apos;https://archive.secure.vote/&apos;,
         archivePushUrl: &apos;https://archive.push.secure.vote/&apos;,
         lookupAddress: &apos;&apos;,
+        svApiUrl: &apos;&apos;,
         unsafeEd25519DelegationAddr: &apos;&apos;
     }
 }
@@ -198,7 +205,8 @@ export const getNetwork = (networkId: number, chainId: number): EthNetConf =&gt;
         `Cannot find network with net_id ${networkId} and chainId ${chainId}`
     )
 }
-</code></pre>
+
+export const Ed25519DelegatePrefix = &apos;SV-ED-ETH&apos;</code></pre>
 
 </div>
 
