@@ -1,5 +1,4 @@
 import { ProxyVote } from './types';
-import BN from 'bn.js';
 /**
  * This object tracks the flags used for SV ballot boxes. They determine the submission
  * methods and whether ballots are tracked as binding, official, or testing.
@@ -28,7 +27,7 @@ export declare const flags: {
  *  Returns a `bn.js` BigNum of the packed values.
  *  Format: [submissionBits(16)][startTime(64)][endTime(64)]
  */
-export declare const mkPacked: (start: any, end: any, submissionBits: any) => BN;
+export declare const mkPacked: (start: any, end: any, submissionBits: any) => any;
 /**
  * This combines flags into a finished submissionBits. It also does some validation.
  * @param {*} toCombine

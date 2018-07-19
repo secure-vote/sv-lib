@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var R = require("ramda");
-var bn_js_1 = require("bn.js");
+var BN = require('bn.js');
 var assert = require("assert");
 var web3Utils = require("web3-utils");
 var svCrypto = require("./crypto");
@@ -36,9 +36,9 @@ exports.flags = {
  *  Format: [submissionBits(16)][startTime(64)][endTime(64)]
  */
 exports.mkPacked = function (start, end, submissionBits) {
-    var s = new bn_js_1.default(start);
-    var e = new bn_js_1.default(end);
-    var sb = new bn_js_1.default(submissionBits);
+    var s = new BN(start);
+    var e = new BN(end);
+    var sb = new BN(submissionBits);
     return sb
         .shln(64)
         .add(s)

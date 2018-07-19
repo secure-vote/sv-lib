@@ -1,7 +1,7 @@
 import { ProxyVote } from './types'
 
 import * as R from 'ramda'
-import BN from 'bn.js'
+const BN = require('bn.js')
 import * as assert from 'assert'
 import * as web3Utils from 'web3-utils'
 import * as svCrypto from './crypto'

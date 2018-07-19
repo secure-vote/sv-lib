@@ -3,6 +3,8 @@ import commonjs from 'rollup-plugin-commonjs'
 import sourceMaps from 'rollup-plugin-sourcemaps'
 import typescript from 'rollup-plugin-typescript2'
 import json from 'rollup-plugin-json'
+import globals from 'rollup-plugin-node-globals'
+import builtins from 'rollup-plugin-node-builtins'
 
 const pkg = require('./package.json')
 
@@ -20,6 +22,7 @@ export default {
   plugins: [
     // Allow json resolution
     json(),
+    builtins(),
     // Compile TypeScript files
     typescript({ useTsconfigDeclarationDir: true }),
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
