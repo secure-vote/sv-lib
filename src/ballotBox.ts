@@ -1,7 +1,7 @@
 import { ProxyVote } from './types'
 
-import * as R from 'ramda'
 const BN = require('bn.js')
+import * as R from 'ramda'
 import * as assert from 'assert'
 import * as web3Utils from 'web3-utils'
 import * as svCrypto from './crypto'
@@ -39,9 +39,29 @@ export const flags = {
  *  Format: [submissionBits(16)][startTime(64)][endTime(64)]
  */
 export const mkPacked = (start, end, submissionBits) => {
+  const max64Bit = new BN('ffffffffffffffff', 16)
+
   const s = new BN(start)
+  assert.equal(
+    s.lte(max64Bit) && s.gtn(0),
+    true,
+    'start time must be >0 and <2^64'
+  )
+
   const e = new BN(end)
+  assert.equal(
+    e.lte(max64Bit) && e.gtn(0),
+    true,
+    'end time must be >0 and <2^64'
+  )
+
   const sb = new BN(submissionBits)
+  assert.equal(
+    sb.ltn(2 ** 16) && sb.gtn(0),
+    true,
+    'submission bits must be >0 and <2^16'
+  ) // note: submission bits of 0 is invalid
+
   return sb
     .shln(64)
     .add(s)

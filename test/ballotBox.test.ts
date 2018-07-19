@@ -1,6 +1,14 @@
-const bb = require('../src/ballotBox')
-const _const = require('../src/const')
-const Account = require('eth-lib/lib/account')
+import * as BN from 'bn.js'
+import * as Account from 'eth-lib/lib/account'
+
+import * as _const from '../src/const'
+import * as bb from '../src/ballotBox'
+
+test('mkPacked works as expected', () => {
+  const p1 = bb.mkPacked(1, 2, 7)
+  expect(p1).toEqual(new BN('0700000000000000010000000000000002', 16))
+  expect(p1.eq(new BN('0700000000000000010000000000000002', 16))).toBe(true)
+})
 
 test('create and verify proxy ballots', () => {
   const privKey =
@@ -18,9 +26,11 @@ test('create and verify proxy ballots', () => {
 
   const proxyVote = bb.mkSignedBallotForProxy(...proxyVoteParams)
 
-  console.log('Proxy Vote generated:', JSON.stringify(proxyVote, null, 2))
-  console.log('Proxy Vote params:', JSON.stringify(proxyVoteParams, null, 2))
-  console.log('Address:', address)
+  if (process.env.DEBUG_PROXY_VOTE) {
+    console.log('Proxy Vote generated:', JSON.stringify(proxyVote, null, 2))
+    console.log('Proxy Vote params:', JSON.stringify(proxyVoteParams, null, 2))
+    console.log('Address:', address)
+  }
 
   const verificationResp = bb.verifySignedBallotForProxy(proxyVote)
 

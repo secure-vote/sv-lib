@@ -67,10 +67,10 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/light.ts</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import NH from &apos;eth-ens-namehash&apos;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import * as NH from &apos;eth-ens-namehash&apos;
 import axios from &apos;axios&apos;
 import * as bs58 from &apos;bs58&apos;
-import sha256 from &apos;sha256&apos;
+import * as sha256 from &apos;sha256&apos;
 
 // Lovely ABIs
 import * as ResolverAbi from &apos;./smart_contracts/SV_ENS_Resolver.abi.json&apos;
@@ -276,14 +276,29 @@ export const getCurrentGasPrice = async () =&gt; {
     fastest: data.fastest / 10
   }
 }
-// Checks the ballot hash against the ballot content
-export const checkBallotHashBSpec = (ballotSpec, assertSpecHash) =&gt; {
-  let contentHash = &apos;0x&apos; + sha256(JSON.stringify(ballotSpec, null, 2))
-  if (assertSpecHash === contentHash) {
-    return true
-  } else {
-    return false
-  }
+
+/**
+ * Verify a BallotSpec&apos;s hash
+ *
+ * @param {*} rawBallotSpecString The raw string/bytes before JSON.parse
+ * @param {*} expectedSpecHash The expected hash as Eth Hex
+ *
+ * @returns {boolean} Whether the ballotSpec matched the expected hash
+ */
+export const checkBallotHashBSpec = (rawBallotSpecString, expectedSpecHash) =&gt; {
+  throw Error(&quot;Unimplemented (check code for details)&quot;)
+
+  // NOTE: This function is unsafe - JSON does not have deterministic key order
+  // a ballotSpec object is not suitable to verify the hash; you need the _raw_
+  // string before it is parsed to JSON
+
+  // Original function
+  // let contentHash = &apos;0x&apos; + sha256(JSON.stringify(ballotSpec, null, 2))
+  // if (assertSpecHash === contentHash) {
+  //   return true
+  // } else {
+  //   return false
+  // }
 }
 
 // Checks the ballot hash against a ballot global ballot object

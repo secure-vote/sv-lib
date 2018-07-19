@@ -69,8 +69,8 @@
 <div class="content" data-ice="content"><h1 data-ice="title">src/ballotBox.ts</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import { ProxyVote } from &apos;./types&apos;
 
-import * as R from &apos;ramda&apos;
 const BN = require(&apos;bn.js&apos;)
+import * as R from &apos;ramda&apos;
 import * as assert from &apos;assert&apos;
 import * as web3Utils from &apos;web3-utils&apos;
 import * as svCrypto from &apos;./crypto&apos;
@@ -108,9 +108,17 @@ export const flags = {
  *  Format: [submissionBits(16)][startTime(64)][endTime(64)]
  */
 export const mkPacked = (start, end, submissionBits) =&gt; {
+  const max64Bit = new BN(&apos;ffffffffffffffff&apos;, 16)
+
   const s = new BN(start)
+  assert.equal(s.lte(max64Bit) &amp;&amp; s.gtn(0), true, &quot;start time must be &gt;0 and &lt;2^64&quot;)
+
   const e = new BN(end)
+  assert.equal(e.lte(max64Bit) &amp;&amp; e.gtn(0), true, &quot;end time must be &gt;0 and &lt;2^64&quot;)
+
   const sb = new BN(submissionBits)
+  assert.equal(sb.ltn(2**16) &amp;&amp; sb.gtn(0), true, &quot;submission bits must be &gt;0 and &lt;2^16&quot;)  // note: submission bits of 0 is invalid
+
   return sb
     .shln(64)
     .add(s)
