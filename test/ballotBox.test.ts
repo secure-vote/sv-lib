@@ -8,13 +8,19 @@ test('create and verify proxy ballots', () => {
   const acct = Account.fromPrivate(privKey)
   const { address } = acct
 
-  const proxyVote = bb.mkSignedBallotForProxy(
+  const proxyVoteParams = [
     '0x0000000000000000053970000000000000000000000000000000000000000000', // some ballot id
     1, // sequence num
     '0x4000000000000000000000000000000000000000000000000000000000000000', // some voteData
     '0x', // trivial extra
     privKey
-  )
+  ]
+
+  const proxyVote = bb.mkSignedBallotForProxy(...proxyVoteParams)
+
+  console.log('Proxy Vote generated:', JSON.stringify(proxyVote, null, 2))
+  console.log('Proxy Vote params:', JSON.stringify(proxyVoteParams, null, 2))
+  console.log('Address:', address)
 
   const verificationResp = bb.verifySignedBallotForProxy(proxyVote)
 
