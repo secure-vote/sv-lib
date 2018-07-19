@@ -1,6 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var R = require("ramda");
+import * as R from 'ramda';
 /**
  * This will take an Ethereum hex string (or a normal hex string) and
  * output a normal hex string (no '0x' header) or throw an error on a
@@ -11,7 +9,7 @@ var R = require("ramda");
  * @returns {string}
  *  the hex string.
  */
-exports.cleanEthHex = function (hex) {
+export var cleanEthHex = function (hex) {
     if (hex === '0x0') {
         return '00';
     }
@@ -33,7 +31,7 @@ exports.cleanEthHex = function (hex) {
  *
  * @returns {bool}
  */
-exports.ethAddrEq = function (addr1, addr2) {
+export var ethAddrEq = function (addr1, addr2) {
     var _clean = function (a) { return module.exports.cleanEthHex(a).toLowerCase(); };
     // throw a length check in there to ensure we have valid addresses
     return _clean(addr1) === _clean(addr2) && addr1.length === 42;
@@ -56,8 +54,8 @@ var toAlphabet = function (arr) {
  * @returns {string}
  *  The Base32 version of the hex string.
  */
-exports.hexToBase32 = function (hex) {
-    var _hex = exports.cleanEthHex(hex);
+export var hexToBase32 = function (hex) {
+    var _hex = cleanEthHex(hex);
     var buf = Buffer.from(_hex, 'hex');
     var digits = [0];
     var digitlength = 1;

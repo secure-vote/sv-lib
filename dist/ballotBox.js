@@ -1,17 +1,15 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var R = require("ramda");
+import * as R from 'ramda';
 var BN = require('bn.js');
-var assert = require("assert");
-var web3Utils = require("web3-utils");
-var svCrypto = require("./crypto");
+import * as assert from 'assert';
+import * as web3Utils from 'web3-utils';
+import * as svCrypto from './crypto';
 /**
  * This object tracks the flags used for SV ballot boxes. They determine the submission
  * methods and whether ballots are tracked as binding, official, or testing.
  *
  * For more info see docs.secure.vote
  */
-exports.flags = {
+export var flags = {
     // flags on submission methods
     USE_ETH: Math.pow(2, 0),
     USE_SIGNED: Math.pow(2, 1),
@@ -35,7 +33,7 @@ exports.flags = {
  *  Returns a `bn.js` BigNum of the packed values.
  *  Format: [submissionBits(16)][startTime(64)][endTime(64)]
  */
-exports.mkPacked = function (start, end, submissionBits) {
+export var mkPacked = function (start, end, submissionBits) {
     var s = new BN(start);
     var e = new BN(end);
     var sb = new BN(submissionBits);
@@ -53,7 +51,7 @@ exports.mkPacked = function (start, end, submissionBits) {
  * @returns {number}
  *  A 16 bit integer of combined flags.
  */
-exports.mkSubmissionBits = function () {
+export var mkSubmissionBits = function () {
     var toCombine = [];
     for (var _i = 0; _i < arguments.length; _i++) {
         toCombine[_i] = arguments[_i];
@@ -87,7 +85,7 @@ exports.mkSubmissionBits = function () {
  * @returns {object}
  *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`
  */
-exports.mkSignedBallotForProxy = function (ballotId, sequence, voteData, extra, privateKey, opts) {
+export var mkSignedBallotForProxy = function (ballotId, sequence, voteData, extra, privateKey, opts) {
     if (opts === void 0) { opts = {}; }
     if (opts.skipSequenceSizeCheck !== true)
         assert.equal(0 < sequence && sequence < Math.pow(2, 32), true, 'sequence number out of bounds');
@@ -119,7 +117,7 @@ exports.mkSignedBallotForProxy = function (ballotId, sequence, voteData, extra, 
  * @param {*} [opts={}] Not used currently; for future options
  * @returns {{verified: bool, address: EthAddress}}
  */
-exports.verifySignedBallotForProxy = function (proxyVote, opts) {
+export var verifySignedBallotForProxy = function (proxyVote, opts) {
     if (opts === void 0) { opts = {}; }
     var _a = proxyVote.proxyReq, r = _a[0], s = _a[1], packed2 = _a[2], ballotId = _a[3], voteData = _a[4], extra = proxyVote.extra;
     var p2Bytes = web3Utils.hexToBytes(packed2);
@@ -138,7 +136,7 @@ exports.verifySignedBallotForProxy = function (proxyVote, opts) {
  * @returns {string}
  *  Returns an eth hex string of the vote data
  */
-exports.genRange3VoteData = function (votesArray) {
+export var genRange3VoteData = function (votesArray) {
     assert.equal(R.all(function (v) { return (v | 0) === v; }, votesArray), true, 'All array elements must be defined and integers.');
     assert.equal(R.all(function (v) { return -3 <= v && v <= 3; }, votesArray), true, 'Votes must be in range -3 to 3.');
     assert.equal(votesArray.length <= 85, true, 'Too many votes; maximum capacity of 32 bytes is 85 individual items.');

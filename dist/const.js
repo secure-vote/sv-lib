@@ -1,7 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.zeroAddr = "0x0000000000000000000000000000000000000000";
-exports.zeroHash = "0x0000000000000000000000000000000000000000000000000000000000000000";
+export var zeroAddr = "0x0000000000000000000000000000000000000000";
+export var zeroHash = "0x0000000000000000000000000000000000000000000000000000000000000000";
 var _raw_networkVars = {
     kovan: {
         indexContractName: "index.kov.sv",
@@ -56,13 +54,13 @@ var _raw_networkVars = {
         lookupAddress: ""
     },
 };
-exports.networkVars = new Proxy(_raw_networkVars, {
+export var networkVars = new Proxy(_raw_networkVars, {
     get: function (obj, prop) {
         console.warn("Warning: const.networkVars is deprecated; please use const.getNetwork(..)");
         return obj[prop];
     }
 });
-exports.networkName = function (networkId) {
+export var networkName = function (networkId) {
     console.warn("Warning: const.networkName(..) is deprecated. Please use const.getNetwork(..).name");
     switch (networkId) {
         case 1:
@@ -79,7 +77,7 @@ exports.networkName = function (networkId) {
             return "Unknown";
     }
 };
-exports.getNetwork = function (networkId, chainId) {
+export var getNetwork = function (networkId, chainId) {
     switch (networkId) {
         case 1:
             if (chainId === 1)

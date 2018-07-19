@@ -1,16 +1,16 @@
-import NH from 'eth-ens-namehash'
+import * as NH from 'eth-ens-namehash'
 import axios from 'axios'
 import * as bs58 from 'bs58'
 import sha256 from 'sha256'
 
 // Lovely ABIs
-import * as ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'
-import * as IndexAbi from './smart_contracts/SVLightIndex.abi.json'
-import * as BackendAbi from './smart_contracts/SVLightIndexBackend.abi.json'
-import * as BBFarmAbi from './smart_contracts/BBFarm.abi.json'
-import * as PaymentsAbi from './smart_contracts/SVPayments.abi.json'
-import * as AuxAbi from './smart_contracts/AuxAbi.abi.json'
-import * as AuctionAbi from './smart_contracts/CommAuctionIface.abi.json'
+import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'
+import IndexAbi from './smart_contracts/SVLightIndex.abi.json'
+import BackendAbi from './smart_contracts/SVLightIndexBackend.abi.json'
+import BBFarmAbi from './smart_contracts/BBFarm.abi.json'
+import PaymentsAbi from './smart_contracts/SVPayments.abi.json'
+import AuxAbi from './smart_contracts/AuxAbi.abi.json'
+import AuctionAbi from './smart_contracts/CommAuctionIface.abi.json'
 // import * as ERC20Abi from './smart_contracts/ERC20.abi.json'
 
 export const initializeSvLight = async svConfig => {
@@ -18,7 +18,7 @@ export const initializeSvLight = async svConfig => {
 
   const Web3 = require('web3')
   const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
-
+  console.log('IndexAbi :', IndexAbi)
   const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
 
   // const indexAddress =

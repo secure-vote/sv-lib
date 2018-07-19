@@ -1,4 +1,3 @@
-"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -46,19 +45,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
-Object.defineProperty(exports, "__esModule", { value: true });
-var eth_ens_namehash_1 = require("eth-ens-namehash");
-var axios_1 = require("axios");
-var bs58 = require("bs58");
-var sha256_1 = require("sha256");
+import * as NH from 'eth-ens-namehash';
+import axios from 'axios';
+import * as bs58 from 'bs58';
+import sha256 from 'sha256';
 // Lovely ABIs
-var ResolverAbi = require("./smart_contracts/SV_ENS_Resolver.abi.json");
-var IndexAbi = require("./smart_contracts/SVLightIndex.abi.json");
-var BackendAbi = require("./smart_contracts/SVLightIndexBackend.abi.json");
-var PaymentsAbi = require("./smart_contracts/SVPayments.abi.json");
-var AuxAbi = require("./smart_contracts/AuxAbi.abi.json");
+import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json';
+import IndexAbi from './smart_contracts/SVLightIndex.abi.json';
+import BackendAbi from './smart_contracts/SVLightIndexBackend.abi.json';
+import PaymentsAbi from './smart_contracts/SVPayments.abi.json';
+import AuxAbi from './smart_contracts/AuxAbi.abi.json';
 // import * as ERC20Abi from './smart_contracts/ERC20.abi.json'
-exports.initializeSvLight = function (svConfig) { return __awaiter(_this, void 0, void 0, function () {
+export var initializeSvLight = function (svConfig) { return __awaiter(_this, void 0, void 0, function () {
     var indexContractName, ensResolver, httpProvider, auxContract, Web3, web3, resolver, index, _a, _b, _c, backendAddress, backend, aux, payments, _d, _e, _f;
     return __generator(this, function (_g) {
         switch (_g.label) {
@@ -66,13 +64,14 @@ exports.initializeSvLight = function (svConfig) { return __awaiter(_this, void 0
                 indexContractName = svConfig.indexContractName, ensResolver = svConfig.ensResolver, httpProvider = svConfig.httpProvider, auxContract = svConfig.auxContract;
                 Web3 = require('web3');
                 web3 = new Web3(new Web3.providers.HttpProvider(httpProvider));
+                console.log('IndexAbi :', IndexAbi);
                 resolver = new web3.eth.Contract(ResolverAbi, ensResolver);
                 _b = (_a = web3.eth.Contract).bind;
                 _c = [void 0, IndexAbi];
-                return [4 /*yield*/, exports.resolveEnsAddress({ resolver: resolver }, indexContractName)];
+                return [4 /*yield*/, resolveEnsAddress({ resolver: resolver }, indexContractName)];
             case 1:
                 index = new (_b.apply(_a, _c.concat([_g.sent()])))();
-                return [4 /*yield*/, exports.getBackendAddress({ index: index })];
+                return [4 /*yield*/, getBackendAddress({ index: index })];
             case 2:
                 backendAddress = _g.sent();
                 backend = new web3.eth.Contract(BackendAbi, backendAddress);
@@ -94,18 +93,18 @@ exports.initializeSvLight = function (svConfig) { return __awaiter(_this, void 0
         }
     });
 }); };
-exports.resolveEnsAddress = function (_a, ensName) {
+export var resolveEnsAddress = function (_a, ensName) {
     var resolver = _a.resolver;
     return __awaiter(_this, void 0, void 0, function () {
         return __generator(this, function (_b) {
             switch (_b.label) {
-                case 0: return [4 /*yield*/, resolver.methods.addr(eth_ens_namehash_1.default.hash(ensName)).call()];
+                case 0: return [4 /*yield*/, resolver.methods.addr(NH.hash(ensName)).call()];
                 case 1: return [2 /*return*/, _b.sent()];
             }
         });
     });
 };
-exports.getBackendAddress = function (_a) {
+export var getBackendAddress = function (_a) {
     var index = _a.index;
     return __awaiter(_this, void 0, void 0, function () {
         return __generator(this, function (_b) {
@@ -116,7 +115,7 @@ exports.getBackendAddress = function (_a) {
         });
     });
 };
-exports.getDemocInfo = function (_a) {
+export var getDemocInfo = function (_a) {
     var backend = _a.backend, democHash = _a.democHash;
     return __awaiter(_this, void 0, void 0, function () {
         return __generator(this, function (_b) {
@@ -127,7 +126,7 @@ exports.getDemocInfo = function (_a) {
         });
     });
 };
-exports.getDemocNthBallot = function (_a, democBallotInfo) {
+export var getDemocNthBallot = function (_a, democBallotInfo) {
     var svNetwork = _a.svNetwork;
     return __awaiter(_this, void 0, void 0, function () {
         var index, backend, aux, svConfig, democHash, nthBallot, indexAddress, backendAddress, archiveUrl, bbFarmAndBallotId, id, bbFarmAddress, userEthAddress, ethBallotDetails, ballotSpec, ballotObject;
@@ -153,7 +152,7 @@ exports.getDemocNthBallot = function (_a, democBallotInfo) {
                             .call()];
                 case 2:
                     ethBallotDetails = _b.sent();
-                    return [4 /*yield*/, exports.getBallotSpec(archiveUrl, ethBallotDetails.specHash)
+                    return [4 /*yield*/, getBallotSpec(archiveUrl, ethBallotDetails.specHash)
                         // console.log('ballotSpec :', ballotSpec);
                         // .then(x => console.log('Then called', x))
                         // .catch(x => console.log('Caught error', x));
@@ -166,7 +165,7 @@ exports.getDemocNthBallot = function (_a, democBallotInfo) {
         });
     });
 };
-exports.getBallotSpec = function (archiveUrl, ballotSpecHash) { return __awaiter(_this, void 0, void 0, function () {
+export var getBallotSpec = function (archiveUrl, ballotSpecHash) { return __awaiter(_this, void 0, void 0, function () {
     return __generator(this, function (_a) {
         // TODO refactor to be a bit more elegant
         return [2 /*return*/, new Promise(function (res, rej) {
@@ -177,10 +176,10 @@ exports.getBallotSpec = function (archiveUrl, ballotSpecHash) { return __awaiter
                         res(obj);
                     }
                 };
-                exports.getBallotObjectFromIpfs(ballotSpecHash).then(doRes);
+                getBallotObjectFromIpfs(ballotSpecHash).then(doRes);
                 setTimeout(function () {
                     if (!done) {
-                        exports.getBallotObjectFromS3(archiveUrl, ballotSpecHash)
+                        getBallotObjectFromS3(archiveUrl, ballotSpecHash)
                             .then(doRes)
                             .catch(rej);
                     }
@@ -188,12 +187,12 @@ exports.getBallotSpec = function (archiveUrl, ballotSpecHash) { return __awaiter
             })];
     });
 }); };
-exports.getBallotObjectFromS3 = function (archiveUrl, ballotSpecHash) { return __awaiter(_this, void 0, void 0, function () {
+export var getBallotObjectFromS3 = function (archiveUrl, ballotSpecHash) { return __awaiter(_this, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        return [2 /*return*/, axios_1.default.get(archiveUrl + ballotSpecHash + '.json')];
+        return [2 /*return*/, axios.get(archiveUrl + ballotSpecHash + '.json')];
     });
 }); };
-exports.getBallotObjectFromIpfs = function (ballotSpecHash) { return __awaiter(_this, void 0, void 0, function () {
+export var getBallotObjectFromIpfs = function (ballotSpecHash) { return __awaiter(_this, void 0, void 0, function () {
     var ipfsUrl, cidHex, bytes, cid;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -202,13 +201,13 @@ exports.getBallotObjectFromIpfs = function (ballotSpecHash) { return __awaiter(_
                 cidHex = '1220' + ballotSpecHash.substr(2);
                 bytes = Buffer.from(cidHex, 'hex');
                 cid = bs58.encode(bytes);
-                return [4 /*yield*/, axios_1.default.get(ipfsUrl + cid)];
+                return [4 /*yield*/, axios.get(ipfsUrl + cid)];
             case 1: return [2 /*return*/, _a.sent()];
         }
     });
 }); };
 // Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array
-exports.getDemocBallots = function (_a) {
+export var getDemocBallots = function (_a) {
     var svNetwork = _a.svNetwork, democHash = _a.democHash;
     return __awaiter(_this, void 0, void 0, function () {
         var backend, democInfo, erc20, owner, numBallots, ballotsArray, i, _b, _c;
@@ -216,7 +215,7 @@ exports.getDemocBallots = function (_a) {
             switch (_d.label) {
                 case 0:
                     backend = svNetwork.backend;
-                    return [4 /*yield*/, exports.getDemocInfo({ backend: backend, democHash: democHash })
+                    return [4 /*yield*/, getDemocInfo({ backend: backend, democHash: democHash })
                         // Throw an error if the democ info is not correct
                     ];
                 case 1:
@@ -233,7 +232,7 @@ exports.getDemocBallots = function (_a) {
                     if (!(i < numBallots)) return [3 /*break*/, 5];
                     _b = ballotsArray;
                     _c = i;
-                    return [4 /*yield*/, exports.getDemocNthBallot({ svNetwork: svNetwork }, { democHash: democHash, nthBallot: i })];
+                    return [4 /*yield*/, getDemocNthBallot({ svNetwork: svNetwork }, { democHash: democHash, nthBallot: i })];
                 case 3:
                     _b[_c] = _d.sent();
                     _d.label = 4;
@@ -246,7 +245,7 @@ exports.getDemocBallots = function (_a) {
     });
 };
 /** Takes in the svNetwork object and returns all relevant addresses */
-exports.getContractAddresses = function (_a) {
+export var getContractAddresses = function (_a) {
     var svNetwork = _a.svNetwork;
     return __awaiter(_this, void 0, void 0, function () {
         var index, resolver, backend, aux, svConfig, delegationContractName, lookupAddress, _b;
@@ -265,7 +264,7 @@ exports.getContractAddresses = function (_a) {
                     return [4 /*yield*/, index.methods.getCommAuction().call()];
                 case 1:
                     _b.communityAuctionAddress = _c.sent();
-                    return [4 /*yield*/, exports.resolveEnsAddress({ resolver: resolver }, delegationContractName)];
+                    return [4 /*yield*/, resolveEnsAddress({ resolver: resolver }, delegationContractName)];
                 case 2:
                     _b.delegationAddress = _c.sent();
                     return [4 /*yield*/, index.methods.getPayments().call()];
@@ -275,7 +274,7 @@ exports.getContractAddresses = function (_a) {
         });
     });
 };
-exports.weiToCents = function (_a, wei) {
+export var weiToCents = function (_a, wei) {
     var payments = _a.payments;
     return __awaiter(_this, void 0, void 0, function () {
         return __generator(this, function (_b) {
@@ -286,7 +285,7 @@ exports.weiToCents = function (_a, wei) {
         });
     });
 };
-exports.getCommunityBallotPrice = function (_a, democHash) {
+export var getCommunityBallotPrice = function (_a, democHash) {
     var payments = _a.payments;
     return __awaiter(_this, void 0, void 0, function () {
         return __generator(this, function (_b) {
@@ -297,7 +296,7 @@ exports.getCommunityBallotPrice = function (_a, democHash) {
         });
     });
 };
-exports.checkIfAddressIsEditor = function (_a, _b) {
+export var checkIfAddressIsEditor = function (_a, _b) {
     var svNetwork = _a.svNetwork;
     var userAddress = _b.userAddress, democHash = _b.democHash;
     return __awaiter(_this, void 0, void 0, function () {
@@ -313,11 +312,11 @@ exports.checkIfAddressIsEditor = function (_a, _b) {
     });
 };
 // Checks the current ethereum gas price and returns a couple of values
-exports.getCurrentGasPrice = function () { return __awaiter(_this, void 0, void 0, function () {
+export var getCurrentGasPrice = function () { return __awaiter(_this, void 0, void 0, function () {
     var gasStationInfo, data;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, axios_1.default.get('https://ethgasstation.info/json/ethgasAPI.json')];
+            case 0: return [4 /*yield*/, axios.get('https://ethgasstation.info/json/ethgasAPI.json')];
             case 1:
                 gasStationInfo = _a.sent();
                 data = gasStationInfo.data;
@@ -331,8 +330,8 @@ exports.getCurrentGasPrice = function () { return __awaiter(_this, void 0, void 
     });
 }); };
 // Checks the ballot hash against the ballot content
-exports.checkBallotHashBSpec = function (ballotSpec, assertSpecHash) {
-    var contentHash = '0x' + sha256_1.default(JSON.stringify(ballotSpec, null, 2));
+export var checkBallotHashBSpec = function (ballotSpec, assertSpecHash) {
+    var contentHash = '0x' + sha256(JSON.stringify(ballotSpec, null, 2));
     if (assertSpecHash === contentHash) {
         return true;
     }
@@ -342,8 +341,8 @@ exports.checkBallotHashBSpec = function (ballotSpec, assertSpecHash) {
 };
 // Checks the ballot hash against a ballot global ballot object
 // Does this by destructuring the specHash and data out of it
-exports.checkBallotHashGBallot = function (ballotObject) {
+export var checkBallotHashGBallot = function (ballotObject) {
     var data = ballotObject.data, specHash = ballotObject.specHash;
-    return exports.checkBallotHashBSpec(data, specHash);
+    return checkBallotHashBSpec(data, specHash);
 };
 //# sourceMappingURL=light.js.map

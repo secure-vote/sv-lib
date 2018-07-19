@@ -1,8 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var Account = require("eth-lib/lib/account");
-var Hash = require("eth-lib/lib/hash");
-var web3Utils = require("web3-utils");
+import * as Account from 'eth-lib/lib/account';
+import * as Hash from 'eth-lib/lib/hash';
+import * as web3Utils from 'web3-utils';
 /**
  * Like web3.eth.accounts.hashMessage without the envelope.
  *
@@ -12,7 +10,7 @@ var web3Utils = require("web3-utils");
  * @returns {*}
  *  The hashed message (using keccak256)
  */
-exports.hashMsgRaw = function (data) {
+export var hashMsgRaw = function (data) {
     var msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data;
     var msgBuffer = Buffer.from(msg);
     return Hash.keccak256s(msgBuffer);
@@ -28,7 +26,7 @@ exports.hashMsgRaw = function (data) {
  *
  * @returns {{messageHash: string, r: string, s: string, v: string}}
  */
-exports.ethSignHash = function (messageHash, privateKey) {
+export var ethSignHash = function (messageHash, privateKey) {
     // near identical to web3-eth-accounts (web3 v1)
     // the main difference is we don't envelop the data.
     var signature = Account.sign(messageHash, privateKey);
@@ -41,7 +39,14 @@ exports.ethSignHash = function (messageHash, privateKey) {
         signature: signature
     };
 };
-exports.ethVerifySig = function (messageHash, _a) {
+export /**
+ *
+ * Operates `ecrecover` over the provided signature
+ *
+ * @param {string} messageHash This should be an Ethereum HexString
+ * @param {string[]} [v, r, s] Components for the secp256k1 signature
+ * @returns {{verified: bool, address: EthAddress}}
+ */ var ethVerifySig = function (messageHash, _a) {
     var v = _a[0], r = _a[1], s = _a[2];
     var address = Account.recover(messageHash, Account.encodeSignature([v, r, s]));
     return {
