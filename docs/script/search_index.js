@@ -156,6 +156,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "sv-lib/src/utils.ts~hextouint8array",
+    "function/index.html#static-function-hexToUint8Array",
+    "<span>hexToUint8Array</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/light.ts~initializesvlight",
     "function/index.html#static-function-initializeSvLight",
     "<span>initializeSvLight</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",

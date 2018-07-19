@@ -64,6 +64,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cleanEthHex">cleanEthHex</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethAddrEq">ethAddrEq</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexToBase32">hexToBase32</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexToUint8Array">hexToUint8Array</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-flags">flags</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Ed25519DelegatePrefix">Ed25519DelegatePrefix</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-networkVars">networkVars</a></span></span></li>
@@ -80,6 +81,9 @@ import * as bs58 from &apos;bs58&apos;
 import sha256 from &apos;sha256&apos;
 import * as SvConsts from &apos;./const&apos;
 import * as SvUtils from &apos;./utils&apos;
+import * as StellarBase from &apos;stellar-base&apos;
+import * as assert from &apos;assert&apos;
+import * as Buffer from &apos;buffer/&apos;
 
 // Lovely ABIs
 import ResolverAbi from &apos;./smart_contracts/SV_ENS_Resolver.abi.json&apos;
@@ -100,11 +104,8 @@ export const initializeSvLight = async svConfig =&gt; {
         auxContract
     } = svConfig
 
-    console.log(&apos;Initialising!&apos;)
-
     const Web3 = require(&apos;web3&apos;)
     const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
-    console.log(&apos;IndexAbi :&apos;, IndexAbi)
     const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
 
     // const indexAddress =
@@ -133,7 +134,6 @@ export const initializeSvLight = async svConfig =&gt; {
 }
 
 export const resolveEnsAddress = async ({ resolver }, ensName) =&gt; {
-    console.log(NH)
     return await resolver.methods.addr(NH.hash(ensName)).call()
 }
 
@@ -334,7 +334,10 @@ export const getSingularCleanAbi = (requestedAbiName, methodName) =&gt; {
 }
 
 // Returns the Ed25519 delegations
-export const getUnsafeEd25519delegations = async (pubKey: string, svNetwork: any) =&gt; {
+export const getUnsafeEd25519delegations = async (
+    pubKey: string,
+    svNetwork: any
+) =&gt; {
     // TODO - Some assertions and stuff..
 
     const { web3, svConfig } = svNetwork
@@ -354,22 +357,46 @@ export const getUnsafeEd25519delegations = async (pubKey: string, svNetwork: any
     return delegations
 }
 
-export const prepareEd25519Delegation = (sk: string, web3: any) =&gt; {
+export const prepareEd25519Delegation = (sk: string, svNetwork: any) =&gt; {
+    const { web3 } = svNetwork
     const account = web3.eth.accounts.privateKeyToAccount(sk)
     const address = account.address
 
     // Delegate prefix (SV-ED-ETH)
     const prefix = web3.utils.toHex(SvConsts.Ed25519DelegatePrefix)
-    const nonce = web3.utils.randomHex(3)
+
+    let nonce = null
+    do {
+        nonce = web3.utils.randomHex(3).substr(2, 6)
+    } while (nonce.length !== 6)
+
+    console.log(&apos;nonce :&apos;, nonce)
     const trimmedAddress = SvUtils.cleanEthHex(address)
 
     return `${prefix}${nonce}${trimmedAddress}`
 }
 
-export const verifyEd25519Delegation = (delegation: string, signature: any[]) =&gt; {
+export const verifyEd25519Delegation = (delRequest: string, pubKey: string, signature: any[]) =&gt; {
+    assert.equal(signature.length, 2, &quot;Invalid signature, should be an array containing two bytes32 strings&quot;)
 
-} 
-</code></pre>
+    // Create the keypair from the public key
+    const kp = StellarBase.Keypair.fromPublicKey(pubKey)
+
+    // console.log(&apos;signature :&apos;, signature);
+    
+    // Concatenate the signature array and turn it into a buffer
+    const concatSig = `${signature[0]}${signature[1]}`
+    console.log(&apos;concatSig :&apos;, concatSig);
+    const sigBuffer = Buffer.from(concatSig)
+    
+    console.log(&apos;delRequest :&apos;, delRequest)
+    console.log(&apos;sigBuffer :&apos;, sigBuffer);    
+
+
+    console.log(&apos;kp :&apos;, kp);
+    // Attempt to verify the delegation against the signature - return the value (bool)
+    return kp.verify(delRequest, sigBuffer)
+}</code></pre>
 
 </div>
 

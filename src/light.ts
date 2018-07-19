@@ -4,6 +4,8 @@ import * as bs58 from 'bs58'
 import sha256 from 'sha256'
 import * as SvConsts from './const'
 import * as SvUtils from './utils'
+import * as StellarBase from 'stellar-base'
+import * as assert from 'assert'
 
 // Lovely ABIs
 import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'
@@ -296,7 +298,62 @@ export const prepareEd25519Delegation = (sk: string, svNetwork: any) => {
     return `${prefix}${nonce}${trimmedAddress}`
 }
 
+export const createEd25519DelegationTransaction = async (
+    svNetwork: any,
+    delRequest: string,
+    pubKey: string,
+    sigArray: string[]
+) => {
+    const { web3, svConfig } = svNetwork
+    const { unsafeEd25519DelegationAddr } = svConfig
+
+    const Ed25519Del = new web3.eth.Contract(
+        UnsafeEd25519DelegationAbi,
+        unsafeEd25519DelegationAddr
+    )
+
+    const pubKeyHex = web3.utils.utf8ToHex(pubKey)
+    console.log('pubKeyHex :', pubKeyHex)
+    const isHex = web3.utils.isHex(pubKeyHex)
+    console.log('isHex :', isHex)
+
+    console.log(delRequest)
+    console.log(sigArray)
+
+    const addDelegation = Ed25519Del.methods.addUntrustedSelfDelegation(
+        delRequest,
+        pubKeyHex,
+        sigArray
+    )
+    const txData = addDelegation.encodeABI()
+
+    // const account = web3.eth.accounts.privateKeyToAccount('c497fac6b7d9e8dded3d0cb04d3926070969514d8d8a94f5641dcaecccb865e8') // Testing private key (0x1337FB304Fee2F386527839Af9892101c7925623)
+    // console.log('account :', account);
+
+    console.log('txData :', txData)
+
+    return txData
+}
+
 export const verifyEd25519Delegation = (
-    delegation: string,
+    delRequest: string,
+    pubKey: string,
     signature: any[]
-) => {}
+) => {
+    assert.equal(
+        signature.length,
+        2,
+        'Invalid signature, should be an array containing two bytes32 strings'
+    )
+
+    // Create the keypair from the public key
+    const kp = StellarBase.Keypair.fromPublicKey(pubKey)
+
+    // Concatenate the signature array and turn it into a buffer
+    const concatSig = `${signature[0]}${signature[1]}`
+    const sigArray = SvUtils.hexToUint8Array(concatSig)
+    const sigBuffer = Buffer.from(sigArray)
+
+    // Attempt to verify the delegation against the signature - return the value (bool)
+    return kp.verify(delRequest, sigBuffer)
+}

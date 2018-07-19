@@ -64,6 +64,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cleanEthHex">cleanEthHex</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethAddrEq">ethAddrEq</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexToBase32">hexToBase32</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexToUint8Array">hexToUint8Array</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-flags">flags</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Ed25519DelegatePrefix">Ed25519DelegatePrefix</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-networkVars">networkVars</a></span></span></li>
@@ -162,7 +163,26 @@ export const hexToBase32 = (hex: string) =&gt; {
 
   return toAlphabet(R.reverse(digits.slice(0, digitlength)))
 }
-</code></pre>
+
+export const hexToUint8Array = (hex: string) =&gt; {
+    if (typeof hex !== &apos;string&apos;) {
+        throw new TypeError(&apos;Expected input to be a string&apos;)
+    }
+
+    if (hex.length % 2 !== 0) {
+        throw new RangeError(
+            &apos;Expected string to be an even number of characters&apos;
+        )
+    }
+
+    var view = new Uint8Array(hex.length / 2)
+
+    for (var i = 0; i &lt; hex.length; i += 2) {
+        view[i / 2] = parseInt(hex.substring(i, i + 2), 16)
+    }
+
+    return view
+}</code></pre>
 
 </div>
 

@@ -51,6 +51,8 @@ import * as bs58 from 'bs58';
 import sha256 from 'sha256';
 import * as SvConsts from './const';
 import * as SvUtils from './utils';
+import * as StellarBase from 'stellar-base';
+import * as assert from 'assert';
 // Lovely ABIs
 import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json';
 import IndexAbi from './smart_contracts/SVLightIndex.abi.json';
@@ -401,6 +403,35 @@ export var prepareEd25519Delegation = function (sk, svNetwork) {
     var trimmedAddress = SvUtils.cleanEthHex(address);
     return "" + prefix + nonce + trimmedAddress;
 };
-export var verifyEd25519Delegation = function (delegation, signature) {
+export var createEd25519DelegationTransaction = function (svNetwork, delRequest, pubKey, sigArray) { return __awaiter(_this, void 0, void 0, function () {
+    var web3, svConfig, unsafeEd25519DelegationAddr, Ed25519Del, pubKeyHex, isHex, addDelegation, txData;
+    return __generator(this, function (_a) {
+        web3 = svNetwork.web3, svConfig = svNetwork.svConfig;
+        unsafeEd25519DelegationAddr = svConfig.unsafeEd25519DelegationAddr;
+        Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr);
+        pubKeyHex = web3.utils.utf8ToHex(pubKey);
+        console.log('pubKeyHex :', pubKeyHex);
+        isHex = web3.utils.isHex(pubKeyHex);
+        console.log('isHex :', isHex);
+        console.log(delRequest);
+        console.log(sigArray);
+        addDelegation = Ed25519Del.methods.addUntrustedSelfDelegation(delRequest, pubKeyHex, sigArray);
+        txData = addDelegation.encodeABI();
+        // const account = web3.eth.accounts.privateKeyToAccount('c497fac6b7d9e8dded3d0cb04d3926070969514d8d8a94f5641dcaecccb865e8') // Testing private key (0x1337FB304Fee2F386527839Af9892101c7925623)
+        // console.log('account :', account);
+        console.log('txData :', txData);
+        return [2 /*return*/, txData];
+    });
+}); };
+export var verifyEd25519Delegation = function (delRequest, pubKey, signature) {
+    assert.equal(signature.length, 2, "Invalid signature, should be an array containing two bytes32 strings");
+    // Create the keypair from the public key
+    var kp = StellarBase.Keypair.fromPublicKey(pubKey);
+    // Concatenate the signature array and turn it into a buffer
+    var concatSig = "" + signature[0] + signature[1];
+    var sigArray = SvUtils.hexToUint8Array(concatSig);
+    var sigBuffer = Buffer.from(sigArray);
+    // Attempt to verify the delegation against the signature - return the value (bool)
+    return kp.verify(delRequest, sigBuffer);
 };
 //# sourceMappingURL=light.js.map
