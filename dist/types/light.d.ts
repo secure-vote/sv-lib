@@ -62,3 +62,5 @@ export declare const getCurrentGasPrice: () => Promise<{
 }>;
 export declare const checkBallotHashBSpec: (ballotSpec: any, assertSpecHash: any) => boolean;
 export declare const checkBallotHashGBallot: (ballotObject: any) => boolean;
+export declare const getSingularCleanAbi: (requestedAbiName: any, methodName: any) => any;
+export declare const getUnsafeEd25519delegations: (pubKey: string, svNetwork: any) => Promise<any>;

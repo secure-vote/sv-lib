@@ -29,10 +29,13 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span></span></li>
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-castProxyVote">castProxyVote</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createEd25519SelfDelegation">createEd25519SelfDelegation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkPacked">mkPacked</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSignedBallotForProxy">mkSignedBallotForProxy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSubmissionBits">mkSubmissionBits</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-prepareWeb3BBVoteTx">prepareWeb3BBVoteTx</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-verifySignedBallotForProxy">verifySignedBallotForProxy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getNetwork">getNetwork</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-networkName">networkName</a></span></span></li>
@@ -52,6 +55,8 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocBallots">getDemocBallots</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocInfo">getDemocInfo</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocNthBallot">getDemocNthBallot</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getSingularCleanAbi">getSingularCleanAbi</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUnsafeEd25519delegations">getUnsafeEd25519delegations</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initializeSvLight">initializeSvLight</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resolveEnsAddress">resolveEnsAddress</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-weiToCents">weiToCents</a></span></span></li>
@@ -201,11 +206,11 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber12">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber15">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {flags} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber12">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {flags} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber15">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>This object tracks the flags used for SV ballot boxes. They determine the submission
@@ -247,11 +252,11 @@ methods and whether ballots are tracked as binding, official, or testing.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/const.ts.html#lineNumber57">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/const.ts.html#lineNumber61">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {networkVars} from &apos;<span><a href="file/src/const.ts.html#lineNumber57">sv-lib/src/const.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {networkVars} from &apos;<span><a href="file/src/const.ts.html#lineNumber61">sv-lib/src/const.ts</a></span>&apos;</code></pre></div>
   
   
   

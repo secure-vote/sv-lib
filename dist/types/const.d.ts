@@ -12,6 +12,8 @@ declare type EthNetConf = {
     archiveUrl: string;
     archivePushUrl: string;
     lookupAddress: string;
+    unsafeEd25519DelegationAddr: string;
+    svApiUrl: string;
 };
 export declare const networkVars: {
     [netName: string]: EthNetConf;

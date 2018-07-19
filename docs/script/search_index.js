@@ -1,5 +1,11 @@
 window.esdocSearchIndex = [
   [
+    "sv-lib/src/ballotbox.ts~castproxyvote",
+    "function/index.html#static-function-castProxyVote",
+    "<span>castProxyVote</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/light.ts~checkballothashbspec",
     "function/index.html#static-function-checkBallotHashBSpec",
     "<span>checkBallotHashBSpec</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
@@ -21,6 +27,12 @@ window.esdocSearchIndex = [
     "sv-lib/src/utils.ts~cleanethhex",
     "function/index.html#static-function-cleanEthHex",
     "<span>cleanEthHex</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/ballotbox.ts~createed25519selfdelegation",
+    "function/index.html#static-function-createEd25519SelfDelegation",
+    "<span>createEd25519SelfDelegation</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
     "function"
   ],
   [
@@ -120,6 +132,18 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "sv-lib/src/light.ts~getsingularcleanabi",
+    "function/index.html#static-function-getSingularCleanAbi",
+    "<span>getSingularCleanAbi</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/light.ts~getunsafeed25519delegations",
+    "function/index.html#static-function-getUnsafeEd25519delegations",
+    "<span>getUnsafeEd25519delegations</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/crypto.ts~hashmsgraw",
     "function/index.html#static-function-hashMsgRaw",
     "<span>hashMsgRaw</span> <span class=\"search-result-import-path\">sv-lib/src/crypto.ts</span>",
@@ -166,6 +190,12 @@ window.esdocSearchIndex = [
     "variable/index.html#static-variable-networkVars",
     "<span>networkVars</span> <span class=\"search-result-import-path\">sv-lib/src/const.ts</span>",
     "variable"
+  ],
+  [
+    "sv-lib/src/ballotbox.ts~prepareweb3bbvotetx",
+    "function/index.html#static-function-prepareWeb3BBVoteTx",
+    "<span>prepareWeb3BBVoteTx</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
+    "function"
   ],
   [
     "sv-lib/src/light.ts~resolveensaddress",

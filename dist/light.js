@@ -53,9 +53,12 @@ import sha256 from 'sha256';
 import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json';
 import IndexAbi from './smart_contracts/SVLightIndex.abi.json';
 import BackendAbi from './smart_contracts/SVLightIndexBackend.abi.json';
+import BBFarmAbi from './smart_contracts/BBFarm.abi.json';
 import PaymentsAbi from './smart_contracts/SVPayments.abi.json';
 import AuxAbi from './smart_contracts/AuxAbi.abi.json';
-// import * as ERC20Abi from './smart_contracts/ERC20.abi.json'
+import AuctionAbi from './smart_contracts/CommAuctionIface.abi.json';
+import ERC20Abi from './smart_contracts/ERC20.abi.json';
+import UnsafeEd25519DelegationAbi from './smart_contracts/UnsafeEd25519Delegation.abi.json';
 export var initializeSvLight = function (svConfig) { return __awaiter(_this, void 0, void 0, function () {
     var indexContractName, ensResolver, httpProvider, auxContract, Web3, web3, resolver, index, _a, _b, _c, backendAddress, backend, aux, payments, _d, _e, _f;
     return __generator(this, function (_g) {
@@ -345,4 +348,43 @@ export var checkBallotHashGBallot = function (ballotObject) {
     var data = ballotObject.data, specHash = ballotObject.specHash;
     return checkBallotHashBSpec(data, specHash);
 };
+// Takes the name of an abi and a method name
+// Returns a new ABI array with only the requested method
+export var getSingularCleanAbi = function (requestedAbiName, methodName) {
+    var abiList = {
+        ResolverAbi: ResolverAbi,
+        IndexAbi: IndexAbi,
+        BackendAbi: BackendAbi,
+        BBFarmAbi: BBFarmAbi,
+        PaymentsAbi: PaymentsAbi,
+        AuxAbi: AuxAbi,
+        AuctionAbi: AuctionAbi,
+        ERC20Abi: ERC20Abi
+    };
+    var selectedAbi = abiList[requestedAbiName];
+    var methodObject = selectedAbi.filter(function (abi) { return abi.name == methodName; });
+    return methodObject;
+};
+// Returns the Ed25519 delegations
+export var getUnsafeEd25519delegations = function (pubKey, svNetwork) { return __awaiter(_this, void 0, void 0, function () {
+    var web3, svConfig, unsafeEd25519DelegationAddr, Ed25519Del, delegations;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                web3 = svNetwork.web3, svConfig = svNetwork.svConfig;
+                unsafeEd25519DelegationAddr = svConfig.unsafeEd25519DelegationAddr;
+                Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr);
+                return [4 /*yield*/, Ed25519Del.methods
+                        .getAllForPubKey(pubKey)
+                        .call()
+                        .catch(function (error) {
+                        throw error;
+                    })];
+            case 1:
+                delegations = _a.sent();
+                return [2 /*return*/, delegations];
+        }
+    });
+}); };
+// export const verifyEd25519Delegation =
 //# sourceMappingURL=light.js.map

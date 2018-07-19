@@ -29,10 +29,13 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span></span></li>
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-castProxyVote">castProxyVote</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createEd25519SelfDelegation">createEd25519SelfDelegation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkPacked">mkPacked</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSignedBallotForProxy">mkSignedBallotForProxy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSubmissionBits">mkSubmissionBits</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-prepareWeb3BBVoteTx">prepareWeb3BBVoteTx</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-verifySignedBallotForProxy">verifySignedBallotForProxy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getNetwork">getNetwork</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-networkName">networkName</a></span></span></li>
@@ -52,6 +55,8 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocBallots">getDemocBallots</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocInfo">getDemocInfo</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocNthBallot">getDemocNthBallot</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getSingularCleanAbi">getSingularCleanAbi</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUnsafeEd25519delegations">getUnsafeEd25519delegations</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initializeSvLight">initializeSvLight</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resolveEnsAddress">resolveEnsAddress</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-weiToCents">weiToCents</a></span></span></li>
@@ -72,6 +77,34 @@
   <tbody>
   
   <tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          <span data-ice="async">async</span>
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-castProxyVote">castProxyVote</a></span></span><span class="code" data-ice="signature">(request: <span>*</span>, svConfig: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
     <td>
       <span class="access" data-ice="access">public</span>
       
@@ -179,6 +212,34 @@
 output a normal hex string (no &apos;0x&apos; header) or throw an error on a
 bad hex string.</p>
 </div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          <span data-ice="async">async</span>
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-createEd25519SelfDelegation">createEd25519SelfDelegation</a></span></span><span class="code" data-ice="signature">(delegation: <span>*</span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
       </div>
     </td>
     <td>
@@ -625,6 +686,62 @@ bad hex string.</p>
           
           
           
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getSingularCleanAbi">getSingularCleanAbi</a></span></span><span class="code" data-ice="signature">(requestedAbiName: <span>*</span>, methodName: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          <span data-ice="async">async</span>
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getUnsafeEd25519delegations">getUnsafeEd25519delegations</a></span></span><span class="code" data-ice="signature">(pubKey: <span>*</span>, svNetwork: <span>*</span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
           <span class="code" data-ice="name"><span><a href="function/index.html#static-function-hashMsgRaw">hashMsgRaw</a></span></span><span class="code" data-ice="signature">(data: <span>*</span>): <span>*</span></span>
         </p>
       </div>
@@ -826,6 +943,35 @@ bad hex string.</p>
           
           <span data-ice="async">async</span>
           
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-prepareWeb3BBVoteTx">prepareWeb3BBVoteTx</a></span></span><span class="code" data-ice="signature">(txInfo: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, bbFarm: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, ballotId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, userAddress: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, voteData: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Prepares a transaction for sending with the users web3 browser</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          <span data-ice="async">async</span>
+          
           <span class="code" data-ice="name"><span><a href="function/index.html#static-function-resolveEnsAddress">resolveEnsAddress</a></span></span><span class="code" data-ice="signature">(objectPattern: {&quot;resolver&quot;: <span>*</span>}, ensName: <span>*</span>): <span>*</span></span>
         </p>
       </div>
@@ -903,6 +1049,83 @@ bad hex string.</p>
 <div data-ice="details"><h2 data-ice="title">Static Public </h2>
 
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-castProxyVote">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    <span data-ice="async">async</span>
+    
+    <span class="code" data-ice="name">castProxyVote</span><span class="code" data-ice="signature">(request: <span>*</span>, svConfig: <span>*</span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber201">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {castProxyVote} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber201">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">request</td>
+      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">svConfig</td>
+      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span>*</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="static-function-checkBallotHashBSpec">
     <span class="access" data-ice="access">public</span>
     
@@ -914,11 +1137,11 @@ bad hex string.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber155">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber159">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {checkBallotHashBSpec} from &apos;<span><a href="file/src/light.ts.html#lineNumber155">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {checkBallotHashBSpec} from &apos;<span><a href="file/src/light.ts.html#lineNumber159">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -991,11 +1214,11 @@ bad hex string.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber166">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber170">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {checkBallotHashGBallot} from &apos;<span><a href="file/src/light.ts.html#lineNumber166">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {checkBallotHashGBallot} from &apos;<span><a href="file/src/light.ts.html#lineNumber170">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -1062,11 +1285,11 @@ bad hex string.</p>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber139">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber143">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {checkIfAddressIsEditor} from &apos;<span><a href="file/src/light.ts.html#lineNumber139">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {checkIfAddressIsEditor} from &apos;<span><a href="file/src/light.ts.html#lineNumber143">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -1180,6 +1403,77 @@ bad hex string.</p>
           <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
           <td class="return-desc" data-ice="returnDescription"><p>the hex string.</p>
 </td>
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-createEd25519SelfDelegation">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    <span data-ice="async">async</span>
+    
+    <span class="code" data-ice="name">createEd25519SelfDelegation</span><span class="code" data-ice="signature">(delegation: <span>*</span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber218">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {createEd25519SelfDelegation} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber218">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">delegation</td>
+      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></td>
+          
         </tr>
       </tbody>
     </table>
@@ -1453,11 +1747,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber133">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber136">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {genRange3VoteData} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber133">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {genRange3VoteData} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber136">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Prepares voteData for a Range3 ballot from an array of votes</p>
@@ -1528,11 +1822,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber37">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber41">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getBackendAddress} from &apos;<span><a href="file/src/light.ts.html#lineNumber37">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getBackendAddress} from &apos;<span><a href="file/src/light.ts.html#lineNumber41">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -1599,11 +1893,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber93">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber97">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getBallotObjectFromIpfs} from &apos;<span><a href="file/src/light.ts.html#lineNumber93">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getBallotObjectFromIpfs} from &apos;<span><a href="file/src/light.ts.html#lineNumber97">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -1670,11 +1964,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber90">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber94">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getBallotObjectFromS3} from &apos;<span><a href="file/src/light.ts.html#lineNumber90">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getBallotObjectFromS3} from &apos;<span><a href="file/src/light.ts.html#lineNumber94">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -1747,11 +2041,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber70">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber74">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getBallotSpec} from &apos;<span><a href="file/src/light.ts.html#lineNumber70">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getBallotSpec} from &apos;<span><a href="file/src/light.ts.html#lineNumber74">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -1824,11 +2118,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber136">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber140">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getCommunityBallotPrice} from &apos;<span><a href="file/src/light.ts.html#lineNumber136">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getCommunityBallotPrice} from &apos;<span><a href="file/src/light.ts.html#lineNumber140">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -1901,11 +2195,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber119">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber123">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getContractAddresses} from &apos;<span><a href="file/src/light.ts.html#lineNumber119">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getContractAddresses} from &apos;<span><a href="file/src/light.ts.html#lineNumber123">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Takes in the svNetwork object and returns all relevant addresses</p>
@@ -1973,11 +2267,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber144">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber148">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getCurrentGasPrice} from &apos;<span><a href="file/src/light.ts.html#lineNumber144">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getCurrentGasPrice} from &apos;<span><a href="file/src/light.ts.html#lineNumber148">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -2028,11 +2322,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber101">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber105">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getDemocBallots} from &apos;<span><a href="file/src/light.ts.html#lineNumber101">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getDemocBallots} from &apos;<span><a href="file/src/light.ts.html#lineNumber105">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -2099,11 +2393,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber40">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber44">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getDemocInfo} from &apos;<span><a href="file/src/light.ts.html#lineNumber40">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getDemocInfo} from &apos;<span><a href="file/src/light.ts.html#lineNumber44">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -2170,11 +2464,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber43">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber47">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getDemocNthBallot} from &apos;<span><a href="file/src/light.ts.html#lineNumber43">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getDemocNthBallot} from &apos;<span><a href="file/src/light.ts.html#lineNumber47">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -2247,11 +2541,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/const.ts.html#lineNumber80">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/const.ts.html#lineNumber84">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getNetwork} from &apos;<span><a href="file/src/const.ts.html#lineNumber80">sv-lib/src/const.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getNetwork} from &apos;<span><a href="file/src/const.ts.html#lineNumber84">sv-lib/src/const.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -2274,6 +2568,160 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">chainId</td>
+      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span>*</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-getSingularCleanAbi">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">getSingularCleanAbi</span><span class="code" data-ice="signature">(requestedAbiName: <span>*</span>, methodName: <span>*</span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber176">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getSingularCleanAbi} from &apos;<span><a href="file/src/light.ts.html#lineNumber176">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">requestedAbiName</td>
+      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">methodName</td>
+      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span>*</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-getUnsafeEd25519delegations">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    <span data-ice="async">async</span>
+    
+    <span class="code" data-ice="name">getUnsafeEd25519delegations</span><span class="code" data-ice="signature">(pubKey: <span>*</span>, svNetwork: <span>*</span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber192">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getUnsafeEd25519delegations} from &apos;<span><a href="file/src/light.ts.html#lineNumber192">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">pubKey</td>
+      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">svNetwork</td>
       <td data-ice="type" class="code"><span>*</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
@@ -2472,11 +2920,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber12">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber15">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {initializeSvLight} from &apos;<span><a href="file/src/light.ts.html#lineNumber12">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {initializeSvLight} from &apos;<span><a href="file/src/light.ts.html#lineNumber15">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -2543,11 +2991,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber36">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber39">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {mkPacked} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber36">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {mkPacked} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber39">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Creates a packed copy of start and end times with submissionBits</p>
@@ -2632,11 +3080,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber84">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber87">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {mkSignedBallotForProxy} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber84">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {mkSignedBallotForProxy} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber87">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Take the arguments and produce web3 data fitting the <code>submitProxyVote</code> method.</p>
@@ -2744,11 +3192,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber54">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber57">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {mkSubmissionBits} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber54">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {mkSubmissionBits} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber57">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>This combines flags into a finished submissionBits. It also does some validation.</p>
@@ -2819,11 +3267,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/const.ts.html#lineNumber63">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/const.ts.html#lineNumber67">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {networkName} from &apos;<span><a href="file/src/const.ts.html#lineNumber63">sv-lib/src/const.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {networkName} from &apos;<span><a href="file/src/const.ts.html#lineNumber67">sv-lib/src/const.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -2879,6 +3327,108 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-prepareWeb3BBVoteTx">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    <span data-ice="async">async</span>
+    
+    <span class="code" data-ice="name">prepareWeb3BBVoteTx</span><span class="code" data-ice="signature">(txInfo: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span>, bbFarm: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, ballotId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, userAddress: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, voteData: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber181">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {prepareWeb3BBVoteTx} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber181">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
+  
+  
+  <div data-ice="description"><p>Prepares a transaction for sending with the users web3 browser</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">txInfo</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>Object literal containing the information required to generate the web3 transaction.</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">bbFarm</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>Ethereum address where the vote needs to be cast</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">ballotId</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>The id of the ballot</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">userAddress</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>Ethereum address of the user - &apos;from&apos;</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">voteData</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>The data containing the users vote</p>
+</td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>Returns an object with all fields required to cast the transaction</p>
+</td>
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="static-function-resolveEnsAddress">
     <span class="access" data-ice="access">public</span>
     
@@ -2890,11 +3440,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber34">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber38">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {resolveEnsAddress} from &apos;<span><a href="file/src/light.ts.html#lineNumber34">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {resolveEnsAddress} from &apos;<span><a href="file/src/light.ts.html#lineNumber38">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   
@@ -2967,11 +3517,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber115">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/ballotBox.ts.html#lineNumber118">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {verifySignedBallotForProxy} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber115">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {verifySignedBallotForProxy} from &apos;<span><a href="file/src/ballotBox.ts.html#lineNumber118">sv-lib/src/ballotBox.ts</a></span>&apos;</code></pre></div>
   
   
   <div data-ice="description"><p>Verify a signed vote to be submitted via proxy as generated by <code>mkSignedBallotForProxy</code></p>
@@ -3048,11 +3598,11 @@ Similar to <code>web3.eth.accounts.sign</code> except that we sign the hash dire
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber133">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/light.ts.html#lineNumber137">source</a></span></span>
     </span>
   </h3>
 
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {weiToCents} from &apos;<span><a href="file/src/light.ts.html#lineNumber133">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {weiToCents} from &apos;<span><a href="file/src/light.ts.html#lineNumber137">sv-lib/src/light.ts</a></span>&apos;</code></pre></div>
   
   
   

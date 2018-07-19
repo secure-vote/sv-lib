@@ -29,10 +29,13 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span></span></li>
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-castProxyVote">castProxyVote</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createEd25519SelfDelegation">createEd25519SelfDelegation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkPacked">mkPacked</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSignedBallotForProxy">mkSignedBallotForProxy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSubmissionBits">mkSubmissionBits</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-prepareWeb3BBVoteTx">prepareWeb3BBVoteTx</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-verifySignedBallotForProxy">verifySignedBallotForProxy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getNetwork">getNetwork</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-networkName">networkName</a></span></span></li>
@@ -52,6 +55,8 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocBallots">getDemocBallots</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocInfo">getDemocInfo</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocNthBallot">getDemocNthBallot</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getSingularCleanAbi">getSingularCleanAbi</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUnsafeEd25519delegations">getUnsafeEd25519delegations</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initializeSvLight">initializeSvLight</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resolveEnsAddress">resolveEnsAddress</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-weiToCents">weiToCents</a></span></span></li>
@@ -74,6 +79,10 @@ const BN = require(&apos;bn.js&apos;)
 import * as assert from &apos;assert&apos;
 import * as web3Utils from &apos;web3-utils&apos;
 import * as svCrypto from &apos;./crypto&apos;
+import axios from &apos;axios&apos;
+import * as Light from &apos;./light&apos;
+
+import BBFarmAbi from &apos;./smart_contracts/BBFarm.abi.json&apos;
 
 /**
  * This object tracks the flags used for SV ballot boxes. They determine the submission
@@ -343,7 +352,73 @@ export const genRange3VoteData = (votesArray: number[]) =&gt; {
 
   return voteData
 }
-</code></pre>
+
+
+/**
+ * Prepares a transaction for sending with the users web3 browser 
+ *
+ * @param {object} txInfo
+ *  Object literal containing the information required to generate the web3 transaction.
+ *       @param {string} bbFarm
+ *       Ethereum address where the vote needs to be cast
+ *       @param {string} ballotId
+ *       The id of the ballot
+ *       @param {string} userAddress
+ *       Ethereum address of the user - &apos;from&apos;
+ *       @param {string} voteData
+ *       The data containing the users vote
+ * 
+ * @returns {object} 
+ *  Returns an object with all fields required to cast the transaction
+ */
+export const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) =&gt; {
+  const { bbFarm, ballotId, userAddress, voteData } = txInfo;
+  const { web3 } = svNetwork;
+
+  assert.equal(web3Utils.isAddress(bbFarm), true, &apos;BBFarm address supplied is not a valid ethereum address.&apos;);
+  assert.equal(web3Utils.isAddress(userAddress), true, &apos;User address supplied is not a valid ethereum address.&apos;);
+  assert.equal(voteData.length, 66, &apos;Assertion failed: final hex was not 66 characters long (32 bytes)&apos;);
+
+  const BBFarmContract = new web3.eth.Contract(BBFarmAbi, bbFarm)
+  const submitVote = BBFarmContract.methods.submitVote(ballotId, voteData, &quot;0x&quot;)
+  const gasEstimate = await submitVote.estimateGas()
+  const abiValue = await submitVote.encodeABI()
+  const gasPrice = await Light.getCurrentGasPrice()
+
+  const web3Tx = {
+    to: bbFarm,
+    data: abiValue,
+    gas: web3.utils.toHex(Math.round(gasEstimate * 1.05)), // 5% added just in case
+    gasPrice: gasPrice.average * 1000000000,
+    from: userAddress
+  }
+  return web3Tx
+}
+
+export const castProxyVote = async (request, svConfig) =&gt; {
+  assert.equal(web3Utils.isBN(request.ballotId), true, &apos;Ballot id is not a BN&apos;)
+  assert.equal(request.proxyVoteReq.length == 5, true, &apos;Proxy vote req does not contain the correct number of parameters&apos;)
+  assert.equal(request.hasOwnProperty(&apos;extra&apos;) &amp;&amp; request.hasOwnProperty(&apos;democHash&apos;), true, &apos;Request does not contain extra and democ hash data&apos;)
+
+  return new Promise((resolve, reject) =&gt; {
+    const svApiUrl = svConfig.svApiUrl;
+    const proxyVotePath = &apos;sv/light/submitProxyVote&apos;;
+    const requestUrl = `${svApiUrl}${proxyVotePath}`
+    axios.post(requestUrl, request)
+      .then(response =&gt; {
+        resolve(response)
+      })
+      .catch(error =&gt; {
+        reject(error)
+      })
+  });
+}
+
+export const createEd25519SelfDelegation = async (delegation) =&gt; {
+
+
+  return true
+}</code></pre>
 
 </div>
 
