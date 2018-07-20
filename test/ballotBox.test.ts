@@ -1,4 +1,4 @@
-import * as BN from 'bn.js'
+const BN = require('bn.js')
 import * as Account from 'eth-lib/lib/account'
 
 import * as _const from '../src/const'
@@ -7,7 +7,17 @@ import * as bb from '../src/ballotBox'
 test('mkPacked works as expected', () => {
   const p1 = bb.mkPacked(1, 2, 7)
   expect(p1).toEqual(new BN('0700000000000000010000000000000002', 16))
-  expect(p1.eq(new BN('0700000000000000010000000000000002', 16))).toBe(true)
+
+  const p2 = bb.mkPacked(
+    0x33445566,
+    0xaabbccdd,
+    bb.mkSubmissionBits(
+      bb.flags.USE_ENC,
+      bb.flags.USE_TESTING,
+      bb.flags.USE_ETH
+    )
+  )
+  expect(p2).toEqual(new BN('8009000000003344556600000000aabbccdd', 16))
 })
 
 test('create and verify proxy ballots', () => {
@@ -24,7 +34,7 @@ test('create and verify proxy ballots', () => {
     privKey
   ]
 
-  const proxyVote = bb.mkSignedBallotForProxy(...proxyVoteParams)
+  const proxyVote = bb.mkSignedBallotForProxy.apply(null, proxyVoteParams)
 
   if (process.env.DEBUG_PROXY_VOTE) {
     console.log('Proxy Vote generated:', JSON.stringify(proxyVote, null, 2))
