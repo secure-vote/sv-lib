@@ -7,40 +7,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 const BN = require('bn.js');
 const R = require("ramda");
 const assert = require("assert");
 const web3Utils = require("web3-utils");
 const svCrypto = require("./crypto");
+const axios_1 = require("axios");
+const Light = require("./light");
+const BBFarm_abi_json_1 = require("./smart_contracts/BBFarm.abi.json");
 /**
  * This object tracks the flags used for SV ballot boxes. They determine the submission
  * methods and whether ballots are tracked as binding, official, or testing.
@@ -125,9 +100,7 @@ exports.mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKe
     assert.equal(web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId), true, 'ballotId incorrect format (either not a BN or not hex)');
     assert.equal(web3Utils.isHexStrict(voteData), true, 'vote data is not hex (strict)');
     assert.equal(web3Utils.isHexStrict(extra), true, 'extra param is not hex (strict)');
-    const _ballotId = web3Utils.isBN(ballotId)
-        ? web3Utils.padLeft(web3Utils.toHex(ballotId), 64)
-        : ballotId;
+    const _ballotId = web3Utils.isBN(ballotId) ? web3Utils.padLeft(web3Utils.toHex(ballotId), 64) : ballotId;
     assert.equal(_ballotId.length, 66, 'ballotId incorrect length');
     assert.equal(voteData.length, 66, 'voteData incorrect length');
     const sequenceHex = web3Utils.padLeft(web3Utils.toHex(sequence), 8);
@@ -213,65 +186,44 @@ exports.genRange3VoteData = (votesArray) => {
  * @returns {object}
  *  Returns an object with all fields required to cast the transaction
  */
-exports.prepareWeb3BBVoteTx = function (_a, _b) {
-    var txInfo = _a.txInfo;
-    var svNetwork = _b.svNetwork;
-    return __awaiter(_this, void 0, void 0, function () {
-        var bbFarm, ballotId, userAddress, voteData, web3, BBFarmContract, submitVote, gasEstimate, abiValue, gasPrice, web3Tx;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0:
-                    bbFarm = txInfo.bbFarm, ballotId = txInfo.ballotId, userAddress = txInfo.userAddress, voteData = txInfo.voteData;
-                    web3 = svNetwork.web3;
-                    assert.equal(web3Utils.isAddress(bbFarm), true, 'BBFarm address supplied is not a valid ethereum address.');
-                    assert.equal(web3Utils.isAddress(userAddress), true, 'User address supplied is not a valid ethereum address.');
-                    assert.equal(voteData.length, 66, 'Assertion failed: final hex was not 66 characters long (32 bytes)');
-                    BBFarmContract = new web3.eth.Contract(BBFarm_abi_json_1.default, bbFarm);
-                    submitVote = BBFarmContract.methods.submitVote(ballotId, voteData, '0x');
-                    return [4 /*yield*/, submitVote.estimateGas()];
-                case 1:
-                    gasEstimate = _c.sent();
-                    return [4 /*yield*/, submitVote.encodeABI()];
-                case 2:
-                    abiValue = _c.sent();
-                    return [4 /*yield*/, Light.getCurrentGasPrice()];
-                case 3:
-                    gasPrice = _c.sent();
-                    web3Tx = {
-                        to: bbFarm,
-                        data: abiValue,
-                        gas: web3.utils.toHex(Math.round(gasEstimate * 1.05)),
-                        gasPrice: gasPrice.average * 1000000000,
-                        from: userAddress
-                    };
-                    return [2 /*return*/, web3Tx];
-            }
+exports.prepareWeb3BBVoteTx = ({ txInfo }, { svNetwork }) => __awaiter(this, void 0, void 0, function* () {
+    const { bbFarm, ballotId, userAddress, voteData } = txInfo;
+    const { web3 } = svNetwork;
+    assert.equal(web3Utils.isAddress(bbFarm), true, 'BBFarm address supplied is not a valid ethereum address.');
+    assert.equal(web3Utils.isAddress(userAddress), true, 'User address supplied is not a valid ethereum address.');
+    assert.equal(voteData.length, 66, 'Assertion failed: final hex was not 66 characters long (32 bytes)');
+    const BBFarmContract = new web3.eth.Contract(BBFarm_abi_json_1.default, bbFarm);
+    const submitVote = BBFarmContract.methods.submitVote(ballotId, voteData, '0x');
+    const gasEstimate = yield submitVote.estimateGas();
+    const abiValue = yield submitVote.encodeABI();
+    const gasPrice = yield Light.getCurrentGasPrice();
+    const web3Tx = {
+        to: bbFarm,
+        data: abiValue,
+        gas: web3.utils.toHex((gasEstimate * 1.05) | 0),
+        gasPrice: gasPrice.average * 1000000000,
+        from: userAddress
+    };
+    return web3Tx;
+});
+exports.castProxyVote = (request, svConfig) => __awaiter(this, void 0, void 0, function* () {
+    assert.equal(web3Utils.isBN(request.ballotId), true, 'Ballot id is not a BN');
+    assert.equal(request.proxyReq.length == 5, true, 'Proxy vote req does not contain the correct number of parameters');
+    assert.equal(request.hasOwnProperty('extra') && request.hasOwnProperty('democHash'), true, 'Request does not contain extra and democ hash data');
+    return new Promise((resolve, reject) => {
+        const svApiUrl = svConfig.svApiUrl;
+        const proxyVotePath = '/sv/light/submitProxyVote';
+        const requestUrl = `${svApiUrl}${proxyVotePath}`;
+        axios_1.default
+            .post(requestUrl, request)
+            .then(response => {
+            const { data } = response;
+            resolve(data);
+        })
+            .catch(error => {
+            console.log('error :', error.response);
+            reject(error);
         });
     });
-};
-exports.castProxyVote = function (request, svConfig) { return __awaiter(_this, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        assert.equal(web3Utils.isBN(request.ballotId), true, 'Ballot id is not a BN');
-        assert.equal(request.proxyReq.length == 5, true, 'Proxy vote req does not contain the correct number of parameters');
-        assert.equal(request.hasOwnProperty('extra') && request.hasOwnProperty('democHash'), true, 'Request does not contain extra and democ hash data');
-        return [2 /*return*/, new Promise(function (resolve, reject) {
-                var svApiUrl = svConfig.svApiUrl;
-                var proxyVotePath = '/sv/light/submitProxyVote';
-                var requestUrl = "" + svApiUrl + proxyVotePath;
-                axios_1.default
-                    .post(requestUrl, request)
-                    .then(function (response) {
-                    var data = response.data;
-                    resolve(data);
-                })
-                    .catch(function (error) {
-                    console.log('error :', error.response);
-                    reject(error);
-                });
-            })];
-    });
-}); };
-// export const createEd25519SelfDelegation = async (delegation) => {
-//   return true
-// }
+});
 //# sourceMappingURL=ballotBox.js.map
