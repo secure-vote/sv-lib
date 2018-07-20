@@ -220,16 +220,21 @@ export const getSingularCleanAbi = (requestedAbiName, methodName) => {
 
 // Returns the Ed25519 delegations
 // pubKey is in normal format
-export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork: any) => {
+export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => {
     // TODO - Some assertions and stuff..
 
     const { web3, svConfig } = svNetwork
     const { unsafeEd25519DelegationAddr } = svConfig
 
     // Get the hex pub key
-    const kp = StellarBase.Keypair.fromPublicKey(pubKey)
-    const rawPubKey = kp.rawPublicKey()
-    const hexPubKey = '0x' + rawPubKey.toString('hex')
+    let rawPubKey, hexPubKey
+    if (web3.utils.isHex(pubKey)) {
+        hexPubKey = web3.utils.isHexStrict(pubKey) ? pubKey : '0x' + pubKey
+    } else {
+        const kp = StellarBase.Keypair.fromPublicKey(pubKey)
+        const rawPubKey = kp.rawPublicKey()
+        const hexPubKey = '0x' + rawPubKey.toString('hex')
+    }
 
     const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)
     const delegations = await Ed25519Del.methods
