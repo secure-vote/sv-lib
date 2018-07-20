@@ -331,7 +331,7 @@ export const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) => {
     const web3Tx = {
         to: bbFarm,
         data: abiValue,
-        gas: web3.utils.toHex(Math.round(gasEstimate * 1.05)), // 5% added just in case
+        gas: web3.utils.toHex((gasEstimate * 1.05) | 0), // 5% added just in case
         gasPrice: gasPrice.average * 1000000000,
         from: userAddress
     }

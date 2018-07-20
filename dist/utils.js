@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const R = require("ramda");
+var R = require("ramda");
 /**
  * This will take an Ethereum hex string (or a normal hex string) and
  * output a normal hex string (no '0x' header) or throw an error on a
@@ -11,13 +11,13 @@ const R = require("ramda");
  * @returns {string}
  *  the hex string.
  */
-exports.cleanEthHex = (hex) => {
+exports.cleanEthHex = function (hex) {
     if (hex === '0x0') {
         return '00';
     }
     // hex must be even - only exception above
     if (hex.length % 2 !== 0) {
-        throw Error(`Bad hex string: ${hex}`);
+        throw Error("Bad hex string: " + hex);
     }
     // this covers the case hex=="0x" => ""
     if (hex.slice(0, 2) === '0x') {
@@ -33,16 +33,16 @@ exports.cleanEthHex = (hex) => {
  *
  * @returns {bool}
  */
-exports.ethAddrEq = (addr1, addr2) => {
-    const _clean = a => module.exports.cleanEthHex(a).toLowerCase();
+exports.ethAddrEq = function (addr1, addr2) {
+    var _clean = function (a) { return module.exports.cleanEthHex(a).toLowerCase(); };
     // throw a length check in there to ensure we have valid addresses
     return _clean(addr1) === _clean(addr2) && addr1.length === 42;
 };
 // this is from the bech32 spec (Bitcoin)
-const B32_ALPHA = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
-const toAlphabet = (arr) => {
+var B32_ALPHA = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+var toAlphabet = function (arr) {
     var ret = '';
-    for (let i = 0; i < arr.length; i++) {
+    for (var i = 0; i < arr.length; i++) {
         ret += B32_ALPHA.charAt(arr[i]);
     }
     return ret;
@@ -56,15 +56,15 @@ const toAlphabet = (arr) => {
  * @returns {string}
  *  The Base32 version of the hex string.
  */
-exports.hexToBase32 = (hex) => {
-    const _hex = exports.cleanEthHex(hex);
-    const buf = Buffer.from(_hex, 'hex');
-    const digits = [0];
-    let digitlength = 1;
-    let carry;
-    for (let i = 0; i < buf.length; ++i) {
+exports.hexToBase32 = function (hex) {
+    var _hex = exports.cleanEthHex(hex);
+    var buf = Buffer.from(_hex, 'hex');
+    var digits = [0];
+    var digitlength = 1;
+    var carry;
+    for (var i = 0; i < buf.length; ++i) {
         carry = buf[i];
-        for (let j = 0; j < digitlength; ++j) {
+        for (var j = 0; j < digitlength; ++j) {
             carry += digits[j] * 256;
             digits[j] = carry % 32;
             carry = (carry / 32) | 0;
@@ -76,5 +76,18 @@ exports.hexToBase32 = (hex) => {
         }
     }
     return toAlphabet(R.reverse(digits.slice(0, digitlength)));
+};
+exports.hexToUint8Array = function (hex) {
+    if (typeof hex !== 'string') {
+        throw new TypeError('Expected input to be a string');
+    }
+    if (hex.length % 2 !== 0) {
+        throw new RangeError('Expected string to be an even number of characters');
+    }
+    var view = new Uint8Array(hex.length / 2);
+    for (var i = 0; i < hex.length; i += 2) {
+        view[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+    }
+    return view;
 };
 //# sourceMappingURL=utils.js.map

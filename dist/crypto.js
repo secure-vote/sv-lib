@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Account = require("eth-lib/lib/account");
-const Hash = require("eth-lib/lib/hash");
-const web3Utils = require("web3-utils");
+var Account = require("eth-lib/lib/account");
+var Hash = require("eth-lib/lib/hash");
+var web3Utils = require("web3-utils");
 /**
  * Like web3.eth.accounts.hashMessage without the envelope.
  *
@@ -12,9 +12,9 @@ const web3Utils = require("web3-utils");
  * @returns {*}
  *  The hashed message (using keccak256)
  */
-exports.hashMsgRaw = (data) => {
-    const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data;
-    const msgBuffer = Buffer.from(msg);
+exports.hashMsgRaw = function (data) {
+    var msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data;
+    var msgBuffer = Buffer.from(msg);
     return Hash.keccak256s(msgBuffer);
 };
 /**
@@ -28,24 +28,25 @@ exports.hashMsgRaw = (data) => {
  *
  * @returns {{messageHash: string, r: string, s: string, v: string}}
  */
-exports.ethSignHash = (messageHash, privateKey) => {
+exports.ethSignHash = function (messageHash, privateKey) {
     // near identical to web3-eth-accounts (web3 v1)
     // the main difference is we don't envelop the data.
-    const signature = Account.sign(messageHash, privateKey);
-    const vrs = Account.decodeSignature(signature);
+    var signature = Account.sign(messageHash, privateKey);
+    var vrs = Account.decodeSignature(signature);
     return {
-        messageHash,
+        messageHash: messageHash,
         v: vrs[0],
         r: vrs[1],
         s: vrs[2],
-        signature
+        signature: signature
     };
 };
-exports.ethVerifySig = (messageHash, [v, r, s]) => {
-    const address = Account.recover(messageHash, Account.encodeSignature([v, r, s]));
+exports.ethVerifySig = function (messageHash, _a) {
+    var v = _a[0], r = _a[1], s = _a[2];
+    var address = Account.recover(messageHash, Account.encodeSignature([v, r, s]));
     return {
         verified: true,
-        address
+        address: address
     };
 };
 //# sourceMappingURL=crypto.js.map
