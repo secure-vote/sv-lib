@@ -369,22 +369,27 @@ export var getSingularCleanAbi = function (requestedAbiName, methodName) {
     return methodObject;
 };
 // Returns the Ed25519 delegations
+// pubKey is in normal format
 export var getUnsafeEd25519delegations = function (pubKey, svNetwork) { return __awaiter(_this, void 0, void 0, function () {
-    var web3, svConfig, unsafeEd25519DelegationAddr, Ed25519Del, delegations;
+    var web3, svConfig, unsafeEd25519DelegationAddr, kp, rawPubKey, hexPubKey, Ed25519Del, delegations;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 web3 = svNetwork.web3, svConfig = svNetwork.svConfig;
                 unsafeEd25519DelegationAddr = svConfig.unsafeEd25519DelegationAddr;
+                kp = StellarBase.Keypair.fromPublicKey(pubKey);
+                rawPubKey = kp.rawPublicKey();
+                hexPubKey = '0x' + rawPubKey.toString('hex');
                 Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr);
                 return [4 /*yield*/, Ed25519Del.methods
-                        .getAllForPubKey(pubKey)
+                        .getAllForPubKey(hexPubKey)
                         .call()
                         .catch(function (error) {
                         throw error;
                     })];
             case 1:
                 delegations = _a.sent();
+                console.log('Fresh:', delegations);
                 return [2 /*return*/, delegations];
         }
     });
@@ -400,38 +405,57 @@ export var prepareEd25519Delegation = function (sk, svNetwork) {
         nonce = web3.utils.randomHex(3).substr(2, 6);
     } while (nonce.length !== 6);
     console.log('nonce :', nonce);
-    var trimmedAddress = SvUtils.cleanEthHex(address);
+    var trimmedAddress = SvUtils.cleanEthHex(address).toLowerCase();
     return "" + prefix + nonce + trimmedAddress;
 };
-export var createEd25519DelegationTransaction = function (svNetwork, delRequest, pubKey, sigArray) { return __awaiter(_this, void 0, void 0, function () {
-    var web3, svConfig, unsafeEd25519DelegationAddr, Ed25519Del, pubKeyHex, isHex, addDelegation, txData;
+export var createEd25519DelegationTransaction = function (svNetwork, delRequest, pubKey, signature) { return __awaiter(_this, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        web3 = svNetwork.web3, svConfig = svNetwork.svConfig;
-        unsafeEd25519DelegationAddr = svConfig.unsafeEd25519DelegationAddr;
-        Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr);
-        pubKeyHex = web3.utils.utf8ToHex(pubKey);
-        console.log('pubKeyHex :', pubKeyHex);
-        isHex = web3.utils.isHex(pubKeyHex);
-        console.log('isHex :', isHex);
-        console.log(delRequest);
-        console.log(sigArray);
-        addDelegation = Ed25519Del.methods.addUntrustedSelfDelegation(delRequest, pubKeyHex, sigArray);
-        txData = addDelegation.encodeABI();
-        // const account = web3.eth.accounts.privateKeyToAccount('c497fac6b7d9e8dded3d0cb04d3926070969514d8d8a94f5641dcaecccb865e8') // Testing private key (0x1337FB304Fee2F386527839Af9892101c7925623)
-        // console.log('account :', account);
-        console.log('txData :', txData);
-        return [2 /*return*/, txData];
+        return [2 /*return*/, new Promise(function (resolve, reject) {
+                var web3 = svNetwork.web3, svConfig = svNetwork.svConfig;
+                var unsafeEd25519DelegationAddr = svConfig.unsafeEd25519DelegationAddr;
+                // Initialise the contract
+                var Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr);
+                // Get the hex of the public key
+                var kp = StellarBase.Keypair.fromPublicKey(pubKey);
+                var rawPubKey = kp.rawPublicKey();
+                var hexPubKey = '0x' + rawPubKey.toString('hex');
+                // All characters of the delegation turned into lower case
+                // Due to inconsistency of case data returned from Ethereum
+                var lowerCaseDelRequest = delRequest.toLowerCase();
+                // Split the 64 bytes of the signature into an array containging 2x bytes32
+                var sig1 = "0x" + signature.substring(0, 64);
+                var sig2 = "0x" + signature.substring(64);
+                var sigArray = [sig1, sig2];
+                var addDelegation = Ed25519Del.methods.addUntrustedSelfDelegation(lowerCaseDelRequest, hexPubKey, sigArray);
+                var txData = addDelegation.encodeABI();
+                // Signed with testing kovan private key, no funds, not a real account by any terms (0x1337FB304Fee2F386527839Af9892101c7925623)
+                web3.eth.accounts.signTransaction({
+                    to: unsafeEd25519DelegationAddr,
+                    value: '0',
+                    gas: 2000000,
+                    data: txData
+                }, '0xc497fac6b7d9e8dded3d0cb04d3926070969514d8d8a94f5641dcaecccb865e8')
+                    .then(function (x) {
+                    var rawTransaction = x.rawTransaction;
+                    web3.eth.sendSignedTransaction(rawTransaction)
+                        .on('receipt', function (receipt) {
+                        var transactionHash = receipt.transactionHash;
+                        resolve(transactionHash);
+                    })
+                        .catch(function (error) { return reject(error); });
+                })
+                    .catch(function (error) { return reject(error); });
+            })];
     });
 }); };
 export var verifyEd25519Delegation = function (delRequest, pubKey, signature) {
-    assert.equal(signature.length, 2, "Invalid signature, should be an array containing two bytes32 strings");
+    assert.equal(signature.length, 128, 'Invalid signature, should be 64 byte hex strings');
     // Create the keypair from the public key
     var kp = StellarBase.Keypair.fromPublicKey(pubKey);
-    // Concatenate the signature array and turn it into a buffer
-    var concatSig = "" + signature[0] + signature[1];
-    var sigArray = SvUtils.hexToUint8Array(concatSig);
+    // Create a buffer from the signature
+    var sigArray = SvUtils.hexToUint8Array(signature);
     var sigBuffer = Buffer.from(sigArray);
-    // Attempt to verify the delegation against the signature - return the value (bool)
+    // Verify the request against the signature
     return kp.verify(delRequest, sigBuffer);
 };
 //# sourceMappingURL=light.js.map

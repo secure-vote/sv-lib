@@ -256,6 +256,7 @@ export const getSingularCleanAbi = (requestedAbiName, methodName) => {
 }
 
 // Returns the Ed25519 delegations
+// pubKey is in normal format
 export const getUnsafeEd25519delegations = async (
     pubKey: string,
     svNetwork: any
@@ -265,16 +266,23 @@ export const getUnsafeEd25519delegations = async (
     const { web3, svConfig } = svNetwork
     const { unsafeEd25519DelegationAddr } = svConfig
 
+    // Get the hex pub key
+    const kp = StellarBase.Keypair.fromPublicKey(pubKey)
+    const rawPubKey = kp.rawPublicKey()
+    const hexPubKey = '0x' + rawPubKey.toString('hex')
+
     const Ed25519Del = new web3.eth.Contract(
         UnsafeEd25519DelegationAbi,
         unsafeEd25519DelegationAddr
     )
     const delegations = await Ed25519Del.methods
-        .getAllForPubKey(pubKey)
+        .getAllForPubKey(hexPubKey)
         .call()
         .catch(error => {
             throw error
         })
+
+    console.log('Fresh:', delegations)
 
     return delegations
 }
@@ -293,7 +301,7 @@ export const prepareEd25519Delegation = (sk: string, svNetwork: any) => {
     } while (nonce.length !== 6)
 
     console.log('nonce :', nonce)
-    const trimmedAddress = SvUtils.cleanEthHex(address)
+    const trimmedAddress = SvUtils.cleanEthHex(address).toLowerCase()
 
     return `${prefix}${nonce}${trimmedAddress}`
 }
@@ -302,58 +310,82 @@ export const createEd25519DelegationTransaction = async (
     svNetwork: any,
     delRequest: string,
     pubKey: string,
-    sigArray: string[]
+    signature: string
 ) => {
-    const { web3, svConfig } = svNetwork
-    const { unsafeEd25519DelegationAddr } = svConfig
+    return new Promise((resolve, reject) => {
+        const { web3, svConfig } = svNetwork
+        const { unsafeEd25519DelegationAddr } = svConfig
 
-    const Ed25519Del = new web3.eth.Contract(
-        UnsafeEd25519DelegationAbi,
-        unsafeEd25519DelegationAddr
-    )
+        // Initialise the contract
+        const Ed25519Del = new web3.eth.Contract(
+            UnsafeEd25519DelegationAbi,
+            unsafeEd25519DelegationAddr
+        )
 
-    const pubKeyHex = web3.utils.utf8ToHex(pubKey)
-    console.log('pubKeyHex :', pubKeyHex)
-    const isHex = web3.utils.isHex(pubKeyHex)
-    console.log('isHex :', isHex)
+        // Get the hex of the public key
+        const kp = StellarBase.Keypair.fromPublicKey(pubKey)
+        const rawPubKey = kp.rawPublicKey()
+        const hexPubKey = '0x' + rawPubKey.toString('hex')
 
-    console.log(delRequest)
-    console.log(sigArray)
+        // All characters of the delegation turned into lower case
+        // Due to inconsistency of case data returned from Ethereum
+        const lowerCaseDelRequest = delRequest.toLowerCase()
 
-    const addDelegation = Ed25519Del.methods.addUntrustedSelfDelegation(
-        delRequest,
-        pubKeyHex,
-        sigArray
-    )
-    const txData = addDelegation.encodeABI()
+        // Split the 64 bytes of the signature into an array containging 2x bytes32
+        const sig1 = `0x${signature.substring(0, 64)}`
+        const sig2 = `0x${signature.substring(64)}`
+        const sigArray = [sig1, sig2]
 
-    // const account = web3.eth.accounts.privateKeyToAccount('c497fac6b7d9e8dded3d0cb04d3926070969514d8d8a94f5641dcaecccb865e8') // Testing private key (0x1337FB304Fee2F386527839Af9892101c7925623)
-    // console.log('account :', account);
+        const addDelegation = Ed25519Del.methods.addUntrustedSelfDelegation(
+            lowerCaseDelRequest,
+            hexPubKey,
+            sigArray
+        )
+        const txData = addDelegation.encodeABI()
 
-    console.log('txData :', txData)
-
-    return txData
+        // Signed with testing kovan private key, no funds, not a real account by any terms (0x1337FB304Fee2F386527839Af9892101c7925623)
+        web3.eth.accounts
+            .signTransaction(
+                {
+                    to: unsafeEd25519DelegationAddr,
+                    value: '0',
+                    gas: 2000000,
+                    data: txData
+                },
+                '0xc497fac6b7d9e8dded3d0cb04d3926070969514d8d8a94f5641dcaecccb865e8'
+            )
+            .then(x => {
+                const { rawTransaction } = x
+                web3.eth
+                    .sendSignedTransaction(rawTransaction)
+                    .on('receipt', receipt => {
+                        const { transactionHash } = receipt
+                        resolve(transactionHash)
+                    })
+                    .catch(error => reject(error))
+            })
+            .catch(error => reject(error))
+    })
 }
 
 export const verifyEd25519Delegation = (
     delRequest: string,
     pubKey: string,
-    signature: any[]
+    signature: string
 ) => {
     assert.equal(
         signature.length,
-        2,
-        'Invalid signature, should be an array containing two bytes32 strings'
+        128,
+        'Invalid signature, should be 64 byte hex strings'
     )
 
     // Create the keypair from the public key
     const kp = StellarBase.Keypair.fromPublicKey(pubKey)
 
-    // Concatenate the signature array and turn it into a buffer
-    const concatSig = `${signature[0]}${signature[1]}`
-    const sigArray = SvUtils.hexToUint8Array(concatSig)
+    // Create a buffer from the signature
+    const sigArray = SvUtils.hexToUint8Array(signature)
     const sigBuffer = Buffer.from(sigArray)
 
-    // Attempt to verify the delegation against the signature - return the value (bool)
+    // Verify the request against the signature
     return kp.verify(delRequest, sigBuffer)
 }

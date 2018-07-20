@@ -65,5 +65,5 @@ export declare const checkBallotHashGBallot: (ballotObject: any) => boolean;
 export declare const getSingularCleanAbi: (requestedAbiName: any, methodName: any) => any;
 export declare const getUnsafeEd25519delegations: (pubKey: string, svNetwork: any) => Promise<any>;
 export declare const prepareEd25519Delegation: (sk: string, svNetwork: any) => string;
-export declare const createEd25519DelegationTransaction: (svNetwork: any, delRequest: string, pubKey: string, sigArray: string[]) => Promise<any>;
-export declare const verifyEd25519Delegation: (delRequest: string, pubKey: string, signature: any[]) => any;
+export declare const createEd25519DelegationTransaction: (svNetwork: any, delRequest: string, pubKey: string, signature: string) => Promise<{}>;
+export declare const verifyEd25519Delegation: (delRequest: string, pubKey: string, signature: string) => any;
