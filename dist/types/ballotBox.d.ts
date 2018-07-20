@@ -78,3 +78,32 @@ export declare const verifySignedBallotForProxy: (proxyVote: ProxyVote, opts?: a
  *  Returns an eth hex string of the vote data
  */
 export declare const genRange3VoteData: (votesArray: number[]) => any;
+/**
+ * Prepares a transaction for sending with the users web3 browser
+ *
+ * @param {object} txInfo
+ *  Object literal containing the information required to generate the web3 transaction.
+ *       @param {string} bbFarm
+ *       Ethereum address where the vote needs to be cast
+ *       @param {string} ballotId
+ *       The id of the ballot
+ *       @param {string} userAddress
+ *       Ethereum address of the user - 'from'
+ *       @param {string} voteData
+ *       The data containing the users vote
+ *
+ * @returns {object}
+ *  Returns an object with all fields required to cast the transaction
+ */
+export declare const prepareWeb3BBVoteTx: ({ txInfo }: {
+    txInfo: any;
+}, { svNetwork }: {
+    svNetwork: any;
+}) => Promise<{
+    to: any;
+    data: any;
+    gas: any;
+    gasPrice: number;
+    from: any;
+}>;
+export declare const castProxyVote: (request: any, svConfig: any) => Promise<{}>;

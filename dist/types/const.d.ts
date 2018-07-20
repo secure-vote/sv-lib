@@ -12,10 +12,13 @@ declare type EthNetConf = {
     archiveUrl: string;
     archivePushUrl: string;
     lookupAddress: string;
+    unsafeEd25519DelegationAddr: string;
+    svApiUrl: string;
 };
 export declare const networkVars: {
     [netName: string]: EthNetConf;
 };
 export declare const networkName: (networkId: any) => "Kovan" | "Mainnet" | "Ropsten" | "Morden" | "Rinkeby" | "Unknown";
 export declare const getNetwork: (networkId: number, chainId: number) => EthNetConf;
+export declare const Ed25519DelegatePrefix = "SV-ED-ETH";
 export {};
