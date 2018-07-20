@@ -93,7 +93,7 @@
   "scripts": {
     "dev": "tsc -w",
     "docs": "esdoc",
-    "prepublish": "yarn build",
+    "prepublish": "true # yarn build",
     "lint": "tslint -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf dist",
     "build": "tsc --module commonjs && cp -a ./src/smart_contracts ./dist/smart_contracts && yarn build:rollup && esdoc # typedoc --out docs --target es6 --theme minimal --mode file src",
