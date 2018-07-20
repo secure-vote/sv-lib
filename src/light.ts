@@ -238,8 +238,8 @@ export const getSingularCleanAbi = (requestedAbiName, methodName) => {
 export const stellarPkToHex = (pubKey: string): string => {
     // Get the hex pub key
     let rawPubKey, hexPubKey
-    if (web3.utils.isHex(pubKey)) {
-        hexPubKey = web3.utils.isHexStrict(pubKey) ? pubKey : '0x' + pubKey
+    if (web3Utils.isHex(pubKey)) {
+        hexPubKey = web3Utils.isHexStrict(pubKey) ? pubKey : '0x' + pubKey
     } else {
         const kp = StellarBase.Keypair.fromPublicKey(pubKey)
         const rawPubKey = kp.rawPublicKey()
@@ -279,10 +279,10 @@ export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => 
  * @param nonce A nonce in hex that is 3 bytes (6 characters as hex)
  * @returns {Bytes32} The hex string (with 0x prefix) of the delegation instruction
  */
-export const prepareEd25519Delegation = (address: string, nonce?: string = '') => {
+export const prepareEd25519Delegation = (address: string, nonce?: string) => {
     // Delegate prefix (SV-ED-ETH)
     const prefix = SvUtils.cleanEthHex(web3Utils.toHex(SvConsts.Ed25519DelegatePrefix))
-    const _nonce = nonce.length === 6 && web3Utils.isHex(nonce) ? nonce : web3Utils.randomHex(3).slice(2)
+    const _nonce = nonce && web3Utils.isHex(nonce) ? nonce : web3Utils.randomHex(3).slice(2)
 
     const trimmedAddress = SvUtils.cleanEthHex(address)
 
@@ -348,7 +348,7 @@ export const createEd25519DelegationTransaction = (
  * @returns {boolean}
  */
 export const ed25519DelegationIsValid = (dlgtRequest: string, pubKey: string, signature: string) => {
-    const _sig = cleanEthHex(signature)
+    const _sig = SvUtils.cleanEthHex(signature)
     assert.equal(_sig.length, 128, 'Invalid signature, should be a 64 byte hex string')
 
     // Create the keypair from the public key
