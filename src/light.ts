@@ -219,6 +219,20 @@ export const getSingularCleanAbi = (requestedAbiName, methodName) => {
     return methodObject
 }
 
+export const stellarPkToHex = (pubKey: string): string => {
+    // Get the hex pub key
+    let rawPubKey, hexPubKey
+    if (web3.utils.isHex(pubKey)) {
+        hexPubKey = web3.utils.isHexStrict(pubKey) ? pubKey : '0x' + pubKey
+    } else {
+        const kp = StellarBase.Keypair.fromPublicKey(pubKey)
+        const rawPubKey = kp.rawPublicKey()
+        const hexPubKey = '0x' + rawPubKey.toString('hex')
+    }
+
+    return hexPubKey
+}
+
 /**
  *
  * @param pubKey
@@ -230,19 +244,9 @@ export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => 
     const { web3, svConfig } = svNetwork
     const { unsafeEd25519DelegationAddr } = svConfig
 
-    // Get the hex pub key
-    let rawPubKey, hexPubKey
-    if (web3.utils.isHex(pubKey)) {
-        hexPubKey = web3.utils.isHexStrict(pubKey) ? pubKey : '0x' + pubKey
-    } else {
-        const kp = StellarBase.Keypair.fromPublicKey(pubKey)
-        const rawPubKey = kp.rawPublicKey()
-        const hexPubKey = '0x' + rawPubKey.toString('hex')
-    }
-
     const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)
     const delegations = await Ed25519Del.methods
-        .getAllForPubKey(hexPubKey)
+        .getAllForPubKey(stellarPkToHex(pubKey))
         .call()
         .catch(error => {
             throw error
@@ -271,66 +275,72 @@ export const prepareEd25519Delegation = (address: string, nonce?: string = '') =
     return dlgtPacked
 }
 
-export const createEd25519DelegationTransaction = async (svNetwork: any, delRequest: string, pubKey: string, signature: string) => {
-    return new Promise((resolve, reject) => {
-        const { web3, svConfig } = svNetwork
-        const { unsafeEd25519DelegationAddr } = svConfig
+/**
+ * Create a tx object for an ed25519 delegation
+ * @param svNetwork
+ * @param dlgtRequest
+ * @param pubKey
+ * @param signature
+ * @param privKey
+ * @returns {to: string, value: number, gas: number, data: string}
+ */
+export const createEd25519DelegationTransaction = (
+    svNetwork: any,
+    dlgtRequest: string,
+    pubKey: string,
+    signature: string,
+    privKey: string
+) => {
+    const { web3, svConfig } = svNetwork
+    const { unsafeEd25519DelegationAddr } = svConfig
 
-        // Initialise the contract
-        const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)
+    // Initialise the contract
+    const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)
 
-        // Get the hex of the public key
-        const kp = StellarBase.Keypair.fromPublicKey(pubKey)
-        const rawPubKey = kp.rawPublicKey()
-        const hexPubKey = '0x' + rawPubKey.toString('hex')
+    // Split the 64 bytes of the signature into an array containging 2x bytes32
+    const sig1 = `0x${signature.slice(0, 64)}`
+    const sig2 = `0x${signature.slice(64)}`
 
-        // All characters of the delegation turned into lower case
-        // Due to inconsistency of case data returned from Ethereum
-        const lowerCaseDelRequest = delRequest.toLowerCase()
+    const addDelegation = Ed25519Del.methods.addUntrustedSelfDelegation(dlgtRequest, stellarPkToHex(pubKey), [sig1, sig2])
+    const txData = addDelegation.encodeABI()
 
-        // Split the 64 bytes of the signature into an array containging 2x bytes32
-        const sig1 = `0x${signature.substring(0, 64)}`
-        const sig2 = `0x${signature.substring(64)}`
-        const sigArray = [sig1, sig2]
+    return {
+        to: unsafeEd25519DelegationAddr,
+        value: 0,
+        gas: 500000,
+        data: txData
+    }
 
-        const addDelegation = Ed25519Del.methods.addUntrustedSelfDelegation(lowerCaseDelRequest, hexPubKey, sigArray)
-        const txData = addDelegation.encodeABI()
-
-        // Signed with testing kovan private key, no funds, not a real account by any terms (0x1337FB304Fee2F386527839Af9892101c7925623)
-        web3.eth.accounts
-            .signTransaction(
-                {
-                    to: unsafeEd25519DelegationAddr,
-                    value: '0',
-                    gas: 2000000,
-                    data: txData
-                },
-                '0xc497fac6b7d9e8dded3d0cb04d3926070969514d8d8a94f5641dcaecccb865e8'
-            )
-            .then(x => {
-                const { rawTransaction } = x
-                web3.eth
-                    .sendSignedTransaction(rawTransaction)
-                    .on('receipt', receipt => {
-                        const { transactionHash } = receipt
-                        resolve(transactionHash)
-                    })
-                    .catch(error => reject(error))
-            })
-            .catch(error => reject(error))
-    })
+    // .then(x => {
+    //     const { rawTransaction } = x
+    //     web3.eth
+    //         .sendSignedTransaction(rawTransaction)
+    //         .on('receipt', receipt => {
+    //             const { transactionHash } = receipt
+    //             resolve(transactionHash)
+    //         })
+    //         .catch(error => reject(error))
+    // })
+    // .catch(error => reject(error))
 }
 
-export const verifyEd25519Delegation = (delRequest: string, pubKey: string, signature: string) => {
-    assert.equal(signature.length, 128, 'Invalid signature, should be 64 byte hex strings')
+/**
+ * Verify an ed25519 self-delegation
+ * @param dlgtRequest eth hex string of the dlgt request
+ * @param pubKey stellar pubkey
+ * @param signature 64 byte signature as eth hex
+ * @returns {boolean}
+ */
+export const ed25519DelegationIsValid = (dlgtRequest: string, pubKey: string, signature: string) => {
+    const _sig = cleanEthHex(signature)
+    assert.equal(_sig.length, 128, 'Invalid signature, should be a 64 byte hex string')
 
     // Create the keypair from the public key
     const kp = StellarBase.Keypair.fromPublicKey(pubKey)
 
     // Create a buffer from the signature
-    const sigArray = SvUtils.hexToUint8Array(signature)
-    const sigBuffer = Buffer.from(sigArray)
+    const sigBuffer = Buffer.from(SvUtils.hexToUint8Array(_sig))
 
     // Verify the request against the signature
-    return kp.verify(delRequest, sigBuffer)
+    return kp.verify(dlgtRequest, sigBuffer)
 }
