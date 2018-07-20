@@ -19,12 +19,7 @@ import ERC20Abi from './smart_contracts/ERC20.abi.json'
 import UnsafeEd25519DelegationAbi from './smart_contracts/UnsafeEd25519Delegation.abi.json'
 
 export const initializeSvLight = async svConfig => {
-    const {
-        indexContractName,
-        ensResolver,
-        httpProvider,
-        auxContract
-    } = svConfig
+    const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig
 
     const Web3 = require('web3')
     const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
@@ -32,17 +27,11 @@ export const initializeSvLight = async svConfig => {
 
     // const indexAddress =
     // console.log('indexAddress :', indexAddress);
-    const index = new web3.eth.Contract(
-        IndexAbi,
-        await resolveEnsAddress({ resolver }, indexContractName)
-    )
+    const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexContractName))
     const backendAddress = await getBackendAddress({ index })
     const backend = new web3.eth.Contract(BackendAbi, backendAddress)
     const aux = new web3.eth.Contract(AuxAbi, auxContract)
-    const payments = new web3.eth.Contract(
-        PaymentsAbi,
-        await index.methods.getPayments().call()
-    )
+    const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())
 
     return {
         svConfig,
@@ -75,26 +64,14 @@ export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
     const backendAddress = backend._address
     const archiveUrl = { svConfig }
 
-    const bbFarmAndBallotId = await aux.methods
-        .getBBFarmAddressAndBallotId(
-            backendAddress,
-            indexAddress,
-            democHash,
-            nthBallot
-        )
-        .call()
+    const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(backendAddress, indexAddress, democHash, nthBallot).call()
     // console.log('bbFarmAndBallotId :', bbFarmAndBallotId);
 
     const { id, bbFarmAddress } = bbFarmAndBallotId
     const userEthAddress = '0x0000000000000000000000000000000000000000'
-    const ethBallotDetails = await aux.methods
-        .getBallotDetails(id, bbFarmAddress, userEthAddress)
-        .call()
+    const ethBallotDetails = await aux.methods.getBallotDetails(id, bbFarmAddress, userEthAddress).call()
 
-    const ballotSpec = await getBallotSpec(
-        archiveUrl,
-        ethBallotDetails.specHash
-    )
+    const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
     // console.log('ballotSpec :', ballotSpec);
     // .then(x => console.log('Then called', x))
     // .catch(x => console.log('Caught error', x));
@@ -108,10 +85,7 @@ export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
     return ballotObject
 }
 
-export const getBallotSpec = async (
-    archiveUrl,
-    ballotSpecHash
-): Promise<{ data: any }> => {
+export const getBallotSpec = async (archiveUrl, ballotSpecHash): Promise<{ data: any }> => {
     // TODO refactor to be a bit more elegant
     return new Promise<{ data: any }>((res, rej) => {
         let done = false
@@ -160,10 +134,7 @@ export const getDemocBallots = async ({ svNetwork, democHash }) => {
     const numBallots = democInfo.nBallots
     const ballotsArray = []
     for (let i = 0; i < numBallots; i++) {
-        ballotsArray[i] = await getDemocNthBallot(
-            { svNetwork },
-            { democHash: democHash, nthBallot: i }
-        )
+        ballotsArray[i] = await getDemocNthBallot({ svNetwork }, { democHash: democHash, nthBallot: i })
     }
 
     return ballotsArray
@@ -181,10 +152,7 @@ export const getContractAddresses = async ({ svNetwork }) => {
         lookupAddress: lookupAddress,
         resolverAddress: resolver._address,
         communityAuctionAddress: await index.methods.getCommAuction().call(),
-        delegationAddress: await resolveEnsAddress(
-            { resolver },
-            delegationContractName
-        ),
+        delegationAddress: await resolveEnsAddress({ resolver }, delegationContractName),
         paymentsAddress: await index.methods.getPayments().call()
     }
 }
@@ -197,19 +165,14 @@ export const getCommunityBallotPrice = async ({ payments }, democHash) => {
     return await payments.methods.getNextPrice(democHash).call()
 }
 
-export const checkIfAddressIsEditor = async (
-    { svNetwork },
-    { userAddress, democHash }
-) => {
+export const checkIfAddressIsEditor = async ({ svNetwork }, { userAddress, democHash }) => {
     const { backend } = svNetwork
     return await backend.methods.isDEditor(democHash, userAddress).call()
 }
 
 // Checks the current ethereum gas price and returns a couple of values
 export const getCurrentGasPrice = async () => {
-    const gasStationInfo = await axios.get(
-        'https://ethgasstation.info/json/ethgasAPI.json'
-    )
+    const gasStationInfo = await axios.get('https://ethgasstation.info/json/ethgasAPI.json')
     const { data } = gasStationInfo
 
     return {
@@ -257,10 +220,7 @@ export const getSingularCleanAbi = (requestedAbiName, methodName) => {
 
 // Returns the Ed25519 delegations
 // pubKey is in normal format
-export const getUnsafeEd25519delegations = async (
-    pubKey: string,
-    svNetwork: any
-) => {
+export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork: any) => {
     // TODO - Some assertions and stuff..
 
     const { web3, svConfig } = svNetwork
@@ -271,10 +231,7 @@ export const getUnsafeEd25519delegations = async (
     const rawPubKey = kp.rawPublicKey()
     const hexPubKey = '0x' + rawPubKey.toString('hex')
 
-    const Ed25519Del = new web3.eth.Contract(
-        UnsafeEd25519DelegationAbi,
-        unsafeEd25519DelegationAddr
-    )
+    const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)
     const delegations = await Ed25519Del.methods
         .getAllForPubKey(hexPubKey)
         .call()
@@ -306,21 +263,13 @@ export const prepareEd25519Delegation = (sk: string, svNetwork: any) => {
     return `${prefix}${nonce}${trimmedAddress}`
 }
 
-export const createEd25519DelegationTransaction = async (
-    svNetwork: any,
-    delRequest: string,
-    pubKey: string,
-    signature: string
-) => {
+export const createEd25519DelegationTransaction = async (svNetwork: any, delRequest: string, pubKey: string, signature: string) => {
     return new Promise((resolve, reject) => {
         const { web3, svConfig } = svNetwork
         const { unsafeEd25519DelegationAddr } = svConfig
 
         // Initialise the contract
-        const Ed25519Del = new web3.eth.Contract(
-            UnsafeEd25519DelegationAbi,
-            unsafeEd25519DelegationAddr
-        )
+        const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)
 
         // Get the hex of the public key
         const kp = StellarBase.Keypair.fromPublicKey(pubKey)
@@ -336,11 +285,7 @@ export const createEd25519DelegationTransaction = async (
         const sig2 = `0x${signature.substring(64)}`
         const sigArray = [sig1, sig2]
 
-        const addDelegation = Ed25519Del.methods.addUntrustedSelfDelegation(
-            lowerCaseDelRequest,
-            hexPubKey,
-            sigArray
-        )
+        const addDelegation = Ed25519Del.methods.addUntrustedSelfDelegation(lowerCaseDelRequest, hexPubKey, sigArray)
         const txData = addDelegation.encodeABI()
 
         // Signed with testing kovan private key, no funds, not a real account by any terms (0x1337FB304Fee2F386527839Af9892101c7925623)
@@ -368,16 +313,8 @@ export const createEd25519DelegationTransaction = async (
     })
 }
 
-export const verifyEd25519Delegation = (
-    delRequest: string,
-    pubKey: string,
-    signature: string
-) => {
-    assert.equal(
-        signature.length,
-        128,
-        'Invalid signature, should be 64 byte hex strings'
-    )
+export const verifyEd25519Delegation = (delRequest: string, pubKey: string, signature: string) => {
+    assert.equal(signature.length, 128, 'Invalid signature, should be 64 byte hex strings')
 
     // Create the keypair from the public key
     const kp = StellarBase.Keypair.fromPublicKey(pubKey)
