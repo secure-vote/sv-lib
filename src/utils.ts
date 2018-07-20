@@ -90,6 +90,12 @@ export const hexToBase32 = (hex: string) => {
     return toAlphabet(R.reverse(digits.slice(0, digitlength)))
 }
 
+/**
+ * Turn a hexstring (with or without prefix) to a Uint8Array
+ *
+ * @param {string} hex
+ * @returns {Uint8Array}
+ */
 export const hexToUint8Array = (hex: string) => {
     const _hex = hex.slice(0, 2) === '0x' ? hex.slice(2) : hex
     ThrowReporter.report(HexString.decode('0x' + _hex))
