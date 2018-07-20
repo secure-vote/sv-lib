@@ -6,6 +6,7 @@ import * as SvConsts from './const'
 import * as SvUtils from './utils'
 import * as StellarBase from 'stellar-base'
 import * as assert from 'assert'
+import * as web3Utils from 'web3-utils'
 
 // Lovely ABIs
 import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'
@@ -218,8 +219,11 @@ export const getSingularCleanAbi = (requestedAbiName, methodName) => {
     return methodObject
 }
 
-// Returns the Ed25519 delegations
-// pubKey is in normal format
+/**
+ *
+ * @param pubKey
+ * @param svNetwork
+ */
 export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => {
     // TODO - Some assertions and stuff..
 
@@ -249,23 +253,17 @@ export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => 
     return delegations
 }
 
-export const prepareEd25519Delegation = (sk: string, svNetwork: any) => {
-    const { web3 } = svNetwork
-    const account = web3.eth.accounts.privateKeyToAccount(sk)
-    const address = account.address
-
+export const prepareEd25519Delegation = (address: string) => {
     // Delegate prefix (SV-ED-ETH)
-    const prefix = web3.utils.toHex(SvConsts.Ed25519DelegatePrefix)
-
-    let nonce = null
-    do {
-        nonce = web3.utils.randomHex(3).substr(2, 6)
-    } while (nonce.length !== 6)
-
+    const prefix = web3utils.toHex(SvConsts.Ed25519DelegatePrefix)
+    const nonce = web3utils.randomHex(3).slice(2)
     console.log('nonce :', nonce)
+
     const trimmedAddress = SvUtils.cleanEthHex(address).toLowerCase()
 
-    return `${prefix}${nonce}${trimmedAddress}`
+    const dlgtPacked = `${prefix}${nonce}${trimmedAddress}`.toLowerCase()
+    assert.equal(dlgtPacked.length, 64, 'dlgtPacked was not 32 bytes / 64 chars long. This should never happen.')
+    return dlgtPacked
 }
 
 export const createEd25519DelegationTransaction = async (svNetwork: any, delRequest: string, pubKey: string, signature: string) => {
