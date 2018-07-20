@@ -567,7 +567,7 @@
     "__docId__": 48,
     "kind": "file",
     "name": "src/ballotBox.ts",
-    "content": "import { ProxyVote } from './types'\n\nconst BN = require('bn.js')\nimport * as R from 'ramda'\nimport * as assert from 'assert'\nimport * as web3Utils from 'web3-utils'\nimport * as svCrypto from './crypto'\n\n/**\n * This object tracks the flags used for SV ballot boxes. They determine the submission\n * methods and whether ballots are tracked as binding, official, or testing.\n *\n * For more info see docs.secure.vote\n */\nexport const flags = {\n  // flags on submission methods\n  USE_ETH: 2 ** 0,\n  USE_SIGNED: 2 ** 1,\n  USE_NO_ENC: 2 ** 2,\n  USE_ENC: 2 ** 3,\n\n  // other ballot settings\n  IS_BINDING: 2 ** 13,\n  IS_OFFICIAL: 2 ** 14,\n  USE_TESTING: 2 ** 15\n}\n\n/**\n * Creates a packed copy of start and end times with submissionBits\n *\n * @param {number} start\n *  Start time in seconds since epoch\n * @param {number} end\n *  End time in seconds since epoch\n * @param {number} submissionBits\n *  Submission bits - can be created using mkSubmissionBits\n * @returns {BN}\n *  Returns a `bn.js` BigNum of the packed values.\n *  Format: [submissionBits(16)][startTime(64)][endTime(64)]\n */\nexport const mkPacked = (start, end, submissionBits) => {\n  const max64Bit = new BN('ffffffffffffffff', 16)\n\n  const s = new BN(start)\n  assert.equal(\n    s.lte(max64Bit) && s.gtn(0),\n    true,\n    'start time must be >0 and <2^64'\n  )\n\n  const e = new BN(end)\n  assert.equal(\n    e.lte(max64Bit) && e.gtn(0),\n    true,\n    'end time must be >0 and <2^64'\n  )\n\n  const sb = new BN(submissionBits)\n  assert.equal(\n    sb.ltn(2 ** 16) && sb.gtn(0),\n    true,\n    'submission bits must be >0 and <2^16'\n  ) // note: submission bits of 0 is invalid\n\n  return sb\n    .shln(64)\n    .add(s)\n    .shln(64)\n    .add(e)\n}\n\n/**\n * This combines flags into a finished submissionBits. It also does some validation.\n * @param {number[]} toCombine\n *  Array of all submission flags to combine. See SV.ballotBox.flags for flag options.\n *  All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining).\n * @returns {number}\n *  A 16 bit integer of combined flags.\n */\nexport const mkSubmissionBits = (...toCombine) => {\n  const toRet = R.reduce((acc, i) => acc | i, 0, toCombine)\n  assert.equal(\n    R.all(i => typeof i == 'number', toCombine),\n    true,\n    `Bad input to mkSubmissionBits. Input is required to be an array of numbers. Instead got: ${toCombine}`\n  )\n  assert.equal(\n    R.all(i => i === (i | 0), toCombine),\n    true,\n    `Bad input to mkSubmissionBits. Input was not an array of integers. Instead got: ${toCombine}`\n  )\n  assert.equal(\n    toRet,\n    R.sum(toCombine),\n    `Bad input provided to mkSubmissionBits. Logical OR and sum sanity check failed. Input was: ${toCombine}`\n  )\n  assert.equal(\n    toRet < 2 ** 16,\n    true,\n    `Submission bits must fit into a 16 bit integer (i.e. less than 2^16). Result was: ${toRet}`\n  )\n  return toRet\n}\n\n/**\n * Take the arguments and produce web3 data fitting the `submitProxyVote` method.\n * @param {string} ballotId\n *  a BN.js or Hex ballotId\n * @param {number} sequence\n *  the sequence number to use (0 < sequence < 2^32)\n * @param {string} voteData\n *  the vote data to use, should be 32 bytes hex encoded\n * @param {string} extra\n *  any extra data included with the vote (such as curve25519 pubkeys)\n * @param {string} privateKey\n *  the privkey used to sign\n * @param {object?} opts\n *  options:\n *   - skipSequenceSizeCheck: boolean (will not throw if sequence is >= 2^32)\n * @returns {object}\n *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`\n */\nexport const mkSignedBallotForProxy = (\n  ballotId,\n  sequence,\n  voteData,\n  extra,\n  privateKey,\n  opts: any = {}\n): ProxyVote => {\n  if (opts.skipSequenceSizeCheck !== true)\n    assert.equal(\n      0 < sequence && sequence < 2 ** 32,\n      true,\n      'sequence number out of bounds'\n    )\n  assert.equal(\n    web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId),\n    true,\n    'ballotId incorrect format (either not a BN or not hex)'\n  )\n  assert.equal(\n    web3Utils.isHexStrict(voteData),\n    true,\n    'vote data is not hex (strict)'\n  )\n  assert.equal(\n    web3Utils.isHexStrict(extra),\n    true,\n    'extra param is not hex (strict)'\n  )\n\n  const _ballotId = web3Utils.isBN(ballotId)\n    ? web3Utils.padLeft(web3Utils.toHex(ballotId), 64)\n    : ballotId\n\n  assert.equal(_ballotId.length, 66, 'ballotId incorrect length')\n  assert.equal(voteData.length, 66, 'voteData incorrect length')\n\n  const sequenceHex = web3Utils.padLeft(web3Utils.toHex(sequence), 8)\n\n  const messageHash = web3Utils.soliditySha3(\n    { t: 'bytes31', v: web3Utils.padLeft(sequenceHex, '62') },\n    { t: 'bytes32', v: _ballotId },\n    { t: 'bytes32', v: voteData },\n    { t: 'bytes', v: extra }\n  )\n\n  const { v, r, s } = svCrypto.ethSignHash(messageHash, privateKey)\n\n  const vBytes = web3Utils.hexToBytes(v)\n  const midBytes = web3Utils.hexToBytes(web3Utils.padRight('0x', 54))\n  const sequenceBytes = web3Utils.hexToBytes(sequenceHex)\n  const packed2Bytes = R.concat(vBytes, R.concat(midBytes, sequenceBytes))\n  const packed2 = web3Utils.bytesToHex(packed2Bytes)\n\n  return {\n    proxyReq: [r, s, packed2, _ballotId, voteData],\n    extra\n  }\n}\n\n/**\n * Verify a signed vote to be submitted via proxy as generated by `mkSignedBallotForProxy`\n *\n * @param {ProxyVote} proxyVote The ProxyVote object\n * @param {*} [opts={}] Not used currently; for future options\n * @returns {{verified: bool, address: EthAddress}}\n */\nexport const verifySignedBallotForProxy = (\n  proxyVote: ProxyVote,\n  opts: any = {}\n) => {\n  const {\n    proxyReq: [r, s, packed2, ballotId, voteData],\n    extra\n  } = proxyVote\n\n  const p2Bytes = web3Utils.hexToBytes(packed2)\n  const v = web3Utils.bytesToHex(p2Bytes.slice(0, 1))\n  const seqNum = web3Utils.bytesToHex(p2Bytes.slice(27, 32))\n\n  const messageHash = web3Utils.soliditySha3(\n    { t: 'bytes31', v: web3Utils.bytesToHex(p2Bytes.slice(1)) },\n    { t: 'bytes32', v: ballotId },\n    { t: 'bytes32', v: voteData },\n    { t: 'bytes', v: extra }\n  )\n\n  return svCrypto.ethVerifySig(messageHash, [v, r, s])\n}\n\n/**\n * Prepares voteData for a Range3 ballot from an array of votes\n *\n * @param {array} votesArray\n *  Takes an array of numbers which represent the votes to be transformed\n *  Format: [1, 2, -1]\n *\n * @returns {string}\n *  Returns an eth hex string of the vote data\n */\nexport const genRange3VoteData = (votesArray: number[]) => {\n  assert.equal(\n    R.all(v => (v | 0) === v, votesArray),\n    true,\n    'All array elements must be defined and integers.'\n  )\n  assert.equal(\n    R.all(v => -3 <= v && v <= 3, votesArray),\n    true,\n    'Votes must be in range -3 to 3.'\n  )\n  assert.equal(\n    votesArray.length <= 85,\n    true,\n    'Too many votes; maximum capacity of 32 bytes is 85 individual items.'\n  )\n\n  // Generate list of binary encoded votes. Read bottom to top.\n  const binaryVotes = R.compose(\n    // pad to 3 bits\n    R.map((vBin: string) => R.join('', R.repeat('0', 3 - vBin.length)) + vBin),\n    // convert votes to binary\n    R.map((v: number) => v.toString(2)),\n    // offset votes to be in range 0,6\n    R.map((v: number) => v + 3)\n  )(votesArray)\n\n  // check we have converted votes to bitstring representation of length 3\n  assert.equal(\n    R.all(bVote => bVote.length == 3, binaryVotes),\n    true,\n    'Assertion failed: all binary-encoded votes should be 3 bits long'\n  )\n\n  // create the binary voteData\n  const rawBinVotes = R.join('', binaryVotes)\n  // and pad it with 0s to length 256 (32 bytes total)\n  const binVoteData =\n    rawBinVotes + R.join('', R.repeat('0', 32 * 8 - rawBinVotes.length))\n  assert.equal(\n    binVoteData.length,\n    256,\n    'Assertion failed: generated voteData bit string does not have length 256'\n  )\n  // Convert to bytes\n  const voteBytes = R.map(\n    bStr => parseInt(bStr, 2),\n    R.splitEvery(8, binVoteData)\n  )\n\n  // check bytes are in range\n  assert.equal(\n    R.all(vByte => 0 <= vByte && vByte <= 255, voteBytes),\n    true,\n    'Assertion failed: voteBytes (byte array) had a byte out of bounds (<0 or >255)'\n  )\n\n  // generate final hex\n  const voteData = web3Utils.bytesToHex(voteBytes)\n  assert.equal(\n    voteData.length,\n    66,\n    'Assertion failed: final hex was not 66 characters long (32 bytes)'\n  )\n\n  return voteData\n}\n",
+    "content": "import { ProxyVote } from './types'\n\nconst BN = require('bn.js')\nimport * as R from 'ramda'\nimport * as assert from 'assert'\nimport * as web3Utils from 'web3-utils'\nimport * as svCrypto from './crypto'\nimport axios from 'axios'\nimport * as Light from './light'\n\nimport BBFarmAbi from './smart_contracts/BBFarm.abi.json'\n\n/**\n * This object tracks the flags used for SV ballot boxes. They determine the submission\n * methods and whether ballots are tracked as binding, official, or testing.\n *\n * For more info see docs.secure.vote\n */\nexport const flags = {\n    // flags on submission methods\n    USE_ETH: 2 ** 0,\n    USE_SIGNED: 2 ** 1,\n    USE_NO_ENC: 2 ** 2,\n    USE_ENC: 2 ** 3,\n\n    // other ballot settings\n    IS_BINDING: 2 ** 13,\n    IS_OFFICIAL: 2 ** 14,\n    USE_TESTING: 2 ** 15\n}\n\n/**\n * Creates a packed copy of start and end times with submissionBits\n *\n * @param {number} start\n *  Start time in seconds since epoch\n * @param {number} end\n *  End time in seconds since epoch\n * @param {number} submissionBits\n *  Submission bits - can be created using mkSubmissionBits\n * @returns {BN}\n *  Returns a `bn.js` BigNum of the packed values.\n *  Format: [submissionBits(16)][startTime(64)][endTime(64)]\n */\nexport const mkPacked = (start, end, submissionBits) => {\n    const max64Bit = new BN('ffffffffffffffff', 16)\n\n    const s = new BN(start)\n    assert.equal(s.lte(max64Bit) && s.gtn(0), true, 'start time must be >0 and <2^64')\n\n    const e = new BN(end)\n    assert.equal(e.lte(max64Bit) && e.gtn(0), true, 'end time must be >0 and <2^64')\n\n    const sb = new BN(submissionBits)\n    assert.equal(sb.ltn(2 ** 16) && sb.gtn(0), true, 'submission bits must be >0 and <2^16') // note: submission bits of 0 is invalid\n\n    return sb\n        .shln(64)\n        .add(s)\n        .shln(64)\n        .add(e)\n}\n\n/**\n * This combines flags into a finished submissionBits. It also does some validation.\n * @param {number[]} toCombine\n *  Array of all submission flags to combine. See SV.ballotBox.flags for flag options.\n *  All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining).\n * @returns {number}\n *  A 16 bit integer of combined flags.\n */\nexport const mkSubmissionBits = (...toCombine) => {\n    const toRet = R.reduce((acc, i) => acc | i, 0, toCombine)\n    assert.equal(\n        R.all(i => typeof i == 'number', toCombine),\n        true,\n        `Bad input to mkSubmissionBits. Input is required to be an array of numbers. Instead got: ${toCombine}`\n    )\n    assert.equal(\n        R.all(i => i === (i | 0), toCombine),\n        true,\n        `Bad input to mkSubmissionBits. Input was not an array of integers. Instead got: ${toCombine}`\n    )\n    assert.equal(\n        toRet,\n        R.sum(toCombine),\n        `Bad input provided to mkSubmissionBits. Logical OR and sum sanity check failed. Input was: ${toCombine}`\n    )\n    assert.equal(toRet < 2 ** 16, true, `Submission bits must fit into a 16 bit integer (i.e. less than 2^16). Result was: ${toRet}`)\n    return toRet\n}\n\n/**\n * Take the arguments and produce web3 data fitting the `submitProxyVote` method.\n * @param {string} ballotId\n *  a BN.js or Hex ballotId\n * @param {number} sequence\n *  the sequence number to use (0 < sequence < 2^32)\n * @param {string} voteData\n *  the vote data to use, should be 32 bytes hex encoded\n * @param {string} extra\n *  any extra data included with the vote (such as curve25519 pubkeys)\n * @param {string} privateKey\n *  the privkey used to sign\n * @param {object?} opts\n *  options:\n *   - skipSequenceSizeCheck: boolean (will not throw if sequence is >= 2^32)\n * @returns {object}\n *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`\n */\nexport const mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts: any = {}): ProxyVote => {\n    if (opts.skipSequenceSizeCheck !== true) assert.equal(0 < sequence && sequence < 2 ** 32, true, 'sequence number out of bounds')\n    assert.equal(\n        web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId),\n        true,\n        'ballotId incorrect format (either not a BN or not hex)'\n    )\n    assert.equal(web3Utils.isHexStrict(voteData), true, 'vote data is not hex (strict)')\n    assert.equal(web3Utils.isHexStrict(extra), true, 'extra param is not hex (strict)')\n\n    const _ballotId = web3Utils.isBN(ballotId) ? web3Utils.padLeft(web3Utils.toHex(ballotId), 64) : ballotId\n\n    assert.equal(_ballotId.length, 66, 'ballotId incorrect length')\n    assert.equal(voteData.length, 66, 'voteData incorrect length')\n\n    const sequenceHex = web3Utils.padLeft(web3Utils.toHex(sequence), 8)\n\n    const messageHash = web3Utils.soliditySha3(\n        { t: 'bytes31', v: web3Utils.padLeft(sequenceHex, '62') },\n        { t: 'bytes32', v: _ballotId },\n        { t: 'bytes32', v: voteData },\n        { t: 'bytes', v: extra }\n    )\n\n    const { v, r, s } = svCrypto.ethSignHash(messageHash, privateKey)\n\n    const vBytes = web3Utils.hexToBytes(v)\n    const midBytes = web3Utils.hexToBytes(web3Utils.padRight('0x', 54))\n    const sequenceBytes = web3Utils.hexToBytes(sequenceHex)\n    const packed2Bytes = R.concat(vBytes, R.concat(midBytes, sequenceBytes))\n    const packed2 = web3Utils.bytesToHex(packed2Bytes)\n\n    return {\n        proxyReq: [r, s, packed2, _ballotId, voteData],\n        extra\n    }\n}\n\n/**\n * Verify a signed vote to be submitted via proxy as generated by `mkSignedBallotForProxy`\n *\n * @param {ProxyVote} proxyVote The ProxyVote object\n * @param {*} [opts={}] Not used currently; for future options\n * @returns {{verified: bool, address: EthAddress}}\n */\nexport const verifySignedBallotForProxy = (proxyVote: ProxyVote, opts: any = {}) => {\n    const {\n        proxyReq: [r, s, packed2, ballotId, voteData],\n        extra\n    } = proxyVote\n\n    const p2Bytes = web3Utils.hexToBytes(packed2)\n    const v = web3Utils.bytesToHex(p2Bytes.slice(0, 1))\n    const seqNum = web3Utils.bytesToHex(p2Bytes.slice(27, 32))\n\n    const messageHash = web3Utils.soliditySha3(\n        { t: 'bytes31', v: web3Utils.bytesToHex(p2Bytes.slice(1)) },\n        { t: 'bytes32', v: ballotId },\n        { t: 'bytes32', v: voteData },\n        { t: 'bytes', v: extra }\n    )\n\n    return svCrypto.ethVerifySig(messageHash, [v, r, s])\n}\n\n/**\n * Prepares voteData for a Range3 ballot from an array of votes\n *\n * @param {array} votesArray\n *  Takes an array of numbers which represent the votes to be transformed\n *  Format: [1, 2, -1]\n *\n * @returns {string}\n *  Returns an eth hex string of the vote data\n */\nexport const genRange3VoteData = (votesArray: number[]) => {\n    assert.equal(R.all(v => (v | 0) === v, votesArray), true, 'All array elements must be defined and integers.')\n    assert.equal(R.all(v => -3 <= v && v <= 3, votesArray), true, 'Votes must be in range -3 to 3.')\n    assert.equal(votesArray.length <= 85, true, 'Too many votes; maximum capacity of 32 bytes is 85 individual items.')\n\n    // Generate list of binary encoded votes. Read bottom to top.\n    const binaryVotes = R.compose(\n        // pad to 3 bits\n        R.map((vBin: string) => R.join('', R.repeat('0', 3 - vBin.length)) + vBin),\n        // convert votes to binary\n        R.map((v: number) => v.toString(2)),\n        // offset votes to be in range 0,6\n        R.map((v: number) => v + 3)\n    )(votesArray)\n\n    // check we have converted votes to bitstring representation of length 3\n    assert.equal(R.all(bVote => bVote.length == 3, binaryVotes), true, 'Assertion failed: all binary-encoded votes should be 3 bits long')\n\n    // create the binary voteData\n    const rawBinVotes = R.join('', binaryVotes)\n    // and pad it with 0s to length 256 (32 bytes total)\n    const binVoteData = rawBinVotes + R.join('', R.repeat('0', 32 * 8 - rawBinVotes.length))\n    assert.equal(binVoteData.length, 256, 'Assertion failed: generated voteData bit string does not have length 256')\n    // Convert to bytes\n    const voteBytes = R.map(bStr => parseInt(bStr, 2), R.splitEvery(8, binVoteData))\n\n    // check bytes are in range\n    assert.equal(\n        R.all(vByte => 0 <= vByte && vByte <= 255, voteBytes),\n        true,\n        'Assertion failed: voteBytes (byte array) had a byte out of bounds (<0 or >255)'\n    )\n\n    // generate final hex\n    const voteData = web3Utils.bytesToHex(voteBytes)\n    assert.equal(voteData.length, 66, 'Assertion failed: final hex was not 66 characters long (32 bytes)')\n\n    return voteData\n}\n\n/**\n * Prepares a transaction for sending with the users web3 browser\n *\n * @param {object} txInfo\n *  Object literal containing the information required to generate the web3 transaction.\n * @param {object} svNetwork\n *  config object containing svNetwork\n *\n * @returns {object}\n *  Returns an object with all fields required to cast the transaction\n */\nexport const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) => {\n    const { bbFarm, ballotId, userAddress, voteData } = txInfo\n    const { web3 } = svNetwork\n\n    assert.equal(web3Utils.isAddress(bbFarm), true, 'BBFarm address supplied is not a valid ethereum address.')\n    assert.equal(web3Utils.isAddress(userAddress), true, 'User address supplied is not a valid ethereum address.')\n    assert.equal(voteData.length, 66, 'Assertion failed: final hex was not 66 characters long (32 bytes)')\n\n    const BBFarmContract = new web3.eth.Contract(BBFarmAbi, bbFarm)\n    const submitVote = BBFarmContract.methods.submitVote(ballotId, voteData, '0x')\n    const gasEstimate = await submitVote.estimateGas()\n    const abiValue = await submitVote.encodeABI()\n    const gasPrice = await Light.getCurrentGasPrice()\n\n    const web3Tx = {\n        to: bbFarm,\n        data: abiValue,\n        gas: web3.utils.toHex((gasEstimate * 1.05) | 0), // 5% added just in case\n        gasPrice: gasPrice.average * 1000000000,\n        from: userAddress\n    }\n    return web3Tx\n}\n\nexport const castProxyVote = async (request, svConfig) => {\n    assert.equal(web3Utils.isBN(request.ballotId), true, 'Ballot id is not a BN')\n    assert.equal(request.proxyReq.length == 5, true, 'Proxy vote req does not contain the correct number of parameters')\n    assert.equal(\n        request.hasOwnProperty('extra') && request.hasOwnProperty('democHash'),\n        true,\n        'Request does not contain extra and democ hash data'\n    )\n\n    return new Promise((resolve, reject) => {\n        const svApiUrl = svConfig.svApiUrl\n        const proxyVotePath = '/sv/light/submitProxyVote'\n        const requestUrl = `${svApiUrl}${proxyVotePath}`\n        axios\n            .post(requestUrl, request)\n            .then(response => {\n                const { data } = response\n                resolve(data)\n            })\n            .catch(error => {\n                console.log('error :', error.response)\n                reject(error)\n            })\n    })\n}\n",
     "static": true,
     "longname": "/Users/maxkaye/src/sv/lib/src/ballotBox.ts",
     "access": "public",
@@ -607,7 +607,7 @@
     "importPath": "sv-lib/src/ballotBox.ts",
     "importStyle": "{flags}",
     "description": "This object tracks the flags used for SV ballot boxes. They determine the submission\nmethods and whether ballots are tracked as binding, official, or testing.\n\nFor more info see docs.secure.vote",
-    "lineNumber": 12,
+    "lineNumber": 15,
     "type": {
       "types": [
         "{\"USE_ETH\": *, \"USE_SIGNED\": *, \"USE_NO_ENC\": *, \"USE_ENC\": *, \"IS_BINDING\": *, \"IS_OFFICIAL\": *, \"USE_TESTING\": *}"
@@ -628,7 +628,7 @@
     "importPath": "sv-lib/src/ballotBox.ts",
     "importStyle": "{mkPacked}",
     "description": "Creates a packed copy of start and end times with submissionBits",
-    "lineNumber": 36,
+    "lineNumber": 39,
     "unknown": [
       {
         "tagName": "@returns",
@@ -690,7 +690,7 @@
     "importPath": "sv-lib/src/ballotBox.ts",
     "importStyle": "{mkSubmissionBits}",
     "description": "This combines flags into a finished submissionBits. It also does some validation.",
-    "lineNumber": 58,
+    "lineNumber": 61,
     "unknown": [
       {
         "tagName": "@returns",
@@ -732,7 +732,7 @@
     "importPath": "sv-lib/src/ballotBox.ts",
     "importStyle": "{mkSignedBallotForProxy}",
     "description": "Take the arguments and produce web3 data fitting the `submitProxyVote` method.",
-    "lineNumber": 84,
+    "lineNumber": 87,
     "unknown": [
       {
         "tagName": "@returns",
@@ -824,7 +824,7 @@
     "importPath": "sv-lib/src/ballotBox.ts",
     "importStyle": "{verifySignedBallotForProxy}",
     "description": "Verify a signed vote to be submitted via proxy as generated by `mkSignedBallotForProxy`",
-    "lineNumber": 115,
+    "lineNumber": 116,
     "unknown": [
       {
         "tagName": "@returns",
@@ -878,7 +878,7 @@
     "importPath": "sv-lib/src/ballotBox.ts",
     "importStyle": "{genRange3VoteData}",
     "description": "Prepares voteData for a Range3 ballot from an array of votes",
-    "lineNumber": 133,
+    "lineNumber": 134,
     "unknown": [
       {
         "tagName": "@returns",
@@ -908,9 +908,97 @@
   },
   {
     "__docId__": 56,
+    "kind": "function",
+    "name": "prepareWeb3BBVoteTx",
+    "memberof": "src/ballotBox.ts",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/ballotBox.ts~prepareWeb3BBVoteTx",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/ballotBox.ts",
+    "importStyle": "{prepareWeb3BBVoteTx}",
+    "description": "Prepares a transaction for sending with the users web3 browser",
+    "lineNumber": 173,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{object}\n Returns an object with all fields required to cast the transaction"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "txInfo",
+        "description": "Object literal containing the information required to generate the web3 transaction."
+      },
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "svNetwork",
+        "description": "config object containing svNetwork"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "object"
+      ],
+      "spread": false,
+      "description": "Returns an object with all fields required to cast the transaction"
+    }
+  },
+  {
+    "__docId__": 57,
+    "kind": "function",
+    "name": "castProxyVote",
+    "memberof": "src/ballotBox.ts",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/ballotBox.ts~castProxyVote",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/ballotBox.ts",
+    "importStyle": "{castProxyVote}",
+    "description": null,
+    "lineNumber": 193,
+    "undocument": true,
+    "params": [
+      {
+        "name": "request",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "svConfig",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 58,
     "kind": "file",
     "name": "src/const.ts",
-    "content": "export const zeroAddr = \"0x0000000000000000000000000000000000000000\";\nexport const zeroHash = \"0x0000000000000000000000000000000000000000000000000000000000000000\";\n\ntype EthNetConf = {\n    indexContractName: string\n    auxContract: string\n    httpProvider: string\n    delegationContractName: string\n    ensResolver: string\n    ens: string\n    etherscanLink: string\n    name: string\n    archiveUrl: string\n    archivePushUrl: string\n    lookupAddress: string\n}\n\nconst _raw_networkVars: {[netName: string]: EthNetConf} = {\n    kovan: {\n        indexContractName: \"index.kov.sv\",\n        auxContract: \"0x0d31706febd1b8177c722fe39432f3e47143ccd9\",\n        httpProvider: \"https://kovan.eth.secure.vote/tokenvote-dev\",\n        delegationContractName: \"delegation-2018-06-19.kov.sv\",\n        ensResolver: \"0xc8c73829348cb15da4b0785a110017464fb8af51\",\n        ens: \"0xd6F4f22eeC158c434b17d01f62f5dF33b108Ae93\",\n        etherscanLink: \"https://kovan.etherscan.io/\",\n        name: \"Kovan\",\n        archiveUrl: \"https://archive.test.secure.vote/\",\n        archivePushUrl: \"https://archive.test.push.secure.vote/\",\n        lookupAddress: \"0x216265865e46D4c6FE506877EfAAE7dd7Ae2faCE\"\n    },\n    mainnet: {\n        indexContractName: \"index.tokenvote.eth\",\n        auxContract: \"0xff553fe4183f27e2165299b3fc0ae8c3b5c07084\",\n        httpProvider: \"https://mainnet.eth.secure.vote/tokenvote\",\n        delegationContractName: \"delegate.secvote.eth\",\n        ensResolver: \"0x5FfC014343cd971B7eb70732021E26C35B744cc4\",\n        ens: \"0x314159265dd8dbb310642f98f50c066173c1259b\",\n        etherscanLink: \"https://etherscan.io/\",\n        name: \"Mainnet\",\n        archiveUrl: \"https://archive.secure.vote/\",\n        archivePushUrl: \"https://archive.push.secure.vote/\",\n        lookupAddress: \"0x216265865e46D4c6FE506877EfAAE7dd7Ae2faCE\"\n    },\n    ropsten: {\n        indexContractName: \"\",\n        auxContract: \"\",\n        httpProvider: \"https://ropsten.eth.secure.vote/tokenvote-dev\",\n        delegationContractName: \"\",\n        ensResolver: \"\",\n        ens: \"\",\n        etherscanLink: \"https://ropsten.etherscan.io/\",\n        name: \"Ropsten\",\n        archiveUrl: \"https://archive.test.secure.vote/\",\n        archivePushUrl: \"https://archive.test.push.secure.vote/\",\n        lookupAddress: \"\"\n    },\n    classic: {\n        indexContractName: \"\",\n        auxContract: \"\",\n        httpProvider: \"https://classic.eth.secure.vote/tokenvote-dev\",\n        delegationContractName: \"\",\n        ensResolver: \"\",\n        ens: \"\",\n        etherscanLink: \"https://gastracker.io/\",  // eth classic block explorer\n        name: \"Classic\",\n        archiveUrl: \"https://archive.secure.vote/\",\n        archivePushUrl: \"https://archive.push.secure.vote/\",\n        lookupAddress: \"\"\n    },\n};\n\nexport const networkVars = new Proxy(_raw_networkVars, {\n    get: (obj, prop: string) => {\n        console.warn(\"Warning: const.networkVars is deprecated; please use const.getNetwork(..)\");\n        return obj[prop];\n    }\n});\n\nexport const networkName = networkId => {\n    console.warn(\"Warning: const.networkName(..) is deprecated. Please use const.getNetwork(..).name\");\n\n    switch (networkId) {\n        case 1:\n            return \"Mainnet\";\n        case 2:\n            return \"Morden\";\n        case 3:\n            return \"Ropsten\";\n        case 4:\n            return \"Rinkeby\";\n        case 42:\n            return \"Kovan\";\n        default:\n            return \"Unknown\";\n    }\n};\n\nexport const getNetwork = (networkId: number, chainId: number): EthNetConf => {\n    switch (networkId) {\n        case 1:\n            if (chainId === 1) return _raw_networkVars.mainnet\n            if (chainId === 61) return _raw_networkVars.classic\n            break;\n        case 3:\n            return _raw_networkVars.ropsten\n        case 42:\n            return _raw_networkVars.kovan\n        default:\n            break;\n    }\n    throw Error(`Cannot find network with net_id ${networkId} and chainId ${chainId}`)\n}\n",
+    "content": "export const zeroAddr = '0x0000000000000000000000000000000000000000'\nexport const zeroHash =\n    '0x0000000000000000000000000000000000000000000000000000000000000000'\n\ntype EthNetConf = {\n    indexContractName: string\n    auxContract: string\n    httpProvider: string\n    delegationContractName: string\n    ensResolver: string\n    ens: string\n    etherscanLink: string\n    name: string\n    archiveUrl: string\n    archivePushUrl: string\n    lookupAddress: string\n    unsafeEd25519DelegationAddr: string\n    svApiUrl: string\n}\n\nconst _raw_networkVars: { [netName: string]: EthNetConf } = {\n    kovan: {\n        indexContractName: 'index.kov.sv',\n        auxContract: '0x0d31706febd1b8177c722fe39432f3e47143ccd9',\n        httpProvider: 'https://kovan.eth.secure.vote/tokenvote-dev',\n        delegationContractName: 'delegation-2018-06-19.kov.sv',\n        ensResolver: '0xc8c73829348cb15da4b0785a110017464fb8af51',\n        ens: '0xd6F4f22eeC158c434b17d01f62f5dF33b108Ae93',\n        etherscanLink: 'https://kovan.etherscan.io/',\n        name: 'Kovan',\n        archiveUrl: 'https://archive.test.secure.vote/',\n        archivePushUrl: 'https://archive.test.push.secure.vote/',\n        lookupAddress: '0x216265865e46D4c6FE506877EfAAE7dd7Ae2faCE',\n        svApiUrl: 'https://dev.api.secure.vote',\n        unsafeEd25519DelegationAddr:\n            '0x005645072d7c244476e3099619a6089245b6a958'\n    },\n    mainnet: {\n        indexContractName: 'index.tokenvote.eth',\n        auxContract: '0xff553fe4183f27e2165299b3fc0ae8c3b5c07084',\n        httpProvider: 'https://mainnet.eth.secure.vote/tokenvote',\n        delegationContractName: 'delegate.secvote.eth',\n        ensResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',\n        ens: '0x314159265dd8dbb310642f98f50c066173c1259b',\n        etherscanLink: 'https://etherscan.io/',\n        name: 'Mainnet',\n        archiveUrl: 'https://archive.secure.vote/',\n        archivePushUrl: 'https://archive.push.secure.vote/',\n        lookupAddress: '0x216265865e46D4c6FE506877EfAAE7dd7Ae2faCE',\n        svApiUrl: '',\n        unsafeEd25519DelegationAddr: ''\n    },\n    ropsten: {\n        indexContractName: '',\n        auxContract: '',\n        httpProvider: 'https://ropsten.eth.secure.vote/tokenvote-dev',\n        delegationContractName: '',\n        ensResolver: '',\n        ens: '',\n        etherscanLink: 'https://ropsten.etherscan.io/',\n        name: 'Ropsten',\n        archiveUrl: 'https://archive.test.secure.vote/',\n        archivePushUrl: 'https://archive.test.push.secure.vote/',\n        lookupAddress: '',\n        svApiUrl: '',\n        unsafeEd25519DelegationAddr: ''\n    },\n    classic: {\n        indexContractName: '',\n        auxContract: '',\n        httpProvider: 'https://classic.eth.secure.vote/tokenvote-dev',\n        delegationContractName: '',\n        ensResolver: '',\n        ens: '',\n        etherscanLink: 'https://gastracker.io/', // eth classic block explorer\n        name: 'Classic',\n        archiveUrl: 'https://archive.secure.vote/',\n        archivePushUrl: 'https://archive.push.secure.vote/',\n        lookupAddress: '',\n        svApiUrl: '',\n        unsafeEd25519DelegationAddr: ''\n    }\n}\n\nexport const networkVars = new Proxy(_raw_networkVars, {\n    get: (obj, prop: string) => {\n        console.warn(\n            'Warning: const.networkVars is deprecated; please use const.getNetwork(..)'\n        )\n        return obj[prop]\n    }\n})\n\nexport const networkName = networkId => {\n    console.warn(\n        'Warning: const.networkName(..) is deprecated. Please use const.getNetwork(..).name'\n    )\n\n    switch (networkId) {\n        case 1:\n            return 'Mainnet'\n        case 2:\n            return 'Morden'\n        case 3:\n            return 'Ropsten'\n        case 4:\n            return 'Rinkeby'\n        case 42:\n            return 'Kovan'\n        default:\n            return 'Unknown'\n    }\n}\n\nexport const getNetwork = (networkId: number, chainId: number): EthNetConf => {\n    switch (networkId) {\n        case 1:\n            if (chainId === 1) return _raw_networkVars.mainnet\n            if (chainId === 61) return _raw_networkVars.classic\n            break\n        case 3:\n            return _raw_networkVars.ropsten\n        case 42:\n            return _raw_networkVars.kovan\n        default:\n            break\n    }\n    throw Error(\n        `Cannot find network with net_id ${networkId} and chainId ${chainId}`\n    )\n}\n\nexport const Ed25519DelegatePrefix = 'SV-ED-ETH'\n",
     "static": true,
     "longname": "/Users/maxkaye/src/sv/lib/src/const.ts",
     "access": "public",
@@ -918,7 +1006,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 57,
+    "__docId__": 59,
     "kind": "variable",
     "name": "zeroAddr",
     "memberof": "src/const.ts",
@@ -938,7 +1026,7 @@
     }
   },
   {
-    "__docId__": 58,
+    "__docId__": 60,
     "kind": "variable",
     "name": "zeroHash",
     "memberof": "src/const.ts",
@@ -958,7 +1046,7 @@
     }
   },
   {
-    "__docId__": 59,
+    "__docId__": 61,
     "kind": "variable",
     "name": "_raw_networkVars",
     "memberof": "src/const.ts",
@@ -979,7 +1067,7 @@
     "ignore": true
   },
   {
-    "__docId__": 60,
+    "__docId__": 62,
     "kind": "variable",
     "name": "networkVars",
     "memberof": "src/const.ts",
@@ -990,7 +1078,7 @@
     "importPath": "sv-lib/src/const.ts",
     "importStyle": "{networkVars}",
     "description": null,
-    "lineNumber": 57,
+    "lineNumber": 65,
     "undocument": true,
     "type": {
       "types": [
@@ -999,7 +1087,7 @@
     }
   },
   {
-    "__docId__": 61,
+    "__docId__": 63,
     "kind": "function",
     "name": "networkName",
     "memberof": "src/const.ts",
@@ -1012,7 +1100,7 @@
     "importPath": "sv-lib/src/const.ts",
     "importStyle": "{networkName}",
     "description": null,
-    "lineNumber": 63,
+    "lineNumber": 71,
     "undocument": true,
     "params": [
       {
@@ -1029,7 +1117,7 @@
     }
   },
   {
-    "__docId__": 62,
+    "__docId__": 64,
     "kind": "function",
     "name": "getNetwork",
     "memberof": "src/const.ts",
@@ -1042,7 +1130,7 @@
     "importPath": "sv-lib/src/const.ts",
     "importStyle": "{getNetwork}",
     "description": null,
-    "lineNumber": 80,
+    "lineNumber": 88,
     "undocument": true,
     "params": [
       {
@@ -1065,7 +1153,27 @@
     }
   },
   {
-    "__docId__": 63,
+    "__docId__": 65,
+    "kind": "variable",
+    "name": "Ed25519DelegatePrefix",
+    "memberof": "src/const.ts",
+    "static": true,
+    "longname": "src/const.ts~Ed25519DelegatePrefix",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/const.ts",
+    "importStyle": "{Ed25519DelegatePrefix}",
+    "description": null,
+    "lineNumber": 105,
+    "undocument": true,
+    "type": {
+      "types": [
+        "string"
+      ]
+    }
+  },
+  {
+    "__docId__": 66,
     "kind": "file",
     "name": "src/crypto.ts",
     "content": "import * as Account from 'eth-lib/lib/account'\nimport * as Hash from 'eth-lib/lib/hash'\nimport * as web3Utils from 'web3-utils'\n\n/**\n * Like web3.eth.accounts.hashMessage without the envelope.\n *\n * @param {*} data\n *  A message to hash - if it is hex it'll be UTF8 decoded.\n *\n * @returns {*}\n *  The hashed message (using keccak256)\n */\nexport const hashMsgRaw = (data: string | number[]): string => {\n  const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data\n  const msgBuffer = Buffer.from(msg)\n  return Hash.keccak256s(msgBuffer)\n}\n\n/**\n * Sign a message such that it can be verified with `ecrecover`.\n * Similar to `web3.eth.accounts.sign` except that we sign the hash directly.\n *\n * @param {*} messageHash\n *  Hash of a message, as returned by `web3.utils.soliditySha3` or similar.\n * @param {*} privateKey\n *  Privkey to sign with.\n *\n * @returns {{messageHash: string, r: string, s: string, v: string}}\n */\nexport const ethSignHash = (messageHash: string, privateKey: string) => {\n  // near identical to web3-eth-accounts (web3 v1)\n  // the main difference is we don't envelop the data.\n  const signature = Account.sign(messageHash, privateKey)\n  const vrs = Account.decodeSignature(signature)\n  return {\n    messageHash,\n    v: vrs[0],\n    r: vrs[1],\n    s: vrs[2],\n    signature\n  }\n}\n\nexport /**\n *\n * Operates `ecrecover` over the provided signature\n *\n * @param {string} messageHash This should be an Ethereum HexString\n * @param {string[]} [v, r, s] Components for the secp256k1 signature\n * @returns {{verified: bool, address: EthAddress}}\n */\nconst ethVerifySig = (messageHash: string, [v, r, s]: string[]) => {\n  const address = Account.recover(\n    messageHash,\n    Account.encodeSignature([v, r, s])\n  )\n  return {\n    verified: true,\n    address\n  }\n}\n",
@@ -1076,7 +1184,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 64,
+    "__docId__": 67,
     "kind": "function",
     "name": "hashMsgRaw",
     "memberof": "src/crypto.ts",
@@ -1118,7 +1226,7 @@
     }
   },
   {
-    "__docId__": 65,
+    "__docId__": 68,
     "kind": "function",
     "name": "ethSignHash",
     "memberof": "src/crypto.ts",
@@ -1170,7 +1278,7 @@
     }
   },
   {
-    "__docId__": 66,
+    "__docId__": 69,
     "kind": "function",
     "name": "ethVerifySig",
     "memberof": "src/crypto.ts",
@@ -1222,7 +1330,7 @@
     }
   },
   {
-    "__docId__": 67,
+    "__docId__": 70,
     "kind": "file",
     "name": "src/index.ts",
     "content": "import * as ballotBox from './ballotBox'\nimport * as _const from './const'\nimport * as crypto from './crypto'\nimport * as light from './light'\nimport * as utils from './utils.js'\n\nexport default { ballotBox, crypto, light, utils, const: _const }\n",
@@ -1233,10 +1341,10 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 68,
+    "__docId__": 71,
     "kind": "file",
     "name": "src/light.ts",
-    "content": "const NH = require('eth-ens-namehash')\nimport axios from 'axios'\nconst bs58 = require('bs58')\nconst sha256 =require('sha256')\n\n// Lovely ABIs\nimport * as ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'\nimport * as IndexAbi from './smart_contracts/SVLightIndex.abi.json'\nimport * as BackendAbi from './smart_contracts/SVLightIndexBackend.abi.json'\nimport * as BBFarmAbi from './smart_contracts/BBFarm.abi.json'\nimport * as PaymentsAbi from './smart_contracts/SVPayments.abi.json'\nimport * as AuxAbi from './smart_contracts/AuxAbi.abi.json'\nimport * as AuctionAbi from './smart_contracts/CommAuctionIface.abi.json'\n// import * as ERC20Abi from './smart_contracts/ERC20.abi.json'\n\nexport const initializeSvLight = async svConfig => {\n  const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig\n\n  const Web3 = require('web3')\n  const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))\n\n  const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)\n\n  // const indexAddress =\n  // console.log('indexAddress :', indexAddress);\n  const index = new web3.eth.Contract(\n    IndexAbi,\n    await resolveEnsAddress({ resolver }, indexContractName)\n  )\n  const backendAddress = await getBackendAddress({ index })\n  const backend = new web3.eth.Contract(BackendAbi, backendAddress)\n  const aux = new web3.eth.Contract(AuxAbi, auxContract)\n  const payments = new web3.eth.Contract(\n    PaymentsAbi,\n    await index.methods.getPayments().call()\n  )\n\n  return {\n    svConfig,\n    web3,\n    resolver,\n    index,\n    backend,\n    aux,\n    payments\n  }\n}\n\nexport const resolveEnsAddress = async ({ resolver }, ensName) => {\n  return await resolver.methods.addr(NH.hash(ensName)).call()\n}\n\nexport const getBackendAddress = async ({ index }) => {\n  return await index.methods.getBackend().call()\n}\n\nexport const getDemocInfo = async ({ backend, democHash }) => {\n  return await backend.methods.getDInfo(democHash).call()\n}\n\nexport const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {\n  // Destructure and set the variables that are needed\n  const { index, backend, aux, svConfig } = svNetwork\n  const { democHash, nthBallot } = democBallotInfo\n  const indexAddress = index._address\n  const backendAddress = backend._address\n  const archiveUrl = { svConfig }\n\n  const bbFarmAndBallotId = await aux.methods\n    .getBBFarmAddressAndBallotId(\n      backendAddress,\n      indexAddress,\n      democHash,\n      nthBallot\n    )\n    .call()\n  // console.log('bbFarmAndBallotId :', bbFarmAndBallotId);\n\n  const { id, bbFarmAddress } = bbFarmAndBallotId\n  const userEthAddress = '0x0000000000000000000000000000000000000000'\n  const ethBallotDetails = await aux.methods\n    .getBallotDetails(id, bbFarmAddress, userEthAddress)\n    .call()\n\n  const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)\n  // console.log('ballotSpec :', ballotSpec);\n  // .then(x => console.log('Then called', x))\n  // .catch(x => console.log('Caught error', x));\n\n  const ballotObject = {\n    ...bbFarmAndBallotId,\n    ...ethBallotDetails,\n    data: { ...ballotSpec.data }\n  }\n\n  return ballotObject\n}\n\nexport const getBallotSpec = async (\n  archiveUrl,\n  ballotSpecHash\n): Promise<{ data: any }> => {\n  // TODO refactor to be a bit more elegant\n  return new Promise<{ data: any }>((res, rej) => {\n    let done = false\n    const doRes = obj => {\n      if (!done) {\n        done = true\n        res(obj)\n      }\n    }\n    getBallotObjectFromIpfs(ballotSpecHash).then(doRes)\n    setTimeout(() => {\n      if (!done) {\n        getBallotObjectFromS3(archiveUrl, ballotSpecHash)\n          .then(doRes)\n          .catch(rej)\n      }\n    }, 3500)\n  })\n}\n\nexport const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) => {\n  return axios.get(archiveUrl + ballotSpecHash + '.json')\n}\n\nexport const getBallotObjectFromIpfs = async ballotSpecHash => {\n  const ipfsUrl = 'https://ipfs.infura.io/api/v0/block/get?arg='\n  const cidHex = '1220' + ballotSpecHash.substr(2)\n  const bytes = Buffer.from(cidHex, 'hex')\n  const cid = bs58.encode(bytes)\n  return await axios.get(ipfsUrl + cid)\n}\n\n// Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array\nexport const getDemocBallots = async ({ svNetwork, democHash }) => {\n  const { backend } = svNetwork\n  const democInfo = await getDemocInfo({ backend, democHash })\n\n  // Throw an error if the democ info is not correct\n  const { erc20, owner } = democInfo\n  if (owner === '0x0000000000000000000000000000000000000000') {\n    throw new Error('Democracy Hash does not resolve to a democracy')\n  }\n\n  // TODO - Work out where / how to push an errored ballot\n  // Loop through and get all the ballots\n  const numBallots = democInfo.nBallots\n  const ballotsArray = []\n  for (let i = 0; i < numBallots; i++) {\n    ballotsArray[i] = await getDemocNthBallot(\n      { svNetwork },\n      { democHash: democHash, nthBallot: i }\n    )\n  }\n\n  return ballotsArray\n}\n\n/** Takes in the svNetwork object and returns all relevant addresses */\nexport const getContractAddresses = async ({ svNetwork }) => {\n  const { index, resolver, backend, aux, svConfig } = svNetwork\n  const { delegationContractName, lookupAddress } = svConfig\n\n  return {\n    indexAddress: index._address,\n    backendAddress: backend._address,\n    auxAddress: aux._address,\n    lookupAddress: lookupAddress,\n    resolverAddress: resolver._address,\n    communityAuctionAddress: await index.methods.getCommAuction().call(),\n    delegationAddress: await resolveEnsAddress(\n      { resolver },\n      delegationContractName\n    ),\n    paymentsAddress: await index.methods.getPayments().call()\n  }\n}\n\nexport const weiToCents = async ({ payments }, wei) => {\n  return await payments.methods.weiToCents(wei).call()\n}\n\nexport const getCommunityBallotPrice = async ({ payments }, democHash) => {\n  return await payments.methods.getNextPrice(democHash).call()\n}\n\nexport const checkIfAddressIsEditor = async (\n  { svNetwork },\n  { userAddress, democHash }\n) => {\n  const { backend } = svNetwork\n  return await backend.methods.isDEditor(democHash, userAddress).call()\n}\n\n// Checks the current ethereum gas price and returns a couple of values\nexport const getCurrentGasPrice = async () => {\n  const gasStationInfo = await axios.get(\n    'https://ethgasstation.info/json/ethgasAPI.json'\n  )\n  const { data } = gasStationInfo\n\n  return {\n    safeLow: data.safeLow / 10,\n    average: data.average / 10,\n    fast: data.fast / 10,\n    fastest: data.fastest / 10\n  }\n}\n\n/**\n * Verify a BallotSpec's hash\n *\n * @param {*} rawBallotSpecString The raw string/bytes before JSON.parse\n * @param {*} expectedSpecHash The expected hash as Eth Hex\n *\n * @returns {boolean} Whether the ballotSpec matched the expected hash\n */\nexport const checkBallotHashBSpec = (rawBallotSpecString, expectedSpecHash) => {\n  throw Error('Unimplemented (check code for details)')\n\n  // NOTE: This function is unsafe - JSON does not have deterministic key order\n  // a ballotSpec object is not suitable to verify the hash; you need the _raw_\n  // string before it is parsed to JSON\n\n  // Original function\n  // let contentHash = '0x' + sha256(JSON.stringify(ballotSpec, null, 2))\n  // if (assertSpecHash === contentHash) {\n  //   return true\n  // } else {\n  //   return false\n  // }\n}\n\n// Checks the ballot hash against a ballot global ballot object\n// Does this by destructuring the specHash and data out of it\nexport const checkBallotHashGBallot = ballotObject => {\n  const { data, specHash } = ballotObject\n  return checkBallotHashBSpec(data, specHash)\n}\n",
+    "content": "const NH = require('eth-ens-namehash')\nimport axios from 'axios'\nconst bs58 = require('bs58')\nconst sha256 = require('sha256')\n\nimport * as SvConsts from './const'\nimport * as SvUtils from './utils'\nimport * as StellarBase from 'stellar-base'\nimport * as assert from 'assert'\nimport * as web3Utils from 'web3-utils'\n\n// Lovely ABIs\nimport ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'\nimport IndexAbi from './smart_contracts/SVLightIndex.abi.json'\nimport BackendAbi from './smart_contracts/SVLightIndexBackend.abi.json'\nimport BBFarmAbi from './smart_contracts/BBFarm.abi.json'\nimport PaymentsAbi from './smart_contracts/SVPayments.abi.json'\nimport AuxAbi from './smart_contracts/AuxAbi.abi.json'\nimport AuctionAbi from './smart_contracts/CommAuctionIface.abi.json'\nimport ERC20Abi from './smart_contracts/ERC20.abi.json'\nimport UnsafeEd25519DelegationAbi from './smart_contracts/UnsafeEd25519Delegation.abi.json'\n\nexport const initializeSvLight = async svConfig => {\n    const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig\n\n    const Web3 = require('web3')\n    const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))\n    const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)\n\n    // const indexAddress =\n    // console.log('indexAddress :', indexAddress);\n    const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexContractName))\n    const backendAddress = await getBackendAddress({ index })\n    const backend = new web3.eth.Contract(BackendAbi, backendAddress)\n    const aux = new web3.eth.Contract(AuxAbi, auxContract)\n    const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())\n\n    return {\n        svConfig,\n        web3,\n        resolver,\n        index,\n        backend,\n        aux,\n        payments\n    }\n}\n\nexport const resolveEnsAddress = async ({ resolver }, ensName) => {\n    return await resolver.methods.addr(NH.hash(ensName)).call()\n}\n\nexport const getBackendAddress = async ({ index }) => {\n    return await index.methods.getBackend().call()\n}\n\nexport const getDemocInfo = async ({ backend, democHash }) => {\n    return await backend.methods.getDInfo(democHash).call()\n}\n\nexport const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {\n    // Destructure and set the variables that are needed\n    const { index, backend, aux, svConfig } = svNetwork\n    const { democHash, nthBallot } = democBallotInfo\n    const indexAddress = index._address\n    const backendAddress = backend._address\n    const archiveUrl = { svConfig }\n\n    const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(backendAddress, indexAddress, democHash, nthBallot).call()\n    // console.log('bbFarmAndBallotId :', bbFarmAndBallotId);\n\n    const { id, bbFarmAddress } = bbFarmAndBallotId\n    const userEthAddress = '0x0000000000000000000000000000000000000000'\n    const ethBallotDetails = await aux.methods.getBallotDetails(id, bbFarmAddress, userEthAddress).call()\n\n    const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)\n    // console.log('ballotSpec :', ballotSpec);\n    // .then(x => console.log('Then called', x))\n    // .catch(x => console.log('Caught error', x));\n\n    const ballotObject = {\n        ...bbFarmAndBallotId,\n        ...ethBallotDetails,\n        data: { ...ballotSpec.data }\n    }\n\n    return ballotObject\n}\n\nexport const getBallotSpec = async (archiveUrl, ballotSpecHash): Promise<{ data: any }> => {\n    // TODO refactor to be a bit more elegant\n    return new Promise<{ data: any }>((res, rej) => {\n        let done = false\n        const doRes = obj => {\n            if (!done) {\n                done = true\n                res(obj)\n            }\n        }\n        getBallotObjectFromIpfs(ballotSpecHash).then(doRes)\n        setTimeout(() => {\n            if (!done) {\n                getBallotObjectFromS3(archiveUrl, ballotSpecHash)\n                    .then(doRes)\n                    .catch(rej)\n            }\n        }, 3500)\n    })\n}\n\nexport const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) => {\n    return axios.get(archiveUrl + ballotSpecHash + '.json')\n}\n\nexport const getBallotObjectFromIpfs = async ballotSpecHash => {\n    const ipfsUrl = 'https://ipfs.infura.io/api/v0/block/get?arg='\n    const cidHex = '1220' + ballotSpecHash.substr(2)\n    const bytes = Buffer.from(cidHex, 'hex')\n    const cid = bs58.encode(bytes)\n    return await axios.get(ipfsUrl + cid)\n}\n\n// Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array\nexport const getDemocBallots = async ({ svNetwork, democHash }) => {\n    const { backend } = svNetwork\n    const democInfo = await getDemocInfo({ backend, democHash })\n\n    // Throw an error if the democ info is not correct\n    const { erc20, owner } = democInfo\n    if (owner === '0x0000000000000000000000000000000000000000') {\n        throw new Error('Democracy Hash does not resolve to a democracy')\n    }\n\n    // TODO - Work out where / how to push an errored ballot\n    // Loop through and get all the ballots\n    const numBallots = democInfo.nBallots\n    const ballotsArray = []\n    for (let i = 0; i < numBallots; i++) {\n        ballotsArray[i] = await getDemocNthBallot({ svNetwork }, { democHash: democHash, nthBallot: i })\n    }\n\n    return ballotsArray\n}\n\n/** Takes in the svNetwork object and returns all relevant addresses */\nexport const getContractAddresses = async ({ svNetwork }) => {\n    const { index, resolver, backend, aux, svConfig } = svNetwork\n    const { delegationContractName, lookupAddress } = svConfig\n\n    return {\n        indexAddress: index._address,\n        backendAddress: backend._address,\n        auxAddress: aux._address,\n        lookupAddress: lookupAddress,\n        resolverAddress: resolver._address,\n        communityAuctionAddress: await index.methods.getCommAuction().call(),\n        delegationAddress: await resolveEnsAddress({ resolver }, delegationContractName),\n        paymentsAddress: await index.methods.getPayments().call()\n    }\n}\n\nexport const weiToCents = async ({ payments }, wei) => {\n    return await payments.methods.weiToCents(wei).call()\n}\n\nexport const getCommunityBallotPrice = async ({ payments }, democHash) => {\n    return await payments.methods.getNextPrice(democHash).call()\n}\n\nexport const checkIfAddressIsEditor = async ({ svNetwork }, { userAddress, democHash }) => {\n    const { backend } = svNetwork\n    return await backend.methods.isDEditor(democHash, userAddress).call()\n}\n\n// Checks the current ethereum gas price and returns a couple of values\nexport const getCurrentGasPrice = async () => {\n    const gasStationInfo = await axios.get('https://ethgasstation.info/json/ethgasAPI.json')\n    const { data } = gasStationInfo\n\n    return {\n        safeLow: data.safeLow / 10,\n        average: data.average / 10,\n        fast: data.fast / 10,\n        fastest: data.fastest / 10\n    }\n}\n\n/**\n * Verify a BallotSpec's hash\n *\n * @param {*} rawBallotSpecString The raw string/bytes before JSON.parse\n * @param {*} expectedSpecHash The expected hash as Eth Hex\n *\n * @returns {boolean} Whether the ballotSpec matched the expected hash\n */\nexport const checkBallotHashBSpec = (rawBallotSpecString, expectedSpecHash) => {\n    throw Error('Unimplemented (check code for details)')\n\n    // NOTE: This function is unsafe - JSON does not have deterministic key order\n    // a ballotSpec object is not suitable to verify the hash; you need the _raw_\n    // string before it is parsed to JSON\n\n    // Original function\n    // let contentHash = '0x' + sha256(JSON.stringify(ballotSpec, null, 2))\n    // if (assertSpecHash === contentHash) {\n    //   return true\n    // } else {\n    //   return false\n    // }\n}\n\n// Checks the ballot hash against a ballot global ballot object\n// Does this by destructuring the specHash and data out of it\nexport const checkBallotHashGBallot = ballotObject => {\n    const { data, specHash } = ballotObject\n    return checkBallotHashBSpec(data, specHash)\n}\n\n// Takes the name of an abi and a method name\n// Returns a new ABI array with only the requested method\nexport const getSingularCleanAbi = (requestedAbiName, methodName) => {\n    const abiList = {\n        ResolverAbi: ResolverAbi,\n        IndexAbi: IndexAbi,\n        BackendAbi: BackendAbi,\n        BBFarmAbi: BBFarmAbi,\n        PaymentsAbi: PaymentsAbi,\n        AuxAbi: AuxAbi,\n        AuctionAbi: AuctionAbi,\n        ERC20Abi: ERC20Abi\n    }\n\n    const selectedAbi = abiList[requestedAbiName]\n    const methodObject = selectedAbi.filter(abi => abi.name == methodName)\n    return methodObject\n}\n\nexport const stellarPkToHex = (pubKey: string): string => {\n    // Get the hex pub key\n    let rawPubKey, hexPubKey\n    if (web3Utils.isHex(pubKey)) {\n        hexPubKey = web3Utils.isHexStrict(pubKey) ? pubKey : '0x' + pubKey\n    } else {\n        const kp = StellarBase.Keypair.fromPublicKey(pubKey)\n        const rawPubKey = kp.rawPublicKey()\n        const hexPubKey = '0x' + rawPubKey.toString('hex')\n    }\n\n    return hexPubKey\n}\n\n/**\n *\n * @param pubKey\n * @param svNetwork\n */\nexport const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => {\n    // TODO - Some assertions and stuff..\n\n    const { web3, svConfig } = svNetwork\n    const { unsafeEd25519DelegationAddr } = svConfig\n\n    const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)\n    const delegations = await Ed25519Del.methods\n        .getAllForPubKey(stellarPkToHex(pubKey))\n        .call()\n        .catch(error => {\n            throw error\n        })\n\n    console.log('Fresh:', delegations)\n\n    return delegations\n}\n\n/**\n * Generate a packed Ed25519Delegation instruction for use with the smart contract or API\n * @param address An ethereum address to delegate to\n * @param nonce A nonce in hex that is 3 bytes (6 characters as hex)\n * @returns {Bytes32} The hex string (with 0x prefix) of the delegation instruction\n */\nexport const prepareEd25519Delegation = (address: string, nonce?: string) => {\n    // Delegate prefix (SV-ED-ETH)\n    const prefix = SvUtils.cleanEthHex(web3Utils.toHex(SvConsts.Ed25519DelegatePrefix))\n    const _nonce = nonce && web3Utils.isHex(nonce) ? nonce : web3Utils.randomHex(3).slice(2)\n\n    const trimmedAddress = SvUtils.cleanEthHex(address)\n\n    const dlgtPacked = `0x${prefix}${_nonce}${trimmedAddress}`.toLowerCase()\n    assert.equal(dlgtPacked.length, 2 + 64, 'dlgtPacked was not 32 bytes / 64 chars long. This should never happen.')\n    return dlgtPacked\n}\n\n/**\n * Create a tx object for an ed25519 delegation\n * @param svNetwork\n * @param dlgtRequest\n * @param pubKey\n * @param signature\n * @param privKey\n * @returns {to: string, value: number, gas: number, data: string}\n */\nexport const createEd25519DelegationTransaction = (\n    svNetwork: any,\n    dlgtRequest: string,\n    pubKey: string,\n    signature: string,\n    privKey: string\n) => {\n    const { web3, svConfig } = svNetwork\n    const { unsafeEd25519DelegationAddr } = svConfig\n\n    // Initialise the contract\n    const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)\n\n    // Split the 64 bytes of the signature into an array containging 2x bytes32\n    const sig1 = `0x${signature.slice(0, 64)}`\n    const sig2 = `0x${signature.slice(64)}`\n\n    const addDelegation = Ed25519Del.methods.addUntrustedSelfDelegation(dlgtRequest, stellarPkToHex(pubKey), [sig1, sig2])\n    const txData = addDelegation.encodeABI()\n\n    return {\n        to: unsafeEd25519DelegationAddr,\n        value: 0,\n        gas: 500000,\n        data: txData\n    }\n\n    // .then(x => {\n    //     const { rawTransaction } = x\n    //     web3.eth\n    //         .sendSignedTransaction(rawTransaction)\n    //         .on('receipt', receipt => {\n    //             const { transactionHash } = receipt\n    //             resolve(transactionHash)\n    //         })\n    //         .catch(error => reject(error))\n    // })\n    // .catch(error => reject(error))\n}\n\n/**\n * Verify an ed25519 self-delegation\n * @param dlgtRequest eth hex string of the dlgt request\n * @param pubKey stellar pubkey\n * @param signature 64 byte signature as eth hex\n * @returns {boolean}\n */\nexport const ed25519DelegationIsValid = (dlgtRequest: string, pubKey: string, signature: string) => {\n    const _sig = SvUtils.cleanEthHex(signature)\n    assert.equal(_sig.length, 128, 'Invalid signature, should be a 64 byte hex string')\n\n    // Create the keypair from the public key\n    const kp = StellarBase.Keypair.fromPublicKey(pubKey)\n\n    // Create a buffer from the signature\n    const sigBuffer = Buffer.from(SvUtils.hexToUint8Array(_sig))\n\n    // Verify the request against the signature\n    return kp.verify(dlgtRequest, sigBuffer)\n}\n",
     "static": true,
     "longname": "/Users/maxkaye/src/sv/lib/src/light.ts",
     "access": "public",
@@ -1244,7 +1352,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 69,
+    "__docId__": 72,
     "kind": "variable",
     "name": "NH",
     "memberof": "src/light.ts",
@@ -1265,7 +1373,7 @@
     "ignore": true
   },
   {
-    "__docId__": 70,
+    "__docId__": 73,
     "kind": "variable",
     "name": "bs58",
     "memberof": "src/light.ts",
@@ -1286,7 +1394,7 @@
     "ignore": true
   },
   {
-    "__docId__": 71,
+    "__docId__": 74,
     "kind": "variable",
     "name": "sha256",
     "memberof": "src/light.ts",
@@ -1307,7 +1415,7 @@
     "ignore": true
   },
   {
-    "__docId__": 72,
+    "__docId__": 75,
     "kind": "function",
     "name": "initializeSvLight",
     "memberof": "src/light.ts",
@@ -1320,7 +1428,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{initializeSvLight}",
     "description": null,
-    "lineNumber": 12,
+    "lineNumber": 20,
     "undocument": true,
     "params": [
       {
@@ -1337,7 +1445,7 @@
     }
   },
   {
-    "__docId__": 73,
+    "__docId__": 76,
     "kind": "function",
     "name": "resolveEnsAddress",
     "memberof": "src/light.ts",
@@ -1350,7 +1458,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{resolveEnsAddress}",
     "description": null,
-    "lineNumber": 34,
+    "lineNumber": 42,
     "undocument": true,
     "params": [
       {
@@ -1377,7 +1485,7 @@
     }
   },
   {
-    "__docId__": 74,
+    "__docId__": 77,
     "kind": "function",
     "name": "getBackendAddress",
     "memberof": "src/light.ts",
@@ -1390,7 +1498,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getBackendAddress}",
     "description": null,
-    "lineNumber": 37,
+    "lineNumber": 45,
     "undocument": true,
     "params": [
       {
@@ -1411,7 +1519,7 @@
     }
   },
   {
-    "__docId__": 75,
+    "__docId__": 78,
     "kind": "function",
     "name": "getDemocInfo",
     "memberof": "src/light.ts",
@@ -1424,7 +1532,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getDemocInfo}",
     "description": null,
-    "lineNumber": 40,
+    "lineNumber": 48,
     "undocument": true,
     "params": [
       {
@@ -1446,7 +1554,7 @@
     }
   },
   {
-    "__docId__": 76,
+    "__docId__": 79,
     "kind": "function",
     "name": "getDemocNthBallot",
     "memberof": "src/light.ts",
@@ -1459,7 +1567,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getDemocNthBallot}",
     "description": null,
-    "lineNumber": 43,
+    "lineNumber": 51,
     "undocument": true,
     "params": [
       {
@@ -1486,7 +1594,7 @@
     }
   },
   {
-    "__docId__": 77,
+    "__docId__": 80,
     "kind": "function",
     "name": "getBallotSpec",
     "memberof": "src/light.ts",
@@ -1499,7 +1607,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getBallotSpec}",
     "description": null,
-    "lineNumber": 70,
+    "lineNumber": 74,
     "undocument": true,
     "params": [
       {
@@ -1522,7 +1630,7 @@
     }
   },
   {
-    "__docId__": 78,
+    "__docId__": 81,
     "kind": "function",
     "name": "getBallotObjectFromS3",
     "memberof": "src/light.ts",
@@ -1535,7 +1643,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getBallotObjectFromS3}",
     "description": null,
-    "lineNumber": 90,
+    "lineNumber": 94,
     "undocument": true,
     "params": [
       {
@@ -1558,7 +1666,7 @@
     }
   },
   {
-    "__docId__": 79,
+    "__docId__": 82,
     "kind": "function",
     "name": "getBallotObjectFromIpfs",
     "memberof": "src/light.ts",
@@ -1571,7 +1679,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getBallotObjectFromIpfs}",
     "description": null,
-    "lineNumber": 93,
+    "lineNumber": 97,
     "undocument": true,
     "params": [
       {
@@ -1588,7 +1696,7 @@
     }
   },
   {
-    "__docId__": 80,
+    "__docId__": 83,
     "kind": "function",
     "name": "getDemocBallots",
     "memberof": "src/light.ts",
@@ -1601,7 +1709,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getDemocBallots}",
     "description": null,
-    "lineNumber": 101,
+    "lineNumber": 105,
     "undocument": true,
     "params": [
       {
@@ -1623,7 +1731,7 @@
     }
   },
   {
-    "__docId__": 81,
+    "__docId__": 84,
     "kind": "function",
     "name": "getContractAddresses",
     "memberof": "src/light.ts",
@@ -1636,7 +1744,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getContractAddresses}",
     "description": "Takes in the svNetwork object and returns all relevant addresses",
-    "lineNumber": 119,
+    "lineNumber": 123,
     "params": [
       {
         "name": "objectPattern",
@@ -1656,7 +1764,7 @@
     }
   },
   {
-    "__docId__": 82,
+    "__docId__": 85,
     "kind": "function",
     "name": "weiToCents",
     "memberof": "src/light.ts",
@@ -1669,7 +1777,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{weiToCents}",
     "description": null,
-    "lineNumber": 133,
+    "lineNumber": 137,
     "undocument": true,
     "params": [
       {
@@ -1696,7 +1804,7 @@
     }
   },
   {
-    "__docId__": 83,
+    "__docId__": 86,
     "kind": "function",
     "name": "getCommunityBallotPrice",
     "memberof": "src/light.ts",
@@ -1709,7 +1817,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getCommunityBallotPrice}",
     "description": null,
-    "lineNumber": 136,
+    "lineNumber": 140,
     "undocument": true,
     "params": [
       {
@@ -1736,7 +1844,7 @@
     }
   },
   {
-    "__docId__": 84,
+    "__docId__": 87,
     "kind": "function",
     "name": "checkIfAddressIsEditor",
     "memberof": "src/light.ts",
@@ -1749,7 +1857,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{checkIfAddressIsEditor}",
     "description": null,
-    "lineNumber": 139,
+    "lineNumber": 143,
     "undocument": true,
     "params": [
       {
@@ -1781,7 +1889,7 @@
     }
   },
   {
-    "__docId__": 85,
+    "__docId__": 88,
     "kind": "function",
     "name": "getCurrentGasPrice",
     "memberof": "src/light.ts",
@@ -1794,7 +1902,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{getCurrentGasPrice}",
     "description": null,
-    "lineNumber": 144,
+    "lineNumber": 148,
     "undocument": true,
     "params": [],
     "return": {
@@ -1804,7 +1912,7 @@
     }
   },
   {
-    "__docId__": 86,
+    "__docId__": 89,
     "kind": "function",
     "name": "checkBallotHashBSpec",
     "memberof": "src/light.ts",
@@ -1817,7 +1925,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{checkBallotHashBSpec}",
     "description": "Verify a BallotSpec's hash",
-    "lineNumber": 162,
+    "lineNumber": 166,
     "unknown": [
       {
         "tagName": "@returns",
@@ -1856,7 +1964,7 @@
     }
   },
   {
-    "__docId__": 87,
+    "__docId__": 90,
     "kind": "function",
     "name": "checkBallotHashGBallot",
     "memberof": "src/light.ts",
@@ -1869,7 +1977,7 @@
     "importPath": "sv-lib/src/light.ts",
     "importStyle": "{checkBallotHashGBallot}",
     "description": null,
-    "lineNumber": 177,
+    "lineNumber": 181,
     "undocument": true,
     "params": [
       {
@@ -1886,7 +1994,383 @@
     }
   },
   {
-    "__docId__": 88,
+    "__docId__": 91,
+    "kind": "function",
+    "name": "getSingularCleanAbi",
+    "memberof": "src/light.ts",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/light.ts~getSingularCleanAbi",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.ts",
+    "importStyle": "{getSingularCleanAbi}",
+    "description": null,
+    "lineNumber": 187,
+    "undocument": true,
+    "params": [
+      {
+        "name": "requestedAbiName",
+        "types": [
+          "*"
+        ]
+      },
+      {
+        "name": "methodName",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 92,
+    "kind": "function",
+    "name": "stellarPkToHex",
+    "memberof": "src/light.ts",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/light.ts~stellarPkToHex",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.ts",
+    "importStyle": "{stellarPkToHex}",
+    "description": null,
+    "lineNumber": 202,
+    "undocument": true,
+    "params": [
+      {
+        "name": "pubKey",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 93,
+    "kind": "function",
+    "name": "getUnsafeEd25519Delegations",
+    "memberof": "src/light.ts",
+    "generator": false,
+    "async": true,
+    "static": true,
+    "longname": "src/light.ts~getUnsafeEd25519Delegations",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.ts",
+    "importStyle": "{getUnsafeEd25519Delegations}",
+    "description": "",
+    "lineNumber": 220,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "pubKey",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "svNetwork",
+        "description": ""
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 94,
+    "kind": "function",
+    "name": "prepareEd25519Delegation",
+    "memberof": "src/light.ts",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/light.ts~prepareEd25519Delegation",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.ts",
+    "importStyle": "{prepareEd25519Delegation}",
+    "description": "Generate a packed Ed25519Delegation instruction for use with the smart contract or API",
+    "lineNumber": 240,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Bytes32} The hex string (with 0x prefix) of the delegation instruction"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "address",
+        "description": "An ethereum address to delegate to"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "nonce",
+        "description": "A nonce in hex that is 3 bytes (6 characters as hex)"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Bytes32"
+      ],
+      "spread": false,
+      "description": "The hex string (with 0x prefix) of the delegation instruction"
+    }
+  },
+  {
+    "__docId__": 95,
+    "kind": "function",
+    "name": "createEd25519DelegationTransaction",
+    "memberof": "src/light.ts",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/light.ts~createEd25519DelegationTransaction",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.ts",
+    "importStyle": "{createEd25519DelegationTransaction}",
+    "description": "Create a tx object for an ed25519 delegation",
+    "lineNumber": 258,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{to: string, value: number, gas: number, data: string}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "svNetwork",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "dlgtRequest",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "pubKey",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "signature",
+        "description": ""
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "privKey",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "to: string, value: number, gas: number, data: string"
+      ],
+      "spread": false,
+      "description": ""
+    }
+  },
+  {
+    "__docId__": 96,
+    "kind": "function",
+    "name": "ed25519DelegationIsValid",
+    "memberof": "src/light.ts",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/light.ts~ed25519DelegationIsValid",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/light.ts",
+    "importStyle": "{ed25519DelegationIsValid}",
+    "description": "Verify an ed25519 self-delegation",
+    "lineNumber": 293,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{boolean}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "dlgtRequest",
+        "description": "eth hex string of the dlgt request"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "pubKey",
+        "description": "stellar pubkey"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "*"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "signature",
+        "description": "64 byte signature as eth hex"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "boolean"
+      ],
+      "spread": false,
+      "description": ""
+    }
+  },
+  {
+    "__docId__": 97,
+    "kind": "file",
+    "name": "src/runtimeTypes.ts",
+    "content": "import * as t from 'io-ts'\n\nexport const HexString = t.refinement(\n    t.string,\n    v =>\n        v.slice(0, 2) === '0x' &&\n        v.slice(2).replace(/[0-9a-fA-F]*/, '').length === 0 &&\n        v.length % 2 === 0,\n    'HexString'\n)\n\nexport const Bytes32 = t.refinement(\n    HexString,\n    v => v.length === 32 * 2 + 2,\n    'Bytes32'\n)\nexport const Bytes64 = t.refinement(\n    HexString,\n    v => v.length === 64 * 2 + 2,\n    'Bytes64'\n)\n",
+    "static": true,
+    "longname": "/Users/maxkaye/src/sv/lib/src/runtimeTypes.ts",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 98,
+    "kind": "variable",
+    "name": "HexString",
+    "memberof": "src/runtimeTypes.ts",
+    "static": true,
+    "longname": "src/runtimeTypes.ts~HexString",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/runtimeTypes.ts",
+    "importStyle": "{HexString}",
+    "description": null,
+    "lineNumber": 2,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 99,
+    "kind": "variable",
+    "name": "Bytes32",
+    "memberof": "src/runtimeTypes.ts",
+    "static": true,
+    "longname": "src/runtimeTypes.ts~Bytes32",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/runtimeTypes.ts",
+    "importStyle": "{Bytes32}",
+    "description": null,
+    "lineNumber": 5,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 100,
+    "kind": "variable",
+    "name": "Bytes64",
+    "memberof": "src/runtimeTypes.ts",
+    "static": true,
+    "longname": "src/runtimeTypes.ts~Bytes64",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/runtimeTypes.ts",
+    "importStyle": "{Bytes64}",
+    "description": null,
+    "lineNumber": 6,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 101,
     "kind": "file",
     "name": "src/types.ts",
     "content": "\n\n\nexport type ProxyVote = {\n    // these should be `bytes32` hexstrings\n    proxyReq: [string, string, string, string, string]\n    // this is a `bytes` hexstring\n    extra: string\n}\n",
@@ -1897,7 +2381,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 89,
+    "__docId__": 102,
     "kind": "file",
     "name": "src/typings.d.ts",
     "content": "declare module '*.json' {\n  const value: any\n  export default value\n}\n",
@@ -1908,10 +2392,10 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 90,
+    "__docId__": 103,
     "kind": "file",
     "name": "src/utils.ts",
-    "content": "import * as R from 'ramda'\n\n/**\n * This will take an Ethereum hex string (or a normal hex string) and\n * output a normal hex string (no '0x' header) or throw an error on a\n * bad hex string.\n *\n * @param {string} hex\n *\n * @returns {string}\n *  the hex string.\n */\nexport const cleanEthHex = (hex: string) => {\n  if (hex === '0x0') {\n    return '00'\n  }\n\n  // hex must be even - only exception above\n  if (hex.length % 2 !== 0) {\n    throw Error(`Bad hex string: ${hex}`)\n  }\n\n  // this covers the case hex==\"0x\" => \"\"\n  if (hex.slice(0, 2) === '0x') {\n    return hex.slice(2)\n  }\n\n  return hex\n}\n\n/**\n * This compares ethereum addresses (taking into account case, etc)\n *\n * @param {string} addr1\n * @param {string} addr2\n *\n * @returns {bool}\n */\nexport const ethAddrEq = (addr1: string, addr2: string) => {\n  const _clean = a => module.exports.cleanEthHex(a).toLowerCase()\n  // throw a length check in there to ensure we have valid addresses\n  return _clean(addr1) === _clean(addr2) && addr1.length === 42\n}\n\n// this is from the bech32 spec (Bitcoin)\nconst B32_ALPHA = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l'\nconst toAlphabet = (arr: number[]) => {\n  var ret = ''\n  for (let i = 0; i < arr.length; i++) {\n    ret += B32_ALPHA.charAt(arr[i])\n  }\n  return ret\n}\n\n/**\n * This will convert a hex string to Base32 in the bech32 format WITHOUT a checksum.\n *\n * @param {string} hex\n *  The hex string to convert to Base32 - can be an EthHex or plain hex string.\n *\n * @returns {string}\n *  The Base32 version of the hex string.\n */\nexport const hexToBase32 = (hex: string) => {\n  const _hex = cleanEthHex(hex)\n\n  const buf = Buffer.from(_hex, 'hex')\n  const digits = [0]\n  let digitlength = 1\n\n  let carry\n  for (let i = 0; i < buf.length; ++i) {\n    carry = buf[i]\n    for (let j = 0; j < digitlength; ++j) {\n      carry += digits[j] * 256\n      digits[j] = carry % 32\n      carry = (carry / 32) | 0\n    }\n\n    while (carry > 0) {\n      digits[digitlength] = carry % 32\n      digitlength++\n      carry = (carry / 32) | 0\n    }\n  }\n\n  return toAlphabet(R.reverse(digits.slice(0, digitlength)))\n}\n",
+    "content": "import * as R from 'ramda'\nimport { ThrowReporter } from 'io-ts/lib/ThrowReporter'\n\nimport { HexString } from './runtimeTypes'\n\n/**\n * This will take an Ethereum hex string (or a normal hex string) and\n * output a normal hex string (no '0x' header) or throw an error on a\n * bad hex string.\n *\n * @param {string} hex\n *\n * @returns {string}\n *  the hex string.\n */\nexport const cleanEthHex = (hex: string) => {\n    if (hex === '0x0') {\n        return '00'\n    }\n\n    // hex must be even - only exception above\n    if (hex.length % 2 !== 0) {\n        throw Error(`Bad hex string: ${hex}`)\n    }\n\n    // this covers the case hex==\"0x\" => \"\"\n    if (hex.slice(0, 2) === '0x') {\n        return hex.slice(2)\n    }\n\n    return hex\n}\n\n/**\n * This compares ethereum addresses (taking into account case, etc)\n *\n * @param {string} addr1\n * @param {string} addr2\n *\n * @returns {bool}\n */\nexport const ethAddrEq = (addr1: string, addr2: string) => {\n    const _clean = a => module.exports.cleanEthHex(a).toLowerCase()\n    // throw a length check in there to ensure we have valid addresses\n    return _clean(addr1) === _clean(addr2) && addr1.length === 42\n}\n\n// this is from the bech32 spec (Bitcoin)\nconst B32_ALPHA = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l'\nconst toAlphabet = (arr: number[]) => {\n    var ret = ''\n    for (let i = 0; i < arr.length; i++) {\n        ret += B32_ALPHA.charAt(arr[i])\n    }\n    return ret\n}\n\n/**\n * This will convert a hex string to Base32 in the bech32 format WITHOUT a checksum.\n *\n * @param {string} hex\n *  The hex string to convert to Base32 - can be an EthHex or plain hex string.\n *\n * @returns {string}\n *  The Base32 version of the hex string.\n */\nexport const hexToBase32 = (hex: string) => {\n    const _hex = cleanEthHex(hex)\n\n    const buf = Buffer.from(_hex, 'hex')\n    const digits = [0]\n    let digitlength = 1\n\n    let carry\n    for (let i = 0; i < buf.length; ++i) {\n        carry = buf[i]\n        for (let j = 0; j < digitlength; ++j) {\n            carry += digits[j] * 256\n            digits[j] = carry % 32\n            carry = (carry / 32) | 0\n        }\n\n        while (carry > 0) {\n            digits[digitlength] = carry % 32\n            digitlength++\n            carry = (carry / 32) | 0\n        }\n    }\n\n    return toAlphabet(R.reverse(digits.slice(0, digitlength)))\n}\n\n/**\n * Turn a hexstring (with or without prefix) to a Uint8Array\n *\n * @param {string} hex\n * @returns {Uint8Array}\n */\nexport const hexToUint8Array = (hex: string) => {\n    const _hex = hex.slice(0, 2) === '0x' ? hex.slice(2) : hex\n    ThrowReporter.report(HexString.decode('0x' + _hex))\n\n    var view = new Uint8Array(_hex.length / 2)\n\n    for (var i = 0; i < _hex.length / 2; i++) {\n        view[i] = parseInt(_hex.substring(2 * i, 2 * i + 2), 16)\n    }\n\n    return view\n}\n",
     "static": true,
     "longname": "/Users/maxkaye/src/sv/lib/src/utils.ts",
     "access": "public",
@@ -1919,7 +2403,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 91,
+    "__docId__": 104,
     "kind": "function",
     "name": "cleanEthHex",
     "memberof": "src/utils.ts",
@@ -1932,7 +2416,7 @@
     "importPath": "sv-lib/src/utils.ts",
     "importStyle": "{cleanEthHex}",
     "description": "This will take an Ethereum hex string (or a normal hex string) and\noutput a normal hex string (no '0x' header) or throw an error on a\nbad hex string.",
-    "lineNumber": 12,
+    "lineNumber": 14,
     "unknown": [
       {
         "tagName": "@returns",
@@ -1961,7 +2445,7 @@
     }
   },
   {
-    "__docId__": 92,
+    "__docId__": 105,
     "kind": "function",
     "name": "ethAddrEq",
     "memberof": "src/utils.ts",
@@ -1974,7 +2458,7 @@
     "importPath": "sv-lib/src/utils.ts",
     "importStyle": "{ethAddrEq}",
     "description": "This compares ethereum addresses (taking into account case, etc)",
-    "lineNumber": 34,
+    "lineNumber": 36,
     "unknown": [
       {
         "tagName": "@returns",
@@ -2013,7 +2497,7 @@
     }
   },
   {
-    "__docId__": 93,
+    "__docId__": 106,
     "kind": "variable",
     "name": "B32_ALPHA",
     "memberof": "src/utils.ts",
@@ -2024,7 +2508,7 @@
     "importPath": "sv-lib/src/utils.ts",
     "importStyle": null,
     "description": null,
-    "lineNumber": 40,
+    "lineNumber": 42,
     "undocument": true,
     "type": {
       "types": [
@@ -2034,7 +2518,7 @@
     "ignore": true
   },
   {
-    "__docId__": 94,
+    "__docId__": 107,
     "kind": "function",
     "name": "toAlphabet",
     "memberof": "src/utils.ts",
@@ -2047,7 +2531,7 @@
     "importPath": "sv-lib/src/utils.ts",
     "importStyle": null,
     "description": null,
-    "lineNumber": 41,
+    "lineNumber": 43,
     "undocument": true,
     "params": [
       {
@@ -2065,7 +2549,7 @@
     "ignore": true
   },
   {
-    "__docId__": 95,
+    "__docId__": 108,
     "kind": "function",
     "name": "hexToBase32",
     "memberof": "src/utils.ts",
@@ -2078,7 +2562,7 @@
     "importPath": "sv-lib/src/utils.ts",
     "importStyle": "{hexToBase32}",
     "description": "This will convert a hex string to Base32 in the bech32 format WITHOUT a checksum.",
-    "lineNumber": 57,
+    "lineNumber": 59,
     "unknown": [
       {
         "tagName": "@returns",
@@ -2107,6 +2591,48 @@
     }
   },
   {
+    "__docId__": 109,
+    "kind": "function",
+    "name": "hexToUint8Array",
+    "memberof": "src/utils.ts",
+    "generator": false,
+    "async": false,
+    "static": true,
+    "longname": "src/utils.ts~hexToUint8Array",
+    "access": "public",
+    "export": true,
+    "importPath": "sv-lib/src/utils.ts",
+    "importStyle": "{hexToUint8Array}",
+    "description": "Turn a hexstring (with or without prefix) to a Uint8Array",
+    "lineNumber": 86,
+    "unknown": [
+      {
+        "tagName": "@returns",
+        "tagValue": "{Uint8Array}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "string"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "hex",
+        "description": ""
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Uint8Array"
+      ],
+      "spread": false,
+      "description": ""
+    }
+  },
+  {
     "kind": "index",
     "content": "# sv-lib\n\nLibrary for supporting SecureVote Light apps\n\n## Usage\n\n`const SV = require('sv-lib');`\n\n### `SV.utils`\n\n`cleanEthHex`\n\nTakes a string that should be hex, and removes the `0x` header if present.\n\n`hexToBase32`\n\nTakes a hex string and returns the base32 conversion using the alphabet from the `bech32` standard; though doesn't include a checksum.\nThis is used in serializing democracy hash prefixes.\n\n**Note: does not conform to bech32 standard**\n\n### `SV.ballotBox`\n\n`flags`\n\nAn object with keys corresponding to the names for various flags. All flags are a power of 2 (so can be combined via bitwise OR).\n\n`mkPacked`\n\nTakes startTime, endTime, and submissionBits (should all be JS ints) and packs them for the SV Light Ballot Box.\n\n`mkSubmissionBits`\n\nTakes an array of flags (see SV.ballotBox.flags) and returns the submission bits. Also throws errors on badly constructed flags.\n\n`mkSignedBallotForProxy`\n\nTakes `ballotId`, `sequence`, `voteData`, `extra`, `privateKey`, and `opts = {}` and returns `{proxyReq, extra}` in the format required for `BBFarm.submitProxyVote(proxyReq, extra)`.\n\nthe `opts` param is optional.\n\n`genRange3VoteData`\n\nTakes an array of votes in range `[-3,3]` and returns a `bytes32` eth hex string (suitable for using directly with web3 Contracts)\n\n### `SV.const`\n\nUtility Constants:\n\n* `zeroAddr` - address that's all zeros\n* `zeroHash` - a `bytes32` string that's all zeros\n",
     "longname": "/Users/maxkaye/src/sv/lib/README.md",
@@ -2116,7 +2642,7 @@
   },
   {
     "kind": "packageJSON",
-    "content": "{\n  \"name\": \"sv-lib\",\n  \"version\": \"0.1.20\",\n  \"description\": \"SecureVote Light supporting functionality\",\n  \"main\": \"dist/index.js\",\n  \"module-commented-out\": \"dist/index.es5.js\",\n  \"types\": \"dist/types/index.d.ts\",\n  \"homepage\": \"https://github.com/secure-vote/sv-lib#readme\",\n  \"files\": [\n    \"./dist\",\n    \"./docs\"\n  ],\n  \"author\": {\n    \"name\": \"Max Kaye\",\n    \"email\": \"max@secure.vote\"\n  },\n  \"bugs\": {\n    \"url\": \"https://github.com/secure-vote/sv-lib/issues\"\n  },\n  \"dependencies\": {\n    \"@types/bn.js\": \"^4.11.1\",\n    \"@types/bs58\": \"^3.0.30\",\n    \"@types/ramda\": \"^0.25.35\",\n    \"assert\": \"^1.4.1\",\n    \"axios\": \"^0.18.0\",\n    \"bs58\": \"^4.0.1\",\n    \"colors\": \"^1.3.0\",\n    \"esdoc-typescript-plugin\": \"^1.0.1\",\n    \"eth-ens-namehash\": \"^2.0.8\",\n    \"eth-lib\": \"^0.2.8\",\n    \"ethereumjs-util\": \"^5.2.0\",\n    \"ramda\": \"^0.25.0\",\n    \"sha256\": \"^0.2.0\",\n    \"web3\": \"^1.0.0-beta.34\",\n    \"web3-eth-abi\": \"^1.0.0-beta.34\",\n    \"web3-eth-accounts\": \"^1.0.0-beta.34\",\n    \"web3-utils\": \"^1.0.0-beta.34\"\n  },\n  \"deprecated\": false,\n  \"keywords\": [\n    \"SecureVote\",\n    \"voting\",\n    \"crypto\",\n    \"blockchain\"\n  ],\n  \"license\": \"UNLICENSED\",\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git+https://github.com/secure-vote/sv-lib.git\"\n  },\n  \"devDependencies\": {\n    \"@types/jest\": \"^23.3.0\",\n    \"@types/node\": \"^10.5.2\",\n    \"buffer\": \"^5.1.0\",\n    \"commitizen\": \"^2.9.6\",\n    \"coveralls\": \"^3.0.0\",\n    \"cross-env\": \"^5.0.1\",\n    \"cz-conventional-changelog\": \"^2.0.0\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-ecmascript-proposal-plugin\": \"^1.0.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"husky\": \"^0.14.0\",\n    \"jest\": \"^23.4.1\",\n    \"lint-staged\": \"^7.1.3\",\n    \"lodash.camelcase\": \"^4.3.0\",\n    \"minami\": \"^1.2.3\",\n    \"prettier\": \"^1.13.4\",\n    \"prompt\": \"^1.0.0\",\n    \"replace-in-file\": \"^3.0.0-beta.2\",\n    \"rimraf\": \"^2.6.1\",\n    \"rollup\": \"^0.58.0\",\n    \"rollup-plugin-commonjs\": \"^9.1.3\",\n    \"rollup-plugin-json\": \"^3.0.0\",\n    \"rollup-plugin-node-builtins\": \"^2.1.2\",\n    \"rollup-plugin-node-globals\": \"^1.2.1\",\n    \"rollup-plugin-node-resolve\": \"^3.3.0\",\n    \"rollup-plugin-sourcemaps\": \"^0.4.2\",\n    \"rollup-plugin-typescript2\": \"^0.15.1\",\n    \"semantic-release\": \"^15.0.0\",\n    \"ts-jest\": \"^23.0.1\",\n    \"ts-node\": \"^6.0.0\",\n    \"tslint\": \"^5.11.0\",\n    \"tslint-config-prettier\": \"^1.1.0\",\n    \"tslint-config-standard\": \"^7.0.0\",\n    \"typedoc\": \"^0.11.0\",\n    \"typescript\": \"^3.0.0-rc\",\n    \"validate-commit-msg\": \"^2.12.2\"\n  },\n  \"scripts\": {\n    \"dev\": \"tsc -w\",\n    \"docs\": \"esdoc\",\n    \"prepublish\": \"yarn build\",\n    \"lint\": \"tslint -t codeFrame 'src/**/*.ts' 'test/**/*.ts'\",\n    \"prebuild\": \"rimraf dist\",\n    \"build\": \"tsc --module commonjs && cp -a ./src/smart_contracts ./dist/smart_contracts && yarn build:rollup && esdoc # typedoc --out docs --target es6 --theme minimal --mode file src\",\n    \"build:rollup\": \"rollup -c rollup.config.ts\",\n    \"start\": \"rollup -c rollup.config.ts -w\",\n    \"test\": \"jest\",\n    \"test:watch\": \"jest --watch\",\n    \"test:prod\": \"npm run lint && npm run test -- --coverage --no-cache\",\n    \"report-coverage\": \"cat ./coverage/lcov.info | coveralls\",\n    \"commit\": \"echo 'commit' || git-cz\",\n    \"semantic-release\": \"semantic-release\",\n    \"semantic-release-prepare\": \"ts-node tools/semantic-release-prepare\",\n    \"precommit\": \"lint-staged\"\n  },\n  \"lint-staged\": {\n    \"{src,test}/**/*.ts\": [\n      \"prettier --write\",\n      \"git add\"\n    ]\n  },\n  \"config\": {\n    \"commitizen\": {\n      \"path\": \"node_modules/cz-conventional-changelog\"\n    },\n    \"validate-commit-msg\": {\n      \"types\": \"conventional-commit-types\",\n      \"helpMessage\": \"Use \\\"npm run commit\\\" instead, we use conventional-changelog format :) (https://github.com/commitizen/cz-cli)\"\n    }\n  },\n  \"jest\": {\n    \"transform\": {\n      \"^.+\\\\.tsx?$\": \"ts-jest\"\n    },\n    \"testRegex\": \"(/__tests__/.*|\\\\.(test|spec))\\\\.(ts|tsx|js)$\",\n    \"moduleFileExtensions\": [\n      \"ts\",\n      \"tsx\",\n      \"js\",\n      \"jsx\",\n      \"json\",\n      \"node\"\n    ],\n    \"coverageThreshold-commented\": {\n      \"global\": {\n        \"branches\": 90,\n        \"functions\": 95,\n        \"lines\": 95,\n        \"statements\": 95\n      }\n    },\n    \"collectCoverage\": false,\n    \"testPathIgnorePatterns\": [\n      \"/node_modules/\",\n      \"/dist\"\n    ]\n  },\n  \"prettier\": {\n    \"semi\": false,\n    \"singleQuote\": true\n  }\n}\n",
+    "content": "{\n  \"name\": \"sv-lib\",\n  \"version\": \"0.1.20\",\n  \"description\": \"SecureVote Light supporting functionality\",\n  \"main\": \"dist/index.js\",\n  \"module-commented-out\": \"dist/index.es5.js\",\n  \"types\": \"dist/types/index.d.ts\",\n  \"homepage\": \"https://github.com/secure-vote/sv-lib#readme\",\n  \"files\": [\n    \"./dist\",\n    \"./docs\"\n  ],\n  \"author\": {\n    \"name\": \"Max Kaye\",\n    \"email\": \"max@secure.vote\"\n  },\n  \"bugs\": {\n    \"url\": \"https://github.com/secure-vote/sv-lib/issues\"\n  },\n  \"dependencies\": {\n    \"@types/bn.js\": \"^4.11.1\",\n    \"@types/bs58\": \"^3.0.30\",\n    \"@types/ramda\": \"^0.25.35\",\n    \"assert\": \"^1.4.1\",\n    \"axios\": \"^0.18.0\",\n    \"bs58\": \"^4.0.1\",\n    \"buffer\": \"^5.1.0\",\n    \"colors\": \"^1.3.0\",\n    \"esdoc-typescript-plugin\": \"^1.0.1\",\n    \"eth-ens-namehash\": \"^2.0.8\",\n    \"eth-lib\": \"^0.2.8\",\n    \"ethereumjs-util\": \"^5.2.0\",\n    \"io-ts\": \"^1.2.1\",\n    \"ramda\": \"^0.25.0\",\n    \"sha256\": \"^0.2.0\",\n    \"stellar-base\": \"^0.8.0\",\n    \"web3\": \"^1.0.0-beta.34\",\n    \"web3-eth-abi\": \"^1.0.0-beta.34\",\n    \"web3-eth-accounts\": \"^1.0.0-beta.34\",\n    \"web3-providers-ws\": \"^1.0.0-beta.34\",\n    \"web3-utils\": \"^1.0.0-beta.34\"\n  },\n  \"deprecated\": false,\n  \"keywords\": [\n    \"SecureVote\",\n    \"voting\",\n    \"crypto\",\n    \"blockchain\"\n  ],\n  \"license\": \"UNLICENSED\",\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git+https://github.com/secure-vote/sv-lib.git\"\n  },\n  \"devDependencies\": {\n    \"@types/jest\": \"^23.3.0\",\n    \"@types/node\": \"^10.5.2\",\n    \"buffer\": \"^5.1.0\",\n    \"commitizen\": \"^2.9.6\",\n    \"coveralls\": \"^3.0.0\",\n    \"cross-env\": \"^5.0.1\",\n    \"cz-conventional-changelog\": \"^2.0.0\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-ecmascript-proposal-plugin\": \"^1.0.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"husky\": \"^0.14.0\",\n    \"jest\": \"^23.4.1\",\n    \"lint-staged\": \"^7.1.3\",\n    \"lodash.camelcase\": \"^4.3.0\",\n    \"minami\": \"^1.2.3\",\n    \"prettier\": \"^1.13.4\",\n    \"prompt\": \"^1.0.0\",\n    \"replace-in-file\": \"^3.0.0-beta.2\",\n    \"rimraf\": \"^2.6.1\",\n    \"rollup\": \"^0.58.0\",\n    \"rollup-plugin-commonjs\": \"^9.1.3\",\n    \"rollup-plugin-json\": \"^3.0.0\",\n    \"rollup-plugin-node-builtins\": \"^2.1.2\",\n    \"rollup-plugin-node-globals\": \"^1.2.1\",\n    \"rollup-plugin-node-resolve\": \"^3.3.0\",\n    \"rollup-plugin-sourcemaps\": \"^0.4.2\",\n    \"rollup-plugin-typescript2\": \"^0.15.1\",\n    \"semantic-release\": \"^15.0.0\",\n    \"ts-jest\": \"^23.0.1\",\n    \"ts-node\": \"^6.0.0\",\n    \"tslint\": \"^5.11.0\",\n    \"tslint-config-prettier\": \"^1.1.0\",\n    \"tslint-config-standard\": \"^7.0.0\",\n    \"typedoc\": \"^0.11.0\",\n    \"typescript\": \"^3.0.0-rc\",\n    \"validate-commit-msg\": \"^2.12.2\"\n  },\n  \"scripts\": {\n    \"dev\": \"tsc -w\",\n    \"docs\": \"esdoc\",\n    \"prepublish\": \"yarn build\",\n    \"lint\": \"tslint -t codeFrame 'src/**/*.ts' 'test/**/*.ts'\",\n    \"prebuild\": \"rimraf dist\",\n    \"build\": \"tsc --module commonjs && cp -a ./src/smart_contracts ./dist/smart_contracts && yarn build:rollup && esdoc # typedoc --out docs --target es6 --theme minimal --mode file src\",\n    \"build:rollup\": \"rollup -c rollup.config.ts\",\n    \"start\": \"rollup -c rollup.config.ts -w\",\n    \"test\": \"jest\",\n    \"test:watch\": \"jest --watch\",\n    \"test:prod\": \"npm run lint && npm run test -- --coverage --no-cache\",\n    \"report-coverage\": \"cat ./coverage/lcov.info | coveralls\",\n    \"commit\": \"echo 'commit' || git-cz\",\n    \"semantic-release\": \"semantic-release\",\n    \"semantic-release-prepare\": \"ts-node tools/semantic-release-prepare\",\n    \"precommit\": \"lint-staged\"\n  },\n  \"lint-staged\": {\n    \"{src,test}/**/*.ts\": [\n      \"prettier --write\",\n      \"git add\"\n    ]\n  },\n  \"config\": {\n    \"commitizen\": {\n      \"path\": \"node_modules/cz-conventional-changelog\"\n    },\n    \"validate-commit-msg\": {\n      \"types\": \"conventional-commit-types\",\n      \"helpMessage\": \"Use \\\"npm run commit\\\" instead, we use conventional-changelog format :) (https://github.com/commitizen/cz-cli)\"\n    }\n  },\n  \"jest\": {\n    \"transform\": {\n      \"^.+\\\\.tsx?$\": \"ts-jest\"\n    },\n    \"testRegex\": \"(/__tests__/.*|\\\\.(test|spec))\\\\.(ts|tsx|js)$\",\n    \"moduleFileExtensions\": [\n      \"ts\",\n      \"tsx\",\n      \"js\",\n      \"jsx\",\n      \"json\",\n      \"node\"\n    ],\n    \"coverageThreshold-commented\": {\n      \"global\": {\n        \"branches\": 90,\n        \"functions\": 95,\n        \"lines\": 95,\n        \"statements\": 95\n      }\n    },\n    \"collectCoverage\": false,\n    \"testPathIgnorePatterns\": [\n      \"/node_modules/\",\n      \"/dist\"\n    ]\n  },\n  \"prettier\": {\n    \"semi\": false,\n    \"singleQuote\": true,\n    \"tabWidth\": 4,\n    \"printWidth\": 140\n  }\n}\n",
     "longname": "/Users/maxkaye/src/sv/lib/package.json",
     "name": "package.json",
     "static": true,

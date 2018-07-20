@@ -83,14 +83,8 @@ export declare const genRange3VoteData: (votesArray: number[]) => any;
  *
  * @param {object} txInfo
  *  Object literal containing the information required to generate the web3 transaction.
- *       @param {string} bbFarm
- *       Ethereum address where the vote needs to be cast
- *       @param {string} ballotId
- *       The id of the ballot
- *       @param {string} userAddress
- *       Ethereum address of the user - 'from'
- *       @param {string} voteData
- *       The data containing the users vote
+ * @param {object} svNetwork
+ *  config object containing svNetwork
  *
  * @returns {object}
  *  Returns an object with all fields required to cast the transaction

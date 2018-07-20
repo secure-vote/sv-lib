@@ -208,8 +208,8 @@ exports.getSingularCleanAbi = (requestedAbiName, methodName) => {
 exports.stellarPkToHex = (pubKey) => {
     // Get the hex pub key
     let rawPubKey, hexPubKey;
-    if (web3.utils.isHex(pubKey)) {
-        hexPubKey = web3.utils.isHexStrict(pubKey) ? pubKey : '0x' + pubKey;
+    if (web3Utils.isHex(pubKey)) {
+        hexPubKey = web3Utils.isHexStrict(pubKey) ? pubKey : '0x' + pubKey;
     }
     else {
         const kp = StellarBase.Keypair.fromPublicKey(pubKey);
@@ -243,10 +243,10 @@ exports.getUnsafeEd25519Delegations = (pubKey, svNetwork) => __awaiter(this, voi
  * @param nonce A nonce in hex that is 3 bytes (6 characters as hex)
  * @returns {Bytes32} The hex string (with 0x prefix) of the delegation instruction
  */
-exports.prepareEd25519Delegation = (address, nonce = '') => {
+exports.prepareEd25519Delegation = (address, nonce) => {
     // Delegate prefix (SV-ED-ETH)
     const prefix = SvUtils.cleanEthHex(web3Utils.toHex(SvConsts.Ed25519DelegatePrefix));
-    const _nonce = nonce.length === 6 && web3Utils.isHex(nonce) ? nonce : web3Utils.randomHex(3).slice(2);
+    const _nonce = nonce && web3Utils.isHex(nonce) ? nonce : web3Utils.randomHex(3).slice(2);
     const trimmedAddress = SvUtils.cleanEthHex(address);
     const dlgtPacked = `0x${prefix}${_nonce}${trimmedAddress}`.toLowerCase();
     assert.equal(dlgtPacked.length, 2 + 64, 'dlgtPacked was not 32 bytes / 64 chars long. This should never happen.');
@@ -297,7 +297,7 @@ exports.createEd25519DelegationTransaction = (svNetwork, dlgtRequest, pubKey, si
  * @returns {boolean}
  */
 exports.ed25519DelegationIsValid = (dlgtRequest, pubKey, signature) => {
-    const _sig = cleanEthHex(signature);
+    const _sig = SvUtils.cleanEthHex(signature);
     assert.equal(_sig.length, 128, 'Invalid signature, should be a 64 byte hex string');
     // Create the keypair from the public key
     const kp = StellarBase.Keypair.fromPublicKey(pubKey);

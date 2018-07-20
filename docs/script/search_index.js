@@ -1,8 +1,26 @@
 window.esdocSearchIndex = [
   [
+    "sv-lib/src/runtimetypes.ts~bytes32",
+    "variable/index.html#static-variable-Bytes32",
+    "<span>Bytes32</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
+    "variable"
+  ],
+  [
+    "sv-lib/src/runtimetypes.ts~bytes64",
+    "variable/index.html#static-variable-Bytes64",
+    "<span>Bytes64</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
+    "variable"
+  ],
+  [
     "sv-lib/src/const.ts~ed25519delegateprefix",
     "variable/index.html#static-variable-Ed25519DelegatePrefix",
     "<span>Ed25519DelegatePrefix</span> <span class=\"search-result-import-path\">sv-lib/src/const.ts</span>",
+    "variable"
+  ],
+  [
+    "sv-lib/src/runtimetypes.ts~hexstring",
+    "variable/index.html#static-variable-HexString",
+    "<span>HexString</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
     "variable"
   ],
   [
@@ -39,6 +57,12 @@ window.esdocSearchIndex = [
     "sv-lib/src/light.ts~createed25519delegationtransaction",
     "function/index.html#static-function-createEd25519DelegationTransaction",
     "<span>createEd25519DelegationTransaction</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/light.ts~ed25519delegationisvalid",
+    "function/index.html#static-function-ed25519DelegationIsValid",
+    "<span>ed25519DelegationIsValid</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
@@ -145,8 +169,8 @@ window.esdocSearchIndex = [
   ],
   [
     "sv-lib/src/light.ts~getunsafeed25519delegations",
-    "function/index.html#static-function-getUnsafeEd25519delegations",
-    "<span>getUnsafeEd25519delegations</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function/index.html#static-function-getUnsafeEd25519Delegations",
+    "<span>getUnsafeEd25519Delegations</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
@@ -222,9 +246,9 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
-    "sv-lib/src/light.ts~verifyed25519delegation",
-    "function/index.html#static-function-verifyEd25519Delegation",
-    "<span>verifyEd25519Delegation</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "sv-lib/src/light.ts~stellarpktohex",
+    "function/index.html#static-function-stellarPkToHex",
+    "<span>stellarPkToHex</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
@@ -561,6 +585,12 @@ window.esdocSearchIndex = [
     "src/light.ts",
     "file/src/light.ts.html",
     "src/light.ts",
+    "file"
+  ],
+  [
+    "src/runtimetypes.ts",
+    "file/src/runtimeTypes.ts.html",
+    "src/runtimeTypes.ts",
     "file"
   ],
   [
