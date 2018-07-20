@@ -30,7 +30,7 @@ export declare const flags: {
 export declare const mkPacked: (start: any, end: any, submissionBits: any) => any;
 /**
  * This combines flags into a finished submissionBits. It also does some validation.
- * @param {*} toCombine
+ * @param {number[]} toCombine
  *  Array of all submission flags to combine. See SV.ballotBox.flags for flag options.
  *  All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining).
  * @returns {number}

@@ -1,7 +1,8 @@
-import NH from 'eth-ens-namehash'
+const NH = require('eth-ens-namehash')
 import axios from 'axios'
-import * as bs58 from 'bs58'
-import sha256 from 'sha256'
+const bs58 = require('bs58')
+const sha256 = require('sha256')
+
 import * as SvConsts from './const'
 import * as SvUtils from './utils'
 import * as StellarBase from 'stellar-base'
@@ -183,14 +184,29 @@ export const getCurrentGasPrice = async () => {
         fastest: data.fastest / 10
     }
 }
-// Checks the ballot hash against the ballot content
-export const checkBallotHashBSpec = (ballotSpec, assertSpecHash) => {
-    let contentHash = '0x' + sha256(JSON.stringify(ballotSpec, null, 2))
-    if (assertSpecHash === contentHash) {
-        return true
-    } else {
-        return false
-    }
+
+/**
+ * Verify a BallotSpec's hash
+ *
+ * @param {*} rawBallotSpecString The raw string/bytes before JSON.parse
+ * @param {*} expectedSpecHash The expected hash as Eth Hex
+ *
+ * @returns {boolean} Whether the ballotSpec matched the expected hash
+ */
+export const checkBallotHashBSpec = (rawBallotSpecString, expectedSpecHash) => {
+    throw Error('Unimplemented (check code for details)')
+
+    // NOTE: This function is unsafe - JSON does not have deterministic key order
+    // a ballotSpec object is not suitable to verify the hash; you need the _raw_
+    // string before it is parsed to JSON
+
+    // Original function
+    // let contentHash = '0x' + sha256(JSON.stringify(ballotSpec, null, 2))
+    // if (assertSpecHash === contentHash) {
+    //   return true
+    // } else {
+    //   return false
+    // }
 }
 
 // Checks the ballot hash against a ballot global ballot object
