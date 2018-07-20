@@ -253,16 +253,21 @@ export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => 
     return delegations
 }
 
-export const prepareEd25519Delegation = (address: string) => {
+/**
+ * Generate a packed Ed25519Delegation instruction for use with the smart contract or API
+ * @param address An ethereum address to delegate to
+ * @param nonce A nonce in hex that is 3 bytes (6 characters as hex)
+ * @returns {Bytes32} The hex string (with 0x prefix) of the delegation instruction
+ */
+export const prepareEd25519Delegation = (address: string, nonce?: string = '') => {
     // Delegate prefix (SV-ED-ETH)
-    const prefix = web3utils.toHex(SvConsts.Ed25519DelegatePrefix)
-    const nonce = web3utils.randomHex(3).slice(2)
-    console.log('nonce :', nonce)
+    const prefix = SvUtils.cleanEthHex(web3Utils.toHex(SvConsts.Ed25519DelegatePrefix))
+    const _nonce = nonce.length === 6 && web3Utils.isHex(nonce) ? nonce : web3Utils.randomHex(3).slice(2)
 
-    const trimmedAddress = SvUtils.cleanEthHex(address).toLowerCase()
+    const trimmedAddress = SvUtils.cleanEthHex(address)
 
-    const dlgtPacked = `${prefix}${nonce}${trimmedAddress}`.toLowerCase()
-    assert.equal(dlgtPacked.length, 64, 'dlgtPacked was not 32 bytes / 64 chars long. This should never happen.')
+    const dlgtPacked = `0x${prefix}${_nonce}${trimmedAddress}`.toLowerCase()
+    assert.equal(dlgtPacked.length, 2 + 64, 'dlgtPacked was not 32 bytes / 64 chars long. This should never happen.')
     return dlgtPacked
 }
 
