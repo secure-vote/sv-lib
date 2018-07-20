@@ -17,7 +17,6 @@
   "bugs": {
     "url": "https://github.com/secure-vote/sv-lib/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "@types/bn.js": "^4.11.1",
     "@types/bs58": "^3.0.30",
@@ -133,7 +132,7 @@
       "json",
       "node"
     ],
-    "coverageThreshold": {
+    "coverageThreshold-commented": {
       "global": {
         "branches": 90,
         "functions": 95,
@@ -141,7 +140,7 @@
         "statements": 95
       }
     },
-    "collectCoverage": true,
+    "collectCoverage": false,
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/dist"
