@@ -1,7 +1,9 @@
-import * as ballotBox from './ballotBox';
-import * as _const from './const';
-import * as crypto from './crypto';
-import * as light from './light';
-import * as utils from './utils.js';
-export default { ballotBox: ballotBox, crypto: crypto, light: light, utils: utils, const: _const };
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const ballotBox = require("./ballotBox");
+const _const = require("./const");
+const crypto = require("./crypto");
+const light = require("./light");
+const utils = require("./utils.js");
+exports.default = { ballotBox, crypto, light, utils, const: _const };
 //# sourceMappingURL=index.js.map

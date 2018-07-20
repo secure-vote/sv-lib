@@ -60,10 +60,13 @@ export declare const getCurrentGasPrice: () => Promise<{
     fast: number;
     fastest: number;
 }>;
-export declare const checkBallotHashBSpec: (ballotSpec: any, assertSpecHash: any) => boolean;
-export declare const checkBallotHashGBallot: (ballotObject: any) => boolean;
-export declare const getSingularCleanAbi: (requestedAbiName: any, methodName: any) => any;
-export declare const getUnsafeEd25519delegations: (pubKey: string, svNetwork: any) => Promise<any>;
-export declare const prepareEd25519Delegation: (sk: string, svNetwork: any) => string;
-export declare const createEd25519DelegationTransaction: (svNetwork: any, delRequest: string, pubKey: string, signature: string) => Promise<{}>;
-export declare const verifyEd25519Delegation: (delRequest: string, pubKey: string, signature: string) => any;
+/**
+ * Verify a BallotSpec's hash
+ *
+ * @param {*} rawBallotSpecString The raw string/bytes before JSON.parse
+ * @param {*} expectedSpecHash The expected hash as Eth Hex
+ *
+ * @returns {boolean} Whether the ballotSpec matched the expected hash
+ */
+export declare const checkBallotHashBSpec: (rawBallotSpecString: any, expectedSpecHash: any) => never;
+export declare const checkBallotHashGBallot: (ballotObject: any) => never;
