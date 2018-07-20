@@ -67,10 +67,10 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/light.ts</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import * as NH from &apos;eth-ens-namehash&apos;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const NH = require(&apos;eth-ens-namehash&apos;)
 import axios from &apos;axios&apos;
-import * as bs58 from &apos;bs58&apos;
-import * as sha256 from &apos;sha256&apos;
+const bs58 = require(&apos;bs58&apos;)
+const sha256 =require(&apos;sha256&apos;)
 
 // Lovely ABIs
 import * as ResolverAbi from &apos;./smart_contracts/SV_ENS_Resolver.abi.json&apos;

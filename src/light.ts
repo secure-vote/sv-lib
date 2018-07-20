@@ -1,7 +1,7 @@
-import * as NH from 'eth-ens-namehash'
+const NH = require('eth-ens-namehash')
 import axios from 'axios'
-import * as bs58 from 'bs58'
-import * as sha256 from 'sha256'
+const bs58 = require('bs58')
+const sha256 = require('sha256')
 
 // Lovely ABIs
 import * as ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'

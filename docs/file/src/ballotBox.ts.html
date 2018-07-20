@@ -140,20 +140,13 @@ export const mkPacked = (start, end, submissionBits) =&gt; {
 
 /**
  * This combines flags into a finished submissionBits. It also does some validation.
- * @param {*} toCombine
+ * @param {number[]} toCombine
  *  Array of all submission flags to combine. See SV.ballotBox.flags for flag options.
  *  All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining).
  * @returns {number}
  *  A 16 bit integer of combined flags.
  */
 export const mkSubmissionBits = (...toCombine) =&gt; {
-  if (Array.isArray(toCombine[0]) &amp;&amp; typeof toCombine[0][0] == &apos;number&apos;) {
-    console.warn(
-      &apos;Warning: mkSubmissionBits does not take an Array&lt;number&gt; anymore.&apos;
-    )
-    toCombine = toCombine[0]
-  }
-
   const toRet = R.reduce((acc, i) =&gt; acc | i, 0, toCombine)
   assert.equal(
     R.all(i =&gt; typeof i == &apos;number&apos;, toCombine),

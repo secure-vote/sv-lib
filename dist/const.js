@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.zeroAddr = "0x0000000000000000000000000000000000000000";
 exports.zeroHash = "0x0000000000000000000000000000000000000000000000000000000000000000";
-var _raw_networkVars = {
+const _raw_networkVars = {
     kovan: {
         indexContractName: "index.kov.sv",
         auxContract: "0x0d31706febd1b8177c722fe39432f3e47143ccd9",
@@ -57,12 +57,12 @@ var _raw_networkVars = {
     },
 };
 exports.networkVars = new Proxy(_raw_networkVars, {
-    get: function (obj, prop) {
+    get: (obj, prop) => {
         console.warn("Warning: const.networkVars is deprecated; please use const.getNetwork(..)");
         return obj[prop];
     }
 });
-exports.networkName = function (networkId) {
+exports.networkName = networkId => {
     console.warn("Warning: const.networkName(..) is deprecated. Please use const.getNetwork(..).name");
     switch (networkId) {
         case 1:
@@ -79,7 +79,7 @@ exports.networkName = function (networkId) {
             return "Unknown";
     }
 };
-exports.getNetwork = function (networkId, chainId) {
+exports.getNetwork = (networkId, chainId) => {
     switch (networkId) {
         case 1:
             if (chainId === 1)
@@ -94,6 +94,6 @@ exports.getNetwork = function (networkId, chainId) {
         default:
             break;
     }
-    throw Error("Cannot find network with net_id " + networkId + " and chainId " + chainId);
+    throw Error(`Cannot find network with net_id ${networkId} and chainId ${chainId}`);
 };
 //# sourceMappingURL=const.js.map
