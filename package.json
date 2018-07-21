@@ -2,13 +2,12 @@
   "name": "sv-lib",
   "version": "0.1.21",
   "description": "SecureVote Light supporting functionality",
-  "main": "dist/index.js",
-  "module-commented-out": "dist/index.es5.js",
-  "types": "dist/types/index.d.ts",
+  "main": "lib/index.js",
+  "module-commented-out": "lib/index.es5.js",
+  "types": "lib/index.d.ts",
   "homepage": "https://github.com/secure-vote/sv-lib#readme",
   "files": [
-    "./dist",
-    "./docs"
+    "./lib"
   ],
   "author": {
     "name": "Max Kaye",
@@ -96,7 +95,7 @@
     "prepublish": "true # yarn build",
     "lint": "tslint -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf dist",
-    "build": "tsc --module commonjs && cp -a ./src/smart_contracts ./dist/smart_contracts && yarn build:rollup && esdoc # typedoc --out docs --target es6 --theme minimal --mode file src",
+    "build": "tsc --module commonjs && cp -a ./src/smart_contracts ./lib/smart_contracts && yarn build:rollup && esdoc # typedoc --out docs --target es6 --theme minimal --mode file src",
     "build:rollup": "rollup -c rollup.config.ts",
     "start": "rollup -c rollup.config.ts -w",
     "test": "jest",
