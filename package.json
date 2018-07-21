@@ -1,6 +1,6 @@
 {
   "name": "sv-lib",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "description": "SecureVote Light supporting functionality",
   "main": "lib/index.js",
   "module-commented-out": "lib/index.es5.js",
