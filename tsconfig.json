@@ -3,13 +3,13 @@
         "allowSyntheticDefaultImports": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "declarationDir": "dist/types",
-        "outDir": "dist",
+        "declarationDir": "lib",
+        "outDir": "lib",
         "typeRoots": [
           "node_modules/@types"
         ],
         "moduleResolution": "node",
-        "target": "es5",
+        "target": "es6",
         "removeComments": false,
         "module": "es2015",
         "strict": false, /* maybe change this back one day */

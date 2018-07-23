@@ -1,7 +1,7 @@
 import { ProxyVote } from './types'
 
-import * as R from 'ramda'
 const BN = require('bn.js')
+import * as R from 'ramda'
 import * as assert from 'assert'
 import * as web3Utils from 'web3-utils'
 import * as svCrypto from './crypto'
@@ -43,9 +43,17 @@ export const flags = {
  *  Format: [submissionBits(16)][startTime(64)][endTime(64)]
  */
 export const mkPacked = (start, end, submissionBits) => {
+    const max64Bit = new BN('ffffffffffffffff', 16)
+
     const s = new BN(start)
+    assert.equal(s.lte(max64Bit) && s.gtn(0), true, 'start time must be >0 and <2^64')
+
     const e = new BN(end)
+    assert.equal(e.lte(max64Bit) && e.gtn(0), true, 'end time must be >0 and <2^64')
+
     const sb = new BN(submissionBits)
+    assert.equal(sb.ltn(2 ** 16) && sb.gtn(0), true, 'submission bits must be >0 and <2^16') // note: submission bits of 0 is invalid
+
     return sb
         .shln(64)
         .add(s)
@@ -55,20 +63,13 @@ export const mkPacked = (start, end, submissionBits) => {
 
 /**
  * This combines flags into a finished submissionBits. It also does some validation.
- * @param {*} toCombine
+ * @param {number[]} toCombine
  *  Array of all submission flags to combine. See SV.ballotBox.flags for flag options.
  *  All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining).
  * @returns {number}
  *  A 16 bit integer of combined flags.
  */
 export const mkSubmissionBits = (...toCombine) => {
-    if (Array.isArray(toCombine[0]) && typeof toCombine[0][0] == 'number') {
-        console.warn(
-            'Warning: mkSubmissionBits does not take an Array<number> anymore.'
-        )
-        toCombine = toCombine[0]
-    }
-
     const toRet = R.reduce((acc, i) => acc | i, 0, toCombine)
     assert.equal(
         R.all(i => typeof i == 'number', toCombine),
@@ -85,11 +86,7 @@ export const mkSubmissionBits = (...toCombine) => {
         R.sum(toCombine),
         `Bad input provided to mkSubmissionBits. Logical OR and sum sanity check failed. Input was: ${toCombine}`
     )
-    assert.equal(
-        toRet < 2 ** 16,
-        true,
-        `Submission bits must fit into a 16 bit integer (i.e. less than 2^16). Result was: ${toRet}`
-    )
+    assert.equal(toRet < 2 ** 16, true, `Submission bits must fit into a 16 bit integer (i.e. less than 2^16). Result was: ${toRet}`)
     return toRet
 }
 
@@ -111,39 +108,17 @@ export const mkSubmissionBits = (...toCombine) => {
  * @returns {object}
  *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`
  */
-export const mkSignedBallotForProxy = (
-    ballotId,
-    sequence,
-    voteData,
-    extra,
-    privateKey,
-    opts: any = {}
-): ProxyVote => {
-    if (opts.skipSequenceSizeCheck !== true)
-        assert.equal(
-            0 < sequence && sequence < 2 ** 32,
-            true,
-            'sequence number out of bounds'
-        )
+export const mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts: any = {}): ProxyVote => {
+    if (opts.skipSequenceSizeCheck !== true) assert.equal(0 < sequence && sequence < 2 ** 32, true, 'sequence number out of bounds')
     assert.equal(
         web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId),
         true,
         'ballotId incorrect format (either not a BN or not hex)'
     )
-    assert.equal(
-        web3Utils.isHexStrict(voteData),
-        true,
-        'vote data is not hex (strict)'
-    )
-    assert.equal(
-        web3Utils.isHexStrict(extra),
-        true,
-        'extra param is not hex (strict)'
-    )
+    assert.equal(web3Utils.isHexStrict(voteData), true, 'vote data is not hex (strict)')
+    assert.equal(web3Utils.isHexStrict(extra), true, 'extra param is not hex (strict)')
 
-    const _ballotId = web3Utils.isBN(ballotId)
-        ? web3Utils.padLeft(web3Utils.toHex(ballotId), 64)
-        : ballotId
+    const _ballotId = web3Utils.isBN(ballotId) ? web3Utils.padLeft(web3Utils.toHex(ballotId), 64) : ballotId
 
     assert.equal(_ballotId.length, 66, 'ballotId incorrect length')
     assert.equal(voteData.length, 66, 'voteData incorrect length')
@@ -178,10 +153,7 @@ export const mkSignedBallotForProxy = (
  * @param {*} [opts={}] Not used currently; for future options
  * @returns {{verified: bool, address: EthAddress}}
  */
-export const verifySignedBallotForProxy = (
-    proxyVote: ProxyVote,
-    opts: any = {}
-) => {
+export const verifySignedBallotForProxy = (proxyVote: ProxyVote, opts: any = {}) => {
     const {
         proxyReq: [r, s, packed2, ballotId, voteData],
         extra
@@ -212,28 +184,14 @@ export const verifySignedBallotForProxy = (
  *  Returns an eth hex string of the vote data
  */
 export const genRange3VoteData = (votesArray: number[]) => {
-    assert.equal(
-        R.all(v => (v | 0) === v, votesArray),
-        true,
-        'All array elements must be defined and integers.'
-    )
-    assert.equal(
-        R.all(v => -3 <= v && v <= 3, votesArray),
-        true,
-        'Votes must be in range -3 to 3.'
-    )
-    assert.equal(
-        votesArray.length <= 85,
-        true,
-        'Too many votes; maximum capacity of 32 bytes is 85 individual items.'
-    )
+    assert.equal(R.all(v => (v | 0) === v, votesArray), true, 'All array elements must be defined and integers.')
+    assert.equal(R.all(v => -3 <= v && v <= 3, votesArray), true, 'Votes must be in range -3 to 3.')
+    assert.equal(votesArray.length <= 85, true, 'Too many votes; maximum capacity of 32 bytes is 85 individual items.')
 
     // Generate list of binary encoded votes. Read bottom to top.
     const binaryVotes = R.compose(
         // pad to 3 bits
-        R.map(
-            (vBin: string) => R.join('', R.repeat('0', 3 - vBin.length)) + vBin
-        ),
+        R.map((vBin: string) => R.join('', R.repeat('0', 3 - vBin.length)) + vBin),
         // convert votes to binary
         R.map((v: number) => v.toString(2)),
         // offset votes to be in range 0,6
@@ -241,27 +199,15 @@ export const genRange3VoteData = (votesArray: number[]) => {
     )(votesArray)
 
     // check we have converted votes to bitstring representation of length 3
-    assert.equal(
-        R.all(bVote => bVote.length == 3, binaryVotes),
-        true,
-        'Assertion failed: all binary-encoded votes should be 3 bits long'
-    )
+    assert.equal(R.all(bVote => bVote.length == 3, binaryVotes), true, 'Assertion failed: all binary-encoded votes should be 3 bits long')
 
     // create the binary voteData
     const rawBinVotes = R.join('', binaryVotes)
     // and pad it with 0s to length 256 (32 bytes total)
-    const binVoteData =
-        rawBinVotes + R.join('', R.repeat('0', 32 * 8 - rawBinVotes.length))
-    assert.equal(
-        binVoteData.length,
-        256,
-        'Assertion failed: generated voteData bit string does not have length 256'
-    )
+    const binVoteData = rawBinVotes + R.join('', R.repeat('0', 32 * 8 - rawBinVotes.length))
+    assert.equal(binVoteData.length, 256, 'Assertion failed: generated voteData bit string does not have length 256')
     // Convert to bytes
-    const voteBytes = R.map(
-        bStr => parseInt(bStr, 2),
-        R.splitEvery(8, binVoteData)
-    )
+    const voteBytes = R.map(bStr => parseInt(bStr, 2), R.splitEvery(8, binVoteData))
 
     // check bytes are in range
     assert.equal(
@@ -272,11 +218,7 @@ export const genRange3VoteData = (votesArray: number[]) => {
 
     // generate final hex
     const voteData = web3Utils.bytesToHex(voteBytes)
-    assert.equal(
-        voteData.length,
-        66,
-        'Assertion failed: final hex was not 66 characters long (32 bytes)'
-    )
+    assert.equal(voteData.length, 66, 'Assertion failed: final hex was not 66 characters long (32 bytes)')
 
     return voteData
 }
@@ -286,14 +228,8 @@ export const genRange3VoteData = (votesArray: number[]) => {
  *
  * @param {object} txInfo
  *  Object literal containing the information required to generate the web3 transaction.
- *       @param {string} bbFarm
- *       Ethereum address where the vote needs to be cast
- *       @param {string} ballotId
- *       The id of the ballot
- *       @param {string} userAddress
- *       Ethereum address of the user - 'from'
- *       @param {string} voteData
- *       The data containing the users vote
+ * @param {object} svNetwork
+ *  config object containing svNetwork
  *
  * @returns {object}
  *  Returns an object with all fields required to cast the transaction
@@ -302,28 +238,16 @@ export const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) => {
     const { bbFarm, ballotId, userAddress, voteData } = txInfo
     const { web3 } = svNetwork
 
-    assert.equal(
-        web3Utils.isAddress(bbFarm),
-        true,
-        'BBFarm address supplied is not a valid ethereum address.'
-    )
+    assert.equal(web3Utils.isAddress(bbFarm), true, 'BBFarm address supplied is not a valid ethereum address.')
     // assert.equal(
     //     web3Utils.isAddress(userAddress),
     //     true,
     //     'User address supplied is not a valid ethereum address.'
     // )
-    assert.equal(
-        voteData.length,
-        66,
-        'Assertion failed: final hex was not 66 characters long (32 bytes)'
-    )
+    assert.equal(voteData.length, 66, 'Assertion failed: final hex was not 66 characters long (32 bytes)')
 
     const BBFarmContract = new web3.eth.Contract(BBFarmAbi, bbFarm)
-    const submitVote = BBFarmContract.methods.submitVote(
-        ballotId,
-        voteData,
-        '0x'
-    )
+    const submitVote = BBFarmContract.methods.submitVote(ballotId, voteData, '0x')
     const gasEstimate = await submitVote.estimateGas()
     const abiValue = await submitVote.encodeABI()
     const gasPrice = await Light.getCurrentGasPrice()
@@ -331,7 +255,7 @@ export const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) => {
     const web3Tx = {
         to: bbFarm,
         data: abiValue,
-        gas: web3.utils.toHex(Math.round(gasEstimate * 1.05)), // 5% added just in case
+        gas: web3.utils.toHex((gasEstimate * 1.05) | 0), // 5% added just in case
         gasPrice: gasPrice.average * 1000000000,
         from: userAddress
     }
@@ -339,16 +263,8 @@ export const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) => {
 }
 
 export const castProxyVote = async (request, svConfig) => {
-    assert.equal(
-        web3Utils.isBN(request.ballotId),
-        true,
-        'Ballot id is not a BN'
-    )
-    assert.equal(
-        request.proxyReq.length == 5,
-        true,
-        'Proxy vote req does not contain the correct number of parameters'
-    )
+    assert.equal(web3Utils.isBN(request.ballotId), true, 'Ballot id is not a BN')
+    assert.equal(request.proxyReq.length == 5, true, 'Proxy vote req does not contain the correct number of parameters')
     assert.equal(
         request.hasOwnProperty('extra') && request.hasOwnProperty('democHash'),
         true,
@@ -371,8 +287,3 @@ export const castProxyVote = async (request, svConfig) => {
             })
     })
 }
-
-// export const createEd25519SelfDelegation = async (delegation) => {
-
-//   return true
-// }

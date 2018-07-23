@@ -44,6 +44,8 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashBSpec">checkBallotHashBSpec</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashGBallot">checkBallotHashGBallot</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkIfAddressIsEditor">checkIfAddressIsEditor</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createEd25519DelegationTransaction">createEd25519DelegationTransaction</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ed25519DelegationIsValid">ed25519DelegationIsValid</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBackendAddress">getBackendAddress</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBallotObjectFromIpfs">getBallotObjectFromIpfs</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBallotObjectFromS3">getBallotObjectFromS3</a></span></span></li>
@@ -55,11 +57,11 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocInfo">getDemocInfo</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocNthBallot">getDemocNthBallot</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getSingularCleanAbi">getSingularCleanAbi</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUnsafeEd25519delegations">getUnsafeEd25519delegations</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUnsafeEd25519Delegations">getUnsafeEd25519Delegations</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initializeSvLight">initializeSvLight</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-prepareEd25519Delegation">prepareEd25519Delegation</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resolveEnsAddress">resolveEnsAddress</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-verifyEd25519Delegation">verifyEd25519Delegation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stellarPkToHex">stellarPkToHex</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-weiToCents">weiToCents</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cleanEthHex">cleanEthHex</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethAddrEq">ethAddrEq</a></span></span></li>
@@ -70,6 +72,9 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-networkVars">networkVars</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroAddr">zeroAddr</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroHash">zeroHash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Bytes32">Bytes32</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Bytes64">Bytes64</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HexString">HexString</a></span></span></li>
 </ul>
 </div>
 </nav>
@@ -77,8 +82,8 @@
 <div class="content" data-ice="content"><h1 data-ice="title">src/ballotBox.ts</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import { ProxyVote } from &apos;./types&apos;
 
-import * as R from &apos;ramda&apos;
 const BN = require(&apos;bn.js&apos;)
+import * as R from &apos;ramda&apos;
 import * as assert from &apos;assert&apos;
 import * as web3Utils from &apos;web3-utils&apos;
 import * as svCrypto from &apos;./crypto&apos;
@@ -120,9 +125,17 @@ export const flags = {
  *  Format: [submissionBits(16)][startTime(64)][endTime(64)]
  */
 export const mkPacked = (start, end, submissionBits) =&gt; {
+    const max64Bit = new BN(&apos;ffffffffffffffff&apos;, 16)
+
     const s = new BN(start)
+    assert.equal(s.lte(max64Bit) &amp;&amp; s.gtn(0), true, &apos;start time must be &gt;0 and &lt;2^64&apos;)
+
     const e = new BN(end)
+    assert.equal(e.lte(max64Bit) &amp;&amp; e.gtn(0), true, &apos;end time must be &gt;0 and &lt;2^64&apos;)
+
     const sb = new BN(submissionBits)
+    assert.equal(sb.ltn(2 ** 16) &amp;&amp; sb.gtn(0), true, &apos;submission bits must be &gt;0 and &lt;2^16&apos;) // note: submission bits of 0 is invalid
+
     return sb
         .shln(64)
         .add(s)
@@ -132,20 +145,13 @@ export const mkPacked = (start, end, submissionBits) =&gt; {
 
 /**
  * This combines flags into a finished submissionBits. It also does some validation.
- * @param {*} toCombine
+ * @param {number[]} toCombine
  *  Array of all submission flags to combine. See SV.ballotBox.flags for flag options.
  *  All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining).
  * @returns {number}
  *  A 16 bit integer of combined flags.
  */
 export const mkSubmissionBits = (...toCombine) =&gt; {
-    if (Array.isArray(toCombine[0]) &amp;&amp; typeof toCombine[0][0] == &apos;number&apos;) {
-        console.warn(
-            &apos;Warning: mkSubmissionBits does not take an Array&lt;number&gt; anymore.&apos;
-        )
-        toCombine = toCombine[0]
-    }
-
     const toRet = R.reduce((acc, i) =&gt; acc | i, 0, toCombine)
     assert.equal(
         R.all(i =&gt; typeof i == &apos;number&apos;, toCombine),
@@ -162,11 +168,7 @@ export const mkSubmissionBits = (...toCombine) =&gt; {
         R.sum(toCombine),
         `Bad input provided to mkSubmissionBits. Logical OR and sum sanity check failed. Input was: ${toCombine}`
     )
-    assert.equal(
-        toRet &lt; 2 ** 16,
-        true,
-        `Submission bits must fit into a 16 bit integer (i.e. less than 2^16). Result was: ${toRet}`
-    )
+    assert.equal(toRet &lt; 2 ** 16, true, `Submission bits must fit into a 16 bit integer (i.e. less than 2^16). Result was: ${toRet}`)
     return toRet
 }
 
@@ -188,39 +190,17 @@ export const mkSubmissionBits = (...toCombine) =&gt; {
  * @returns {object}
  *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`
  */
-export const mkSignedBallotForProxy = (
-    ballotId,
-    sequence,
-    voteData,
-    extra,
-    privateKey,
-    opts: any = {}
-): ProxyVote =&gt; {
-    if (opts.skipSequenceSizeCheck !== true)
-        assert.equal(
-            0 &lt; sequence &amp;&amp; sequence &lt; 2 ** 32,
-            true,
-            &apos;sequence number out of bounds&apos;
-        )
+export const mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts: any = {}): ProxyVote =&gt; {
+    if (opts.skipSequenceSizeCheck !== true) assert.equal(0 &lt; sequence &amp;&amp; sequence &lt; 2 ** 32, true, &apos;sequence number out of bounds&apos;)
     assert.equal(
         web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId),
         true,
         &apos;ballotId incorrect format (either not a BN or not hex)&apos;
     )
-    assert.equal(
-        web3Utils.isHexStrict(voteData),
-        true,
-        &apos;vote data is not hex (strict)&apos;
-    )
-    assert.equal(
-        web3Utils.isHexStrict(extra),
-        true,
-        &apos;extra param is not hex (strict)&apos;
-    )
+    assert.equal(web3Utils.isHexStrict(voteData), true, &apos;vote data is not hex (strict)&apos;)
+    assert.equal(web3Utils.isHexStrict(extra), true, &apos;extra param is not hex (strict)&apos;)
 
-    const _ballotId = web3Utils.isBN(ballotId)
-        ? web3Utils.padLeft(web3Utils.toHex(ballotId), 64)
-        : ballotId
+    const _ballotId = web3Utils.isBN(ballotId) ? web3Utils.padLeft(web3Utils.toHex(ballotId), 64) : ballotId
 
     assert.equal(_ballotId.length, 66, &apos;ballotId incorrect length&apos;)
     assert.equal(voteData.length, 66, &apos;voteData incorrect length&apos;)
@@ -255,10 +235,7 @@ export const mkSignedBallotForProxy = (
  * @param {*} [opts={}] Not used currently; for future options
  * @returns {{verified: bool, address: EthAddress}}
  */
-export const verifySignedBallotForProxy = (
-    proxyVote: ProxyVote,
-    opts: any = {}
-) =&gt; {
+export const verifySignedBallotForProxy = (proxyVote: ProxyVote, opts: any = {}) =&gt; {
     const {
         proxyReq: [r, s, packed2, ballotId, voteData],
         extra
@@ -289,28 +266,14 @@ export const verifySignedBallotForProxy = (
  *  Returns an eth hex string of the vote data
  */
 export const genRange3VoteData = (votesArray: number[]) =&gt; {
-    assert.equal(
-        R.all(v =&gt; (v | 0) === v, votesArray),
-        true,
-        &apos;All array elements must be defined and integers.&apos;
-    )
-    assert.equal(
-        R.all(v =&gt; -3 &lt;= v &amp;&amp; v &lt;= 3, votesArray),
-        true,
-        &apos;Votes must be in range -3 to 3.&apos;
-    )
-    assert.equal(
-        votesArray.length &lt;= 85,
-        true,
-        &apos;Too many votes; maximum capacity of 32 bytes is 85 individual items.&apos;
-    )
+    assert.equal(R.all(v =&gt; (v | 0) === v, votesArray), true, &apos;All array elements must be defined and integers.&apos;)
+    assert.equal(R.all(v =&gt; -3 &lt;= v &amp;&amp; v &lt;= 3, votesArray), true, &apos;Votes must be in range -3 to 3.&apos;)
+    assert.equal(votesArray.length &lt;= 85, true, &apos;Too many votes; maximum capacity of 32 bytes is 85 individual items.&apos;)
 
     // Generate list of binary encoded votes. Read bottom to top.
     const binaryVotes = R.compose(
         // pad to 3 bits
-        R.map(
-            (vBin: string) =&gt; R.join(&apos;&apos;, R.repeat(&apos;0&apos;, 3 - vBin.length)) + vBin
-        ),
+        R.map((vBin: string) =&gt; R.join(&apos;&apos;, R.repeat(&apos;0&apos;, 3 - vBin.length)) + vBin),
         // convert votes to binary
         R.map((v: number) =&gt; v.toString(2)),
         // offset votes to be in range 0,6
@@ -318,27 +281,15 @@ export const genRange3VoteData = (votesArray: number[]) =&gt; {
     )(votesArray)
 
     // check we have converted votes to bitstring representation of length 3
-    assert.equal(
-        R.all(bVote =&gt; bVote.length == 3, binaryVotes),
-        true,
-        &apos;Assertion failed: all binary-encoded votes should be 3 bits long&apos;
-    )
+    assert.equal(R.all(bVote =&gt; bVote.length == 3, binaryVotes), true, &apos;Assertion failed: all binary-encoded votes should be 3 bits long&apos;)
 
     // create the binary voteData
     const rawBinVotes = R.join(&apos;&apos;, binaryVotes)
     // and pad it with 0s to length 256 (32 bytes total)
-    const binVoteData =
-        rawBinVotes + R.join(&apos;&apos;, R.repeat(&apos;0&apos;, 32 * 8 - rawBinVotes.length))
-    assert.equal(
-        binVoteData.length,
-        256,
-        &apos;Assertion failed: generated voteData bit string does not have length 256&apos;
-    )
+    const binVoteData = rawBinVotes + R.join(&apos;&apos;, R.repeat(&apos;0&apos;, 32 * 8 - rawBinVotes.length))
+    assert.equal(binVoteData.length, 256, &apos;Assertion failed: generated voteData bit string does not have length 256&apos;)
     // Convert to bytes
-    const voteBytes = R.map(
-        bStr =&gt; parseInt(bStr, 2),
-        R.splitEvery(8, binVoteData)
-    )
+    const voteBytes = R.map(bStr =&gt; parseInt(bStr, 2), R.splitEvery(8, binVoteData))
 
     // check bytes are in range
     assert.equal(
@@ -349,11 +300,7 @@ export const genRange3VoteData = (votesArray: number[]) =&gt; {
 
     // generate final hex
     const voteData = web3Utils.bytesToHex(voteBytes)
-    assert.equal(
-        voteData.length,
-        66,
-        &apos;Assertion failed: final hex was not 66 characters long (32 bytes)&apos;
-    )
+    assert.equal(voteData.length, 66, &apos;Assertion failed: final hex was not 66 characters long (32 bytes)&apos;)
 
     return voteData
 }
@@ -363,14 +310,8 @@ export const genRange3VoteData = (votesArray: number[]) =&gt; {
  *
  * @param {object} txInfo
  *  Object literal containing the information required to generate the web3 transaction.
- *       @param {string} bbFarm
- *       Ethereum address where the vote needs to be cast
- *       @param {string} ballotId
- *       The id of the ballot
- *       @param {string} userAddress
- *       Ethereum address of the user - &apos;from&apos;
- *       @param {string} voteData
- *       The data containing the users vote
+ * @param {object} svNetwork
+ *  config object containing svNetwork
  *
  * @returns {object}
  *  Returns an object with all fields required to cast the transaction
@@ -379,28 +320,12 @@ export const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) =&gt; {
     const { bbFarm, ballotId, userAddress, voteData } = txInfo
     const { web3 } = svNetwork
 
-    assert.equal(
-        web3Utils.isAddress(bbFarm),
-        true,
-        &apos;BBFarm address supplied is not a valid ethereum address.&apos;
-    )
-    assert.equal(
-        web3Utils.isAddress(userAddress),
-        true,
-        &apos;User address supplied is not a valid ethereum address.&apos;
-    )
-    assert.equal(
-        voteData.length,
-        66,
-        &apos;Assertion failed: final hex was not 66 characters long (32 bytes)&apos;
-    )
+    assert.equal(web3Utils.isAddress(bbFarm), true, &apos;BBFarm address supplied is not a valid ethereum address.&apos;)
+    assert.equal(web3Utils.isAddress(userAddress), true, &apos;User address supplied is not a valid ethereum address.&apos;)
+    assert.equal(voteData.length, 66, &apos;Assertion failed: final hex was not 66 characters long (32 bytes)&apos;)
 
     const BBFarmContract = new web3.eth.Contract(BBFarmAbi, bbFarm)
-    const submitVote = BBFarmContract.methods.submitVote(
-        ballotId,
-        voteData,
-        &apos;0x&apos;
-    )
+    const submitVote = BBFarmContract.methods.submitVote(ballotId, voteData, &apos;0x&apos;)
     const gasEstimate = await submitVote.estimateGas()
     const abiValue = await submitVote.encodeABI()
     const gasPrice = await Light.getCurrentGasPrice()
@@ -408,7 +333,7 @@ export const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) =&gt; {
     const web3Tx = {
         to: bbFarm,
         data: abiValue,
-        gas: web3.utils.toHex(Math.round(gasEstimate * 1.05)), // 5% added just in case
+        gas: web3.utils.toHex((gasEstimate * 1.05) | 0), // 5% added just in case
         gasPrice: gasPrice.average * 1000000000,
         from: userAddress
     }
@@ -416,16 +341,8 @@ export const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) =&gt; {
 }
 
 export const castProxyVote = async (request, svConfig) =&gt; {
-    assert.equal(
-        web3Utils.isBN(request.ballotId),
-        true,
-        &apos;Ballot id is not a BN&apos;
-    )
-    assert.equal(
-        request.proxyReq.length == 5,
-        true,
-        &apos;Proxy vote req does not contain the correct number of parameters&apos;
-    )
+    assert.equal(web3Utils.isBN(request.ballotId), true, &apos;Ballot id is not a BN&apos;)
+    assert.equal(request.proxyReq.length == 5, true, &apos;Proxy vote req does not contain the correct number of parameters&apos;)
     assert.equal(
         request.hasOwnProperty(&apos;extra&apos;) &amp;&amp; request.hasOwnProperty(&apos;democHash&apos;),
         true,
@@ -448,11 +365,6 @@ export const castProxyVote = async (request, svConfig) =&gt; {
             })
     })
 }
-
-// export const createEd25519SelfDelegation = async (delegation) =&gt; {
-
-//   return true
-// }
 </code></pre>
 
 </div>

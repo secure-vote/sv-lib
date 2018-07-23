@@ -1,4 +1,7 @@
 import * as R from 'ramda'
+import { ThrowReporter } from 'io-ts/lib/ThrowReporter'
+
+import { HexString } from './runtimeTypes'
 
 /**
  * This will take an Ethereum hex string (or a normal hex string) and
@@ -87,21 +90,20 @@ export const hexToBase32 = (hex: string) => {
     return toAlphabet(R.reverse(digits.slice(0, digitlength)))
 }
 
+/**
+ * Turn a hexstring (with or without prefix) to a Uint8Array
+ *
+ * @param {string} hex
+ * @returns {Uint8Array}
+ */
 export const hexToUint8Array = (hex: string) => {
-    if (typeof hex !== 'string') {
-        throw new TypeError('Expected input to be a string')
-    }
+    const _hex = hex.slice(0, 2) === '0x' ? hex.slice(2) : hex
+    ThrowReporter.report(HexString.decode('0x' + _hex))
 
-    if (hex.length % 2 !== 0) {
-        throw new RangeError(
-            'Expected string to be an even number of characters'
-        )
-    }
+    var view = new Uint8Array(_hex.length / 2)
 
-    var view = new Uint8Array(hex.length / 2)
-
-    for (var i = 0; i < hex.length; i += 2) {
-        view[i / 2] = parseInt(hex.substring(i, i + 2), 16)
+    for (var i = 0; i < _hex.length / 2; i++) {
+        view[i] = parseInt(_hex.substring(2 * i, 2 * i + 2), 16)
     }
 
     return view

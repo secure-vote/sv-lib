@@ -30,7 +30,7 @@ export declare const flags: {
 export declare const mkPacked: (start: any, end: any, submissionBits: any) => any;
 /**
  * This combines flags into a finished submissionBits. It also does some validation.
- * @param {*} toCombine
+ * @param {number[]} toCombine
  *  Array of all submission flags to combine. See SV.ballotBox.flags for flag options.
  *  All flags must be a power of 2 (which indicates they occupy a single bit in the number when combining).
  * @returns {number}
@@ -83,14 +83,8 @@ export declare const genRange3VoteData: (votesArray: number[]) => any;
  *
  * @param {object} txInfo
  *  Object literal containing the information required to generate the web3 transaction.
- *       @param {string} bbFarm
- *       Ethereum address where the vote needs to be cast
- *       @param {string} ballotId
- *       The id of the ballot
- *       @param {string} userAddress
- *       Ethereum address of the user - 'from'
- *       @param {string} voteData
- *       The data containing the users vote
+ * @param {object} svNetwork
+ *  config object containing svNetwork
  *
  * @returns {object}
  *  Returns an object with all fields required to cast the transaction

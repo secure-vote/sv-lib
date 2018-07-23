@@ -28,4 +28,10 @@ export declare const ethAddrEq: (addr1: string, addr2: string) => boolean;
  *  The Base32 version of the hex string.
  */
 export declare const hexToBase32: (hex: string) => string;
+/**
+ * Turn a hexstring (with or without prefix) to a Uint8Array
+ *
+ * @param {string} hex
+ * @returns {Uint8Array}
+ */
 export declare const hexToUint8Array: (hex: string) => Uint8Array;
