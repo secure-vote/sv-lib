@@ -108,16 +108,12 @@ export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
     const archiveUrl = { svConfig }
 
     const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(backendAddress, indexAddress, democHash, nthBallot).call()
-    // console.log('bbFarmAndBallotId :', bbFarmAndBallotId);
 
     const { id, bbFarmAddress } = bbFarmAndBallotId
     const userEthAddress = '0x0000000000000000000000000000000000000000'
     const ethBallotDetails = await aux.methods.getBallotDetails(id, bbFarmAddress, userEthAddress).call()
 
     const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
-    // console.log('ballotSpec :', ballotSpec);
-    // .then(x => console.log('Then called', x))
-    // .catch(x => console.log('Caught error', x));
 
     const ballotObject = {
         ...bbFarmAndBallotId,
@@ -311,8 +307,6 @@ export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => 
             throw error
         })
 
-    console.log('Fresh:', delegations)
-
     return delegations
 }
 
@@ -381,7 +375,6 @@ export const createEd25519DelegationTransaction = (
  */
 export const ed25519DelegationIsValid = (dlgtRequest: string, pubKey: string, signature: string) => {
     const _sig = SvUtils.cleanEthHex(signature)
-    console.log('_sig :', _sig)
     assert.equal(_sig.length, 128, 'Invalid signature, should be a 64 byte hex string')
 
     // Create the keypair from the public key
@@ -403,7 +396,6 @@ export const submitEd25519Delegation = async (SvNetwork: any, dlgtRequest: strin
 
         // Todo - eventually use SvNetwork to determine what needs to go with the request
         const { svConfig } = SvNetwork
-        console.log('svConfig :', svConfig)
         const { svApiUrl } = svConfig
         const delegationRequest = {
             signature: '0x' + signature,
