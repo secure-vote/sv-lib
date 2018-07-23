@@ -132,3 +132,4 @@ export declare const createEd25519DelegationTransaction: (svNetwork: any, dlgtRe
  * @returns {boolean}
  */
 export declare const ed25519DelegationIsValid: (dlgtRequest: string, pubKey: string, signature: string) => any;
+export declare const submitEd25519Delegation: (SvNetwork: any, dlgtRequest: string, pubKey: string, signature: string) => Promise<{}>;

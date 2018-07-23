@@ -325,11 +325,12 @@ export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => 
 export const prepareEd25519Delegation = (address: string, nonce?: string) => {
     // Delegate prefix (SV-ED-ETH)
     const prefix = SvUtils.cleanEthHex(web3Utils.toHex(SvConsts.Ed25519DelegatePrefix))
-    const _nonce = nonce && web3Utils.isHex(nonce) ? nonce : web3Utils.randomHex(3).slice(2)
+    const _nonce = nonce && web3Utils.isHex(nonce) ? nonce : SvUtils.genRandomHex(3)
 
     const trimmedAddress = SvUtils.cleanEthHex(address)
 
     const dlgtPacked = `0x${prefix}${_nonce}${trimmedAddress}`.toLowerCase()
+
     assert.equal(dlgtPacked.length, 2 + 64, 'dlgtPacked was not 32 bytes / 64 chars long. This should never happen.')
     return dlgtPacked
 }
@@ -369,18 +370,6 @@ export const createEd25519DelegationTransaction = (
         gas: 500000,
         data: txData
     }
-
-    // .then(x => {
-    //     const { rawTransaction } = x
-    //     web3.eth
-    //         .sendSignedTransaction(rawTransaction)
-    //         .on('receipt', receipt => {
-    //             const { transactionHash } = receipt
-    //             resolve(transactionHash)
-    //         })
-    //         .catch(error => reject(error))
-    // })
-    // .catch(error => reject(error))
 }
 
 /**
@@ -392,6 +381,7 @@ export const createEd25519DelegationTransaction = (
  */
 export const ed25519DelegationIsValid = (dlgtRequest: string, pubKey: string, signature: string) => {
     const _sig = SvUtils.cleanEthHex(signature)
+    console.log('_sig :', _sig)
     assert.equal(_sig.length, 128, 'Invalid signature, should be a 64 byte hex string')
 
     // Create the keypair from the public key
@@ -402,4 +392,36 @@ export const ed25519DelegationIsValid = (dlgtRequest: string, pubKey: string, si
 
     // Verify the request against the signature
     return kp.verify(dlgtRequest, sigBuffer)
+}
+
+export const submitEd25519Delegation = async (SvNetwork: any, dlgtRequest: string, pubKey: string, signature: string) => {
+    return new Promise((resolve, reject) => {
+        assert.equal(signature.length, 128, 'Invalid signature, should be a 64 byte string')
+        assert.equal(dlgtRequest.length, 66, 'Invalid dlgtRequest, should be 32 byte hex string')
+        assert.equal(SvNetwork.hasOwnProperty('svConfig'), true, 'Invalid request, SvNetwork should have the property svConfig')
+        assert.equal(pubKey.length, 56, 'Invalid pubKey - must be 28 bytes')
+
+        // Todo - eventually use SvNetwork to determine what needs to go with the request
+        const { svConfig } = SvNetwork
+        console.log('svConfig :', svConfig)
+        const { svApiUrl } = svConfig
+        const delegationRequest = {
+            signature: '0x' + signature,
+            publickey: pubKey,
+            packed: dlgtRequest,
+            subgroupVersion: 1
+        }
+
+        const requestUrl = `${svApiUrl}/sv/light/submitEd25519Delegation`
+
+        axios
+            .post(requestUrl, delegationRequest)
+            .then(response => {
+                const { data } = response
+                resolve(data)
+            })
+            .catch(error => {
+                reject(error.response.data.error)
+            })
+    })
 }

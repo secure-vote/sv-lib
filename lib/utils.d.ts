@@ -35,3 +35,4 @@ export declare const hexToBase32: (hex: string) => string;
  * @returns {Uint8Array}
  */
 export declare const hexToUint8Array: (hex: string) => Uint8Array;
+export declare const genRandomHex: (bytes: number) => any;

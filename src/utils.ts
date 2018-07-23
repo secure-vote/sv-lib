@@ -2,6 +2,7 @@ import * as R from 'ramda'
 import { ThrowReporter } from 'io-ts/lib/ThrowReporter'
 
 import { HexString } from './runtimeTypes'
+import * as web3Utils from 'web3-utils'
 
 /**
  * This will take an Ethereum hex string (or a normal hex string) and
@@ -107,4 +108,12 @@ export const hexToUint8Array = (hex: string) => {
     }
 
     return view
+}
+
+export const genRandomHex = (bytes: number) => {
+    let randomHex = null
+    do {
+        randomHex = web3Utils.randomHex(bytes)
+    } while (randomHex.slice(2).length != bytes * 2)
+    return randomHex.slice(2)
 }
