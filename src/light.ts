@@ -8,6 +8,7 @@ import * as SvUtils from './utils'
 import * as StellarBase from 'stellar-base'
 import * as assert from 'assert'
 import * as detectNetwork from 'web3-detect-network'
+import * as web3Utils from 'web3-utils'
 
 // Lovely ABIs
 import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'
