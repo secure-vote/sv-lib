@@ -231,7 +231,11 @@ export var prepareWeb3BBVoteTx = function (_a, _b) {
                     bbFarm = txInfo.bbFarm, ballotId = txInfo.ballotId, userAddress = txInfo.userAddress, voteData = txInfo.voteData;
                     web3 = svNetwork.web3;
                     assert.equal(web3Utils.isAddress(bbFarm), true, 'BBFarm address supplied is not a valid ethereum address.');
-                    assert.equal(web3Utils.isAddress(userAddress), true, 'User address supplied is not a valid ethereum address.');
+                    // assert.equal(
+                    //     web3Utils.isAddress(userAddress),
+                    //     true,
+                    //     'User address supplied is not a valid ethereum address.'
+                    // )
                     assert.equal(voteData.length, 66, 'Assertion failed: final hex was not 66 characters long (32 bytes)');
                     BBFarmContract = new web3.eth.Contract(BBFarmAbi, bbFarm);
                     submitVote = BBFarmContract.methods.submitVote(ballotId, voteData, '0x');

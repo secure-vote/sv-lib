@@ -7,6 +7,30 @@ export declare const initializeSvLight: (svConfig: any) => Promise<{
     aux: any;
     payments: any;
 }>;
+export declare const initializeWindowWeb3: () => Promise<{
+    detected: boolean;
+    loaded: boolean;
+    network?: undefined;
+    web3?: undefined;
+} | {
+    detected: boolean;
+    loaded: boolean;
+    network: {
+        id: any;
+        type: any;
+        supported: boolean;
+    };
+    web3: any;
+} | {
+    network: {
+        id: any;
+        type: any;
+        supported: boolean;
+    };
+    detected: boolean;
+    loaded: boolean;
+    web3?: undefined;
+}>;
 export declare const resolveEnsAddress: ({ resolver }: {
     resolver: any;
 }, ensName: any) => Promise<any>;

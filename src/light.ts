@@ -6,6 +6,7 @@ import * as SvConsts from './const'
 import * as SvUtils from './utils'
 import * as StellarBase from 'stellar-base'
 import * as assert from 'assert'
+import * as detectNetwork from 'web3-detect-network'
 
 // Lovely ABIs
 import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'
@@ -27,6 +28,7 @@ export const initializeSvLight = async svConfig => {
     } = svConfig
 
     const Web3 = require('web3')
+
     const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
     const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
 
@@ -52,6 +54,46 @@ export const initializeSvLight = async svConfig => {
         backend,
         aux,
         payments
+    }
+}
+
+export const initializeWindowWeb3 = async () => {
+    const Web3 = require('web3')
+    const detectNetwork = require('web3-detect-network')
+    const windowWeb3 = (<any>window).web3
+    const _detected = typeof windowWeb3 !== 'undefined'
+    if (!_detected) {
+        return { detected: false, loaded: true }
+    }
+    const network = await detectNetwork(windowWeb3.currentProvider)
+    const _supported = network.id == 1 || network.id == 42
+    const networkStatus = {
+        id: network.id,
+        type: network.type,
+        supported: _supported
+    }
+    if (_detected && _supported) {
+        // Web3 exists and is on a supported network
+        const web3Instance = new Web3(windowWeb3.currentProvider)
+        return {
+            detected: true,
+            loaded: true,
+            network: networkStatus,
+            web3: web3Instance
+        }
+    } else if (_detected) {
+        // Web3 is detected, but on an unsupported or unknown network
+        return {
+            network: networkStatus,
+            detected: true,
+            loaded: true
+        }
+    } else {
+        // Web3 not detected at all.
+        return {
+            detected: false,
+            loaded: true
+        }
     }
 }
 

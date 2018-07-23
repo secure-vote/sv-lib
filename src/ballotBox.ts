@@ -307,11 +307,11 @@ export const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) => {
         true,
         'BBFarm address supplied is not a valid ethereum address.'
     )
-    assert.equal(
-        web3Utils.isAddress(userAddress),
-        true,
-        'User address supplied is not a valid ethereum address.'
-    )
+    // assert.equal(
+    //     web3Utils.isAddress(userAddress),
+    //     true,
+    //     'User address supplied is not a valid ethereum address.'
+    // )
     assert.equal(
         voteData.length,
         66,

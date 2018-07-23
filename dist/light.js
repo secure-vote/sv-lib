@@ -99,6 +99,55 @@ export var initializeSvLight = function (svConfig) { return __awaiter(_this, voi
         }
     });
 }); };
+export var initializeWindowWeb3 = function () { return __awaiter(_this, void 0, void 0, function () {
+    var Web3, detectNetwork, windowWeb3, _detected, network, _supported, networkStatus, web3Instance;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                Web3 = require('web3');
+                detectNetwork = require('web3-detect-network');
+                windowWeb3 = window.web3;
+                _detected = typeof windowWeb3 !== 'undefined';
+                if (!_detected) {
+                    return [2 /*return*/, { detected: false, loaded: true }];
+                }
+                return [4 /*yield*/, detectNetwork(windowWeb3.currentProvider)];
+            case 1:
+                network = _a.sent();
+                _supported = (network.id == 1 || network.id == 42);
+                networkStatus = {
+                    id: network.id,
+                    type: network.type,
+                    supported: _supported
+                };
+                if (_detected && _supported) {
+                    web3Instance = new Web3(windowWeb3.currentProvider);
+                    return [2 /*return*/, {
+                            detected: true,
+                            loaded: true,
+                            network: networkStatus,
+                            web3: web3Instance
+                        }];
+                }
+                else if (_detected) {
+                    // Web3 is detected, but on an unsupported or unknown network
+                    return [2 /*return*/, {
+                            network: networkStatus,
+                            detected: true,
+                            loaded: true
+                        }];
+                }
+                else {
+                    // Web3 not detected at all.
+                    return [2 /*return*/, {
+                            detected: false,
+                            loaded: true
+                        }];
+                }
+                return [2 /*return*/];
+        }
+    });
+}); };
 export var resolveEnsAddress = function (_a, ensName) {
     var resolver = _a.resolver;
     return __awaiter(_this, void 0, void 0, function () {
@@ -429,7 +478,8 @@ export var createEd25519DelegationTransaction = function (svNetwork, delRequest,
                 var addDelegation = Ed25519Del.methods.addUntrustedSelfDelegation(lowerCaseDelRequest, hexPubKey, sigArray);
                 var txData = addDelegation.encodeABI();
                 // Signed with testing kovan private key, no funds, not a real account by any terms (0x1337FB304Fee2F386527839Af9892101c7925623)
-                web3.eth.accounts.signTransaction({
+                web3.eth.accounts
+                    .signTransaction({
                     to: unsafeEd25519DelegationAddr,
                     value: '0',
                     gas: 2000000,
@@ -437,7 +487,8 @@ export var createEd25519DelegationTransaction = function (svNetwork, delRequest,
                 }, '0xc497fac6b7d9e8dded3d0cb04d3926070969514d8d8a94f5641dcaecccb865e8')
                     .then(function (x) {
                     var rawTransaction = x.rawTransaction;
-                    web3.eth.sendSignedTransaction(rawTransaction)
+                    web3.eth
+                        .sendSignedTransaction(rawTransaction)
                         .on('receipt', function (receipt) {
                         var transactionHash = receipt.transactionHash;
                         resolve(transactionHash);
