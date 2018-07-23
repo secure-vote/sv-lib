@@ -25,7 +25,6 @@ export const initializeSvLight = async svConfig => {
     const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig
 
     const Web3 = require('web3')
-
     const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
     const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
 
@@ -285,7 +284,7 @@ export const stellarPkToHex = (pubKey: string): string => {
     } else {
         const kp = StellarBase.Keypair.fromPublicKey(pubKey)
         const rawPubKey = kp.rawPublicKey()
-        const hexPubKey = '0x' + rawPubKey.toString('hex')
+        hexPubKey = '0x' + rawPubKey.toString('hex')
     }
 
     return hexPubKey
@@ -303,10 +302,12 @@ export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => 
     const { unsafeEd25519DelegationAddr } = svConfig
 
     const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)
+    const hexPubKey = stellarPkToHex(pubKey)
     const delegations = await Ed25519Del.methods
         .getAllForPubKey(stellarPkToHex(pubKey))
         .call()
         .catch(error => {
+            console.log('error :', error)
             throw error
         })
 
