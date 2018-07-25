@@ -1,6 +1,5 @@
+import { ApiError } from './api'
 import { EthNetConf } from './types'
-
-export class ApiError extends Error {}
 
 export const processApiError = err => {
     throw err.response.status === 400 ? new ApiError(err.response.data.error) : err
