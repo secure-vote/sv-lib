@@ -1,7 +1,18 @@
+import { getNetwork } from './const'
 import * as R from 'ramda'
-import { ThrowReporter } from 'io-ts/lib/ThrowReporter'
+import { PathReporter } from 'io-ts/lib/PathReporter'
 
-import { HexString } from './runtimeTypes'
+import { HexString, HexStringRT } from './runtimeTypes'
+import * as web3Utils from 'web3-utils'
+import { HexError, DecodeError } from './errors'
+import * as t from 'io-ts'
+
+export const checkDecode = <S>(validationRes: t.Validation<S>, ErrTyp?: Error): void => {
+    if (validationRes.isLeft()) {
+        const E = ErrTyp ? ErrTyp : DecodeError
+        throw new E(PathReporter.report(validationRes).join('\n'))
+    }
+}
 
 /**
  * This will take an Ethereum hex string (or a normal hex string) and
@@ -20,7 +31,7 @@ export const cleanEthHex = (hex: string) => {
 
     // hex must be even - only exception above
     if (hex.length % 2 !== 0) {
-        throw Error(`Bad hex string: ${hex}`)
+        throw new HexError(`Bad hex string: ${hex}`)
     }
 
     // this covers the case hex=="0x" => ""
@@ -29,6 +40,13 @@ export const cleanEthHex = (hex: string) => {
     }
 
     return hex
+}
+
+export const toEthHex = (hex: string) => {
+    if (hex.length % 2 == 0 && web3Utils.isHexStrict(hex)) return hex
+    const _hex = '0x' + hex
+    checkDecode(HexStringRT.decode(_hex), HexError)
+    return _hex
 }
 
 /**
@@ -98,7 +116,7 @@ export const hexToBase32 = (hex: string) => {
  */
 export const hexToUint8Array = (hex: string) => {
     const _hex = hex.slice(0, 2) === '0x' ? hex.slice(2) : hex
-    ThrowReporter.report(HexString.decode('0x' + _hex))
+    checkDecode(HexStringRT.decode('0x' + _hex))
 
     var view = new Uint8Array(_hex.length / 2)
 
@@ -108,3 +126,21 @@ export const hexToUint8Array = (hex: string) => {
 
     return view
 }
+
+/**
+ * Generate a random hexstring with the requested number of bytes (note: this works around a bug in
+ * web3-utils in-browser, so these are not considered cryptographically secure; there might be some
+ * bias in the distribution of bytes - particularly a statistical lack of 0s)
+ *
+ * @param {number} nBytes number of bytes to generate; returned hexString will be nBytes*2+2 in length
+ * @returns {HexString}
+ */
+export const genRandomHex = (nBytes: number): HexString => web3Utils.randomHex(nBytes + 32).slice(0, nBytes * 2 + 2)
+
+/**
+ * Return bool based on whether a network has an index contract
+ * @param {number} networkId
+ * @param {number} chainId
+ * @returns {boolean}
+ */
+export const doesNetHaveIndex = (networkId, chainId) => getNetwork(networkId, chainId).indexEnsName.length > 0

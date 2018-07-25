@@ -1,29 +1,15 @@
-export const zeroAddr = '0x0000000000000000000000000000000000000000'
-export const zeroHash =
-    '0x0000000000000000000000000000000000000000000000000000000000000000'
+import { EthNetError } from './errors'
+import { EthNetConf } from './types'
 
-type EthNetConf = {
-    indexContractName: string
-    auxContract: string
-    httpProvider: string
-    delegationContractName: string
-    ensResolver: string
-    ens: string
-    etherscanLink: string
-    name: string
-    archiveUrl: string
-    archivePushUrl: string
-    lookupAddress: string
-    unsafeEd25519DelegationAddr: string
-    svApiUrl: string
-}
+export const zeroAddr = '0x0000000000000000000000000000000000000000'
+export const zeroHash = '0x0000000000000000000000000000000000000000000000000000000000000000'
 
 const _raw_networkVars: { [netName: string]: EthNetConf } = {
     kovan: {
-        indexContractName: 'index.kov.sv',
+        indexEnsName: 'index.kov.sv',
         auxContract: '0x0d31706febd1b8177c722fe39432f3e47143ccd9',
         httpProvider: 'https://kovan.eth.secure.vote/tokenvote-dev',
-        delegationContractName: 'delegation-2018-06-19.kov.sv',
+        delegationEnsName: 'delegation-2018-06-19.kov.sv',
         ensResolver: '0xc8c73829348cb15da4b0785a110017464fb8af51',
         ens: '0xd6F4f22eeC158c434b17d01f62f5dF33b108Ae93',
         etherscanLink: 'https://kovan.etherscan.io/',
@@ -32,14 +18,13 @@ const _raw_networkVars: { [netName: string]: EthNetConf } = {
         archivePushUrl: 'https://archive.test.push.secure.vote/',
         lookupAddress: '0x216265865e46D4c6FE506877EfAAE7dd7Ae2faCE',
         svApiUrl: 'https://dev.api.secure.vote',
-        unsafeEd25519DelegationAddr:
-            '0x005645072d7c244476e3099619a6089245b6a958'
+        unsafeEd25519DelegationAddr: '0x005645072d7c244476e3099619a6089245b6a958'
     },
     mainnet: {
-        indexContractName: 'index.tokenvote.eth',
+        indexEnsName: 'index.tokenvote.eth',
         auxContract: '0xff553fe4183f27e2165299b3fc0ae8c3b5c07084',
         httpProvider: 'https://mainnet.eth.secure.vote/tokenvote',
-        delegationContractName: 'delegate.secvote.eth',
+        delegationEnsName: 'delegate.secvote.eth',
         ensResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
         ens: '0x314159265dd8dbb310642f98f50c066173c1259b',
         etherscanLink: 'https://etherscan.io/',
@@ -51,10 +36,10 @@ const _raw_networkVars: { [netName: string]: EthNetConf } = {
         unsafeEd25519DelegationAddr: ''
     },
     ropsten: {
-        indexContractName: '',
+        indexEnsName: '',
         auxContract: '',
         httpProvider: 'https://ropsten.eth.secure.vote/tokenvote-dev',
-        delegationContractName: '',
+        delegationEnsName: '',
         ensResolver: '',
         ens: '',
         etherscanLink: 'https://ropsten.etherscan.io/',
@@ -66,10 +51,10 @@ const _raw_networkVars: { [netName: string]: EthNetConf } = {
         unsafeEd25519DelegationAddr: ''
     },
     classic: {
-        indexContractName: '',
+        indexEnsName: '',
         auxContract: '',
         httpProvider: 'https://classic.eth.secure.vote/tokenvote-dev',
-        delegationContractName: '',
+        delegationEnsName: '',
         ensResolver: '',
         ens: '',
         etherscanLink: 'https://gastracker.io/', // eth classic block explorer
@@ -84,17 +69,13 @@ const _raw_networkVars: { [netName: string]: EthNetConf } = {
 
 export const networkVars = new Proxy(_raw_networkVars, {
     get: (obj, prop: string) => {
-        console.warn(
-            'Warning: const.networkVars is deprecated; please use const.getNetwork(..)'
-        )
+        console.warn('Warning: const.networkVars is deprecated; please use const.getNetwork(..)')
         return obj[prop]
     }
 })
 
 export const networkName = networkId => {
-    console.warn(
-        'Warning: const.networkName(..) is deprecated. Please use const.getNetwork(..).name'
-    )
+    console.warn('Warning: const.networkName(..) is deprecated. Please use const.getNetwork(..).name')
 
     switch (networkId) {
         case 1:
@@ -125,9 +106,7 @@ export const getNetwork = (networkId: number, chainId: number): EthNetConf => {
         default:
             break
     }
-    throw Error(
-        `Cannot find network with net_id ${networkId} and chainId ${chainId}`
-    )
+    throw new EthNetError(`Cannot find network with net_id ${networkId} and chainId ${chainId}`)
 }
 
 export const Ed25519DelegatePrefix = 'SV-ED-ETH'
