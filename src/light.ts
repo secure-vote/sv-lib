@@ -307,13 +307,17 @@ export const getUnsafeEd25519Delegations = async (stellarPK: string, svNetwork):
  * @returns {Bytes32} The hex string (with 0x prefix) of the delegation instruction
  */
 export const prepareEd25519Delegation = (address: string, nonce?: string): Bytes32 => {
-    // Delegate prefix (SV-ED-ETH)
+    // msg prefix (prevents attacks via malicious signature requests)
     const prefix = svUtils.cleanEthHex(web3Utils.toHex(svConst.Ed25519DelegatePrefix))
-    const _nonce = nonce && web3Utils.isHex(nonce) ? nonce : svUtils.genRandomHex(3).slice(2)
+    assert.equal(prefix.length, 9 * 2, 'Invalid prefix (${prefix}). It must be exactly 9 bytes')
+
+    const _nonce = nonce && web3Utils.isHex(nonce) ? nonce : svUtils.genRandomHex(3)
+    const trimmedNonce = svUtils.cleanEthHex(_nonce)
+    assert.equal(trimmedNonce.length, 6, `Invalid nonce (${trimmedNonce}). It must be exactly 3 bytes (6 hex characters)`)
 
     const trimmedAddress = svUtils.cleanEthHex(address)
 
-    const dlgtPacked = `0x${prefix}${_nonce}${trimmedAddress}`.toLowerCase()
+    const dlgtPacked = `0x${prefix}${trimmedNonce}${trimmedAddress}`.toLowerCase()
 
     assert.equal(dlgtPacked.length, 2 + 64, 'dlgtPacked was not 32 bytes / 64 chars long. This should never happen.')
     return dlgtPacked
