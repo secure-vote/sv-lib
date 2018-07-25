@@ -3,8 +3,11 @@ import axios from 'axios'
 const bs58 = require('bs58')
 const sha256 = require('sha256')
 
-import * as SvConsts from './const'
-import * as SvUtils from './utils'
+const Web3 = require('web3')
+const detectNetwork = require('web3-detect-network')
+
+import * as svConst from './const'
+import * as svUtils from './utils'
 import * as StellarBase from 'stellar-base'
 import * as assert from 'assert'
 import * as detectNetwork from 'web3-detect-network'
@@ -20,9 +23,17 @@ import AuxAbi from './smart_contracts/AuxAbi.abi.json'
 import AuctionAbi from './smart_contracts/CommAuctionIface.abi.json'
 import ERC20Abi from './smart_contracts/ERC20.abi.json'
 import UnsafeEd25519DelegationAbi from './smart_contracts/UnsafeEd25519Delegation.abi.json'
+import { WindowWeb3Init, EthNetConf, SvNetwork, SvNetwork } from './types'
+import * as API from './api'
+import { HexString, Bytes32 } from './runtimeTypes'
 
-export const initializeSvLight = async svConfig => {
-    const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig
+/**
+ * Return contract instances and web3 needed for SvLight usage
+ * @param {EthNetConf} netConf Config file for all current network
+ * @returns {SvNetwork} The SvNetwork object based on `netConf`
+ */
+export const initializeSvLight = async (netConf: EthNetConf): SvNetwork => {
+    const { indexContractName, ensResolver, httpProvider, auxContract } = netConf
 
     const Web3 = require('web3')
     const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
@@ -37,7 +48,7 @@ export const initializeSvLight = async svConfig => {
     const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())
 
     return {
-        svConfig,
+        netConf,
         web3,
         resolver,
         index,
@@ -47,46 +58,28 @@ export const initializeSvLight = async svConfig => {
     }
 }
 
-export const initializeWindowWeb3 = async () => {
-    const Web3 = require('web3')
-    const detectNetwork = require('web3-detect-network')
+/**
+ * Initialise a Web3 instance based on the window's web3.currentProvider
+ * @returns {WindowWeb3Init} Object containing the web3 instance and metadata
+ */
+export const initializeWindowWeb3 = async (): WindowWeb3Init => {
     const windowWeb3 = (<any>window).web3
-    const _detected = typeof windowWeb3 !== 'undefined'
-    if (!_detected) {
+    const detected = typeof windowWeb3 !== 'undefined'
+    if (!detected) {
         return { detected: false, loaded: true }
     }
     const network = await detectNetwork(windowWeb3.currentProvider)
-    const _supported = network.id == 1 || network.id == 42
-    const networkStatus = {
-        id: network.id,
-        type: network.type,
-        supported: _supported
-    }
-    if (_detected && _supported) {
-        // Web3 exists and is on a supported network
-        const web3Instance = new Web3(windowWeb3.currentProvider)
-        return {
-            detected: true,
-            loaded: true,
-            network: networkStatus,
-            web3: web3Instance
-        }
-    } else if (_detected) {
-        // Web3 is detected, but on an unsupported or unknown network
-        return {
-            network: networkStatus,
-            detected: true,
-            loaded: true
-        }
-    } else {
-        // Web3 not detected at all.
-        return {
-            detected: false,
-            loaded: true
-        }
-    }
+    const netHasIndex = svConst.doesNetHaveIndex(network.id, network.id)
+    const networkStatus = { id: network.id, type: network.type, hasIndex: netHasIndex }
+    const web3 = new Web3(windowWeb3.currentProvider)
+    return { detected, loaded: true, networkStatus, web3 }
 }
 
+/**
+ * Resolve an ENS name to an address
+ * @param {{resolver: Web3ResolverInstance}} contracts containing a `resolver` field w/ a web3 instance of a Resolver contract
+ * @param {string} ensName
+ */
 export const resolveEnsAddress = async ({ resolver }, ensName) => {
     return await resolver.methods.addr(NH.hash(ensName)).call()
 }
@@ -298,7 +291,6 @@ export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => 
     const { unsafeEd25519DelegationAddr } = svConfig
 
     const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)
-    const hexPubKey = stellarPkToHex(pubKey)
     const delegations = await Ed25519Del.methods
         .getAllForPubKey(stellarPkToHex(pubKey))
         .call()
@@ -318,10 +310,10 @@ export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => 
  */
 export const prepareEd25519Delegation = (address: string, nonce?: string) => {
     // Delegate prefix (SV-ED-ETH)
-    const prefix = SvUtils.cleanEthHex(web3Utils.toHex(SvConsts.Ed25519DelegatePrefix))
-    const _nonce = nonce && web3Utils.isHex(nonce) ? nonce : SvUtils.genRandomHex(3)
+    const prefix = svUtils.cleanEthHex(web3Utils.toHex(svConst.Ed25519DelegatePrefix))
+    const _nonce = nonce && web3Utils.isHex(nonce) ? nonce : svUtils.genRandomHex(3)
 
-    const trimmedAddress = SvUtils.cleanEthHex(address)
+    const trimmedAddress = svUtils.cleanEthHex(address)
 
     const dlgtPacked = `0x${prefix}${_nonce}${trimmedAddress}`.toLowerCase()
 
@@ -374,46 +366,53 @@ export const createEd25519DelegationTransaction = (
  * @returns {boolean}
  */
 export const ed25519DelegationIsValid = (dlgtRequest: string, pubKey: string, signature: string) => {
-    const _sig = SvUtils.cleanEthHex(signature)
+    const _sig = svUtils.cleanEthHex(signature)
     assert.equal(_sig.length, 128, 'Invalid signature, should be a 64 byte hex string')
 
     // Create the keypair from the public key
     const kp = StellarBase.Keypair.fromPublicKey(pubKey)
 
     // Create a buffer from the signature
-    const sigBuffer = Buffer.from(SvUtils.hexToUint8Array(_sig))
+    const sigBuffer = Buffer.from(svUtils.hexToUint8Array(_sig))
 
     // Verify the request against the signature
     return kp.verify(dlgtRequest, sigBuffer)
 }
 
-export const submitEd25519Delegation = async (SvNetwork: any, dlgtRequest: string, pubKey: string, signature: string) => {
-    return new Promise((resolve, reject) => {
-        assert.equal(signature.length, 128, 'Invalid signature, should be a 64 byte string')
-        assert.equal(dlgtRequest.length, 66, 'Invalid dlgtRequest, should be 32 byte hex string')
-        assert.equal(SvNetwork.hasOwnProperty('svConfig'), true, 'Invalid request, SvNetwork should have the property svConfig')
-        assert.equal(pubKey.length, 56, 'Invalid pubKey - must be 28 bytes')
+/**
+ *
+ * @param ethNetConf
+ * @param dlgtRequest
+ * @param stellarPK
+ * @param _signature
+ * @param opts
+ */
+export const submitEd25519Delegation = async (
+    ethNetConf: EthNetConf,
+    dlgtRequest: Bytes32,
+    stellarPK: string,
+    _signature: HexString,
+    opts?
+) => {
+    const signature = svUtils.toEthHex(_signature)
+    assert.equal(signature.length, 64 * 2 + 2, 'Invalid signature, should be a 64 byte string')
+    assert.equal(dlgtRequest.length, 32 * 2 + 2, 'Invalid dlgtRequest, should be 32 byte hex string')
+    assert.equal(stellarPK.length, 56, 'Invalid pubKey - must be Stellar base32 encoded PK - length 56')
 
-        // Todo - eventually use SvNetwork to determine what needs to go with the request
-        const { svConfig } = SvNetwork
-        const { svApiUrl } = svConfig
-        const delegationRequest = {
-            signature: '0x' + signature,
-            publickey: pubKey,
-            packed: dlgtRequest,
-            subgroupVersion: 1
-        }
+    // Todo - eventually use SvNetwork to determine what needs to go with the request
+    const { svApiUrl } = ethNetConf
+    const delegationRequest = {
+        signature: signature,
+        publickey: stellarPK,
+        packed: dlgtRequest,
+        subgroupVersion: 1,
+        broadcast: opts && opts.broadcast === false ? false : true
+    }
 
-        const requestUrl = `${svApiUrl}/sv/light/submitEd25519Delegation`
+    const requestUrl = API.submitEd25519DelegationUrl(ethNetConf)
 
-        axios
-            .post(requestUrl, delegationRequest)
-            .then(response => {
-                const { data } = response
-                resolve(data)
-            })
-            .catch(error => {
-                reject(error.response.data.error)
-            })
-    })
+    return await axios
+        .post(requestUrl, delegationRequest)
+        .then(API.extractData)
+        .catch(API.processApiError)
 }

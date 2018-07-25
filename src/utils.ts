@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 import { ThrowReporter } from 'io-ts/lib/ThrowReporter'
 
-import { HexString } from './runtimeTypes'
+import { HexString, HexStringRT } from './runtimeTypes'
 import * as web3Utils from 'web3-utils'
 
 /**
@@ -30,6 +30,13 @@ export const cleanEthHex = (hex: string) => {
     }
 
     return hex
+}
+
+export const toEthHex = (hex: string) => {
+    if (web3Utils.isHexStrict(hex)) return hex
+    const _hex = '0x' + hex
+    ThrowReporter.report(HexStringRT.decode(_hex))
+    return _hex
 }
 
 /**
@@ -99,7 +106,7 @@ export const hexToBase32 = (hex: string) => {
  */
 export const hexToUint8Array = (hex: string) => {
     const _hex = hex.slice(0, 2) === '0x' ? hex.slice(2) : hex
-    ThrowReporter.report(HexString.decode('0x' + _hex))
+    ThrowReporter.report(HexStringRT.decode('0x' + _hex))
 
     var view = new Uint8Array(_hex.length / 2)
 
@@ -110,10 +117,4 @@ export const hexToUint8Array = (hex: string) => {
     return view
 }
 
-export const genRandomHex = (bytes: number) => {
-    let randomHex = null
-    do {
-        randomHex = web3Utils.randomHex(bytes)
-    } while (randomHex.slice(2).length != bytes * 2)
-    return randomHex.slice(2)
-}
+export const genRandomHex = nBytes => web3Utils.randomHex(nBytes + 32).slice(0, nBytes * 2 + 2)

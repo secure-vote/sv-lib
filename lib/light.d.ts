@@ -1,36 +1,20 @@
-export declare const initializeSvLight: (svConfig: any) => Promise<{
-    svConfig: any;
-    web3: any;
-    resolver: any;
-    index: any;
-    backend: any;
-    aux: any;
-    payments: any;
-}>;
-export declare const initializeWindowWeb3: () => Promise<{
-    detected: boolean;
-    loaded: boolean;
-    network?: undefined;
-    web3?: undefined;
-} | {
-    detected: boolean;
-    loaded: boolean;
-    network: {
-        id: any;
-        type: any;
-        supported: boolean;
-    };
-    web3: any;
-} | {
-    network: {
-        id: any;
-        type: any;
-        supported: boolean;
-    };
-    detected: boolean;
-    loaded: boolean;
-    web3?: undefined;
-}>;
+import { WindowWeb3Init, EthNetConf, SvNetwork } from './types';
+/**
+ * Return contract instances and web3 needed for SvLight usage
+ * @param {EthNetConf} netConf Config file for all current network
+ * @returns {SvNetwork} The SvNetwork object based on `netConf`
+ */
+export declare const initializeSvLight: (netConf: EthNetConf) => SvNetwork;
+/**
+ * Initialise a Web3 instance based on the window's web3.currentProvider
+ * @returns {WindowWeb3Init} Object containing the web3 instance and metadata
+ */
+export declare const initializeWindowWeb3: () => WindowWeb3Init;
+/**
+ * Resolve an ENS name to an address
+ * @param {{resolver: Web3ResolverInstance}} contracts containing a `resolver` field w/ a web3 instance of a Resolver contract
+ * @param {string} ensName
+ */
 export declare const resolveEnsAddress: ({ resolver }: {
     resolver: any;
 }, ensName: any) => Promise<any>;
@@ -132,4 +116,12 @@ export declare const createEd25519DelegationTransaction: (svNetwork: any, dlgtRe
  * @returns {boolean}
  */
 export declare const ed25519DelegationIsValid: (dlgtRequest: string, pubKey: string, signature: string) => any;
-export declare const submitEd25519Delegation: (SvNetwork: any, dlgtRequest: string, pubKey: string, signature: string) => Promise<{}>;
+/**
+ *
+ * @param ethNetConf
+ * @param dlgtRequest
+ * @param stellarPK
+ * @param _signature
+ * @param opts
+ */
+export declare const submitEd25519Delegation: (ethNetConf: EthNetConf, dlgtRequest: string, stellarPK: string, _signature: string, opts?: any) => Promise<any>;

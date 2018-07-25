@@ -9,6 +9,7 @@
  *  the hex string.
  */
 export declare const cleanEthHex: (hex: string) => string;
+export declare const toEthHex: (hex: string) => string;
 /**
  * This compares ethereum addresses (taking into account case, etc)
  *
@@ -35,4 +36,4 @@ export declare const hexToBase32: (hex: string) => string;
  * @returns {Uint8Array}
  */
 export declare const hexToUint8Array: (hex: string) => Uint8Array;
-export declare const genRandomHex: (bytes: number) => any;
+export declare const genRandomHex: (nBytes: any) => any;

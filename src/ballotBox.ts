@@ -235,29 +235,21 @@ export const genRange3VoteData = (votesArray: number[]) => {
  *  Returns an object with all fields required to cast the transaction
  */
 export const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) => {
-    const { bbFarm, ballotId, userAddress, voteData } = txInfo
+    const { bbFarm, ballotId, voteData } = txInfo
     const { web3 } = svNetwork
 
     assert.equal(web3Utils.isAddress(bbFarm), true, 'BBFarm address supplied is not a valid ethereum address.')
-    // assert.equal(
-    //     web3Utils.isAddress(userAddress),
-    //     true,
-    //     'User address supplied is not a valid ethereum address.'
-    // )
     assert.equal(voteData.length, 66, 'Assertion failed: final hex was not 66 characters long (32 bytes)')
 
     const BBFarmContract = new web3.eth.Contract(BBFarmAbi, bbFarm)
     const submitVote = BBFarmContract.methods.submitVote(ballotId, voteData, '0x')
     const gasEstimate = await submitVote.estimateGas()
     const abiValue = await submitVote.encodeABI()
-    const gasPrice = await Light.getCurrentGasPrice()
 
     const web3Tx = {
         to: bbFarm,
         data: abiValue,
-        gas: web3.utils.toHex((gasEstimate * 1.05) | 0), // 5% added just in case
-        gasPrice: gasPrice.average * 1000000000,
-        from: userAddress
+        gas: web3.utils.toHex((gasEstimate * 1.05) | 0) // 5% added just in case
     }
     return web3Tx
 }
