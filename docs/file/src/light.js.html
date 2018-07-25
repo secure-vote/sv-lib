@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/light.js | sv-lib</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="SecureVote Light supporting functionality"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="sv-lib"><meta property="twitter:description" content="SecureVote Light supporting functionality"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/secure-vote/sv-lib"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkPacked">mkPacked</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSignedBallotForProxy">mkSignedBallotForProxy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSubmissionBits">mkSubmissionBits</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getNetwork">getNetwork</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-networkName">networkName</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethSignHash">ethSignHash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hashMsgRaw">hashMsgRaw</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashBSpec">checkBallotHashBSpec</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashGBallot">checkBallotHashGBallot</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkIfAddressIsEditor">checkIfAddressIsEditor</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBackendAddress">getBackendAddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBallotObjectFromIpfs">getBallotObjectFromIpfs</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBallotObjectFromS3">getBallotObjectFromS3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBallotSpec">getBallotSpec</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCommunityBallotPrice">getCommunityBallotPrice</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getContractAddresses">getContractAddresses</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCurrentGasPrice">getCurrentGasPrice</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocBallots">getDemocBallots</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocInfo">getDemocInfo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocNthBallot">getDemocNthBallot</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initializeSvLight">initializeSvLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resolveEnsAddress">resolveEnsAddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-weiToCents">weiToCents</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cleanEthHex">cleanEthHex</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethAddrEq">ethAddrEq</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexToBase32">hexToBase32</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-flags">flags</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-networkVars">networkVars</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroAddr">zeroAddr</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroHash">zeroHash</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/light.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const ENS = require(&apos;eth-ens-namehash&apos;);
+const Constants = require(&apos;./const&apos;);
+const axios = require(&apos;axios&apos;);
+const bs58 = require(&apos;bs58&apos;);
+const sha256 = require(&apos;sha256&apos;);
+
+// Lovely ABIs
+const ResolverAbi = require(&apos;./smart_contracts/SV_ENS_Resolver.abi.json&apos;);
+const IndexAbi = require(&apos;./smart_contracts/SVLightIndex.abi.json&apos;);
+const BackendAbi = require(&apos;./smart_contracts/SVLightIndexBackend.abi.json&apos;);
+const BBFarmAbi = require(&apos;./smart_contracts/BBFarm.abi.json&apos;);
+const PaymentsAbi = require(&apos;./smart_contracts/SVPayments.abi.json&apos;);
+const AuxAbi = require(&apos;./smart_contracts/AuxAbi.abi.json&apos;);
+const AuctionAbi = require(&apos;./smart_contracts/CommAuctionIface.abi.json&apos;);
+const ERC20Abi = require(&apos;./smart_contracts/ERC20.abi.json&apos;);
+
+export const initializeSvLight = async svConfig =&gt; {
+  const { indexContractName, ensResolver, httpProvider, auxContract } = svConfig;
+
+  const Web3 = require(&apos;web3&apos;);
+  const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider));
+
+  const resolver = new web3.eth.Contract(ResolverAbi, ensResolver);
+
+  // const indexAddress =
+  // console.log(&apos;indexAddress :&apos;, indexAddress);
+  const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexContractName));
+  const backendAddress = await getBackendAddress({ index });
+  const backend = new web3.eth.Contract(BackendAbi, backendAddress);
+  const aux = new web3.eth.Contract(AuxAbi, auxContract);
+  const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())
+
+  return {
+    svConfig,
+    web3,
+    resolver,
+    index,
+    backend,
+    aux,
+    payments
+  };
+};
+
+export const resolveEnsAddress = async ({ resolver }, ensName) =&gt; {
+  return await resolver.methods.addr(ENS.hash(ensName)).call();
+};
+
+export const getBackendAddress = async ({ index }) =&gt; {
+  return await index.methods.getBackend().call();
+};
+
+export const getDemocInfo = async ({ backend, democHash }) =&gt; {
+  return await backend.methods.getDInfo(democHash).call();
+};
+
+export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) =&gt; {
+  // Destructure and set the variables that are needed
+  const { index, backend, aux, svConfig } = svNetwork;
+  const { democHash, nthBallot } = democBallotInfo;
+  const indexAddress = index._address;
+  const backendAddress = backend._address;
+  const archiveUrl = { svConfig };
+
+  const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(backendAddress, indexAddress, democHash, nthBallot).call();
+  // console.log(&apos;bbFarmAndBallotId :&apos;, bbFarmAndBallotId);
+
+  const { id, bbFarmAddress } = bbFarmAndBallotId;
+  const userEthAddress = &apos;0x0000000000000000000000000000000000000000&apos;;
+  const ethBallotDetails = await aux.methods.getBallotDetails(id, bbFarmAddress, userEthAddress).call();
+
+  const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash);
+  // console.log(&apos;ballotSpec :&apos;, ballotSpec);
+  // .then(x =&gt; console.log(&apos;Then called&apos;, x))
+  // .catch(x =&gt; console.log(&apos;Caught error&apos;, x));
+
+  const ballotObject = { ...bbFarmAndBallotId, ...ethBallotDetails, data: { ...ballotSpec.data } };
+
+  return ballotObject;
+};
+
+export const getBallotSpec = async (archiveUrl, ballotSpecHash) =&gt; {
+  return new Promise((res, rej) =&gt; {
+    let done = false;
+    const doRes = obj =&gt; {
+      if (!done) {
+        done = true;
+        res(obj);
+      }
+    };
+    getBallotObjectFromIpfs(ballotSpecHash).then(doRes);
+    setTimeout(() =&gt; {
+      if (!done) {
+        getBallotObjectFromS3(archiveUrl, ballotSpecHash)
+          .then(doRes)
+          .catch(error =&gt; {
+            rej(new Error(error));
+          });
+      }
+    }, 3500);
+  });
+};
+
+export const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) =&gt; {
+  return axios.get(archiveUrl + ballotSpecHash + &apos;.json&apos;);
+};
+
+export const getBallotObjectFromIpfs = async ballotSpecHash =&gt; {
+  const ipfsUrl = &apos;https://ipfs.infura.io/api/v0/block/get?arg=&apos;;
+  const cidHex = &apos;1220&apos; + ballotSpecHash.substr(2);
+  const bytes = Buffer.from(cidHex, &apos;hex&apos;);
+  const cid = bs58.encode(bytes);
+  return await axios.get(ipfsUrl + cid);
+};
+
+// Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array
+export const getDemocBallots = async ({ svNetwork, democHash }) =&gt; {
+  const { backend } = svNetwork;
+  const democInfo = await getDemocInfo({ backend, democHash });
+
+  // Throw an error if the democ info is not correct
+  const {erc20, owner} = democInfo
+  if (owner === &apos;0x0000000000000000000000000000000000000000&apos;) {
+    throw new Error(&apos;Democracy Hash does not resolve to a democracy&apos;)
+  }
+
+  // TODO - Work out where / how to push an errored ballot
+  // Loop through and get all the ballots
+  const numBallots = democInfo.nBallots;
+  const ballotsArray = [];
+  for (let i = 0; i &lt; numBallots; i++) {
+    ballotsArray[i] = await getDemocNthBallot({ svNetwork }, { democHash: democHash, nthBallot: i });
+  }
+
+  return ballotsArray;
+};
+
+/** Takes in the svNetwork object and returns all relevant addresses */
+export const getContractAddresses = async ({svNetwork}) =&gt; {
+  const {index, resolver, backend, aux, svConfig} = svNetwork
+  const { delegationContractName, lookupAddress } = svConfig
+
+  return {
+    indexAddress: index._address,
+    backendAddress: backend._address,
+    auxAddress: aux._address,
+    lookupAddress: lookupAddress,
+    resolverAddress: resolver._address,
+    communityAuctionAddress: await index.methods.getCommAuction().call(),
+    delegationAddress: await resolveEnsAddress({ resolver }, delegationContractName),
+    paymentsAddress: await index.methods.getPayments().call(),
+  }
+}
+
+export const weiToCents = async ({payments}, wei) =&gt; {
+  return await payments.methods.weiToCents(wei).call()
+}
+
+export const getCommunityBallotPrice = async ({payments}, democHash) =&gt; {
+  return await payments.methods.getNextPrice(democHash).call()
+}
+
+export const checkIfAddressIsEditor = async ({ svNetwork }, { userAddress, democHash }) =&gt; {
+  const {backend} = svNetwork
+  return await backend.methods.isDEditor(democHash, userAddress).call();
+};
+
+// Checks the current ethereum gas price and returns a couple of values
+export const getCurrentGasPrice = async () =&gt; {
+  const gasStationInfo = await axios.get(&apos;https://ethgasstation.info/json/ethgasAPI.json&apos;)
+  const {data} = gasStationInfo
+
+  return {
+    safeLow: data.safeLow / 10,
+    average: data.average / 10,
+    fast: data.fast / 10,
+    fastest: data.fastest / 10,
+  }
+}
+// Checks the ballot hash against the ballot content
+export const checkBallotHashBSpec = (ballotSpec, assertSpecHash) =&gt; {
+    let contentHash = &apos;0x&apos; + sha256(JSON.stringify(ballotSpec, null, 2));
+    if (assertSpecHash === contentHash) {
+      return true;
+    } else {
+      return false;
+    }
+}
+
+// Checks the ballot hash against a ballot global ballot object
+// Does this by destructuring the specHash and data out of it
+export const checkBallotHashGBallot = (ballotObject) =&gt; {
+  const {data, specHash} = ballotObject
+  return checkBallotHashBSpec(data, specHash)
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
