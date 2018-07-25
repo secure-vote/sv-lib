@@ -159,6 +159,7 @@ export const initializeSvLight = async (netConf: EthNetConf): Promise&lt;SvNetwo
  * @returns {Promise&lt;WindowWeb3Init&gt;} Object containing the web3 instance and metadata
  */
 export const initializeWindowWeb3 = async (): Promise&lt;WindowWeb3Init&gt; =&gt; {
+    // note: on the following line having (&lt;any&gt;window) instead of (window as any) breaks esdoc
     const windowWeb3 = (window as any).web3
     const detected = typeof windowWeb3 !== &apos;undefined&apos;
     if (!detected) {

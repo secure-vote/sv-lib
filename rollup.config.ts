@@ -11,8 +11,8 @@ const pkg = require('./package.json')
 export default {
   input: `src/index.ts`,
   output: [
-    { file: "dist/bundle.umd.js", name: 'svLib', format: 'umd', sourcemap: true },
-    { file: "dist/bundle.es5.js", format: 'es', sourcemap: true },
+    { file: "lib/bundle.umd.js", name: 'svLib', format: 'umd', sourcemap: true },
+    { file: "lib/bundle.es5.js", format: 'es', sourcemap: true },
   ],
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external: [],

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <base data-ice="baseUrl" href="../../">
-  <title data-ice="title">src/ballotBox.test.ts | sv-lib</title>
+  <title data-ice="title">src/errors.ts | sv-lib</title>
   <link type="text/css" rel="stylesheet" href="css/style.css">
   <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
   <script src="script/prettify/prettify.js"></script>
@@ -29,10 +29,19 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span></span></li>
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/errors.ts~ApiError.html">ApiError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/errors.ts~DecodeError.html">DecodeError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/errors.ts~EthNetError.html">EthNetError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/errors.ts~HexError.html">HexError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-extractData">extractData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-processApiError">processApiError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-submitEd25519DelegationUrl">submitEd25519DelegationUrl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-castProxyVote">castProxyVote</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkPacked">mkPacked</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSignedBallotForProxy">mkSignedBallotForProxy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSubmissionBits">mkSubmissionBits</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-prepareWeb3BBVoteTx">prepareWeb3BBVoteTx</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-verifySignedBallotForProxy">verifySignedBallotForProxy</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getNetwork">getNetwork</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-networkName">networkName</a></span></span></li>
@@ -42,6 +51,8 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashBSpec">checkBallotHashBSpec</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashGBallot">checkBallotHashGBallot</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkIfAddressIsEditor">checkIfAddressIsEditor</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createEd25519DelegationTransaction">createEd25519DelegationTransaction</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ed25519DelegationIsValid">ed25519DelegationIsValid</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBackendAddress">getBackendAddress</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBallotObjectFromIpfs">getBallotObjectFromIpfs</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBallotObjectFromS3">getBallotObjectFromS3</a></span></span></li>
@@ -52,75 +63,40 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocBallots">getDemocBallots</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocInfo">getDemocInfo</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocNthBallot">getDemocNthBallot</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getSingularCleanAbi">getSingularCleanAbi</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUnsafeEd25519Delegations">getUnsafeEd25519Delegations</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initializeSvLight">initializeSvLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initializeWindowWeb3">initializeWindowWeb3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-prepareEd25519Delegation">prepareEd25519Delegation</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resolveEnsAddress">resolveEnsAddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stellarPkToHex">stellarPkToHex</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-submitEd25519Delegation">submitEd25519Delegation</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-weiToCents">weiToCents</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkDecode">checkDecode</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cleanEthHex">cleanEthHex</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doesNetHaveIndex">doesNetHaveIndex</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethAddrEq">ethAddrEq</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRandomHex">genRandomHex</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexToBase32">hexToBase32</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexToUint8Array">hexToUint8Array</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-toEthHex">toEthHex</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-flags">flags</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Ed25519DelegatePrefix">Ed25519DelegatePrefix</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-networkVars">networkVars</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroAddr">zeroAddr</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroHash">zeroHash</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-_const">_const</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ballotBox">ballotBox</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-crypto">crypto</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-light">light</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-utils">utils</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Bytes32RT">Bytes32RT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Bytes64RT">Bytes64RT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HexStringRT">HexStringRT</a></span></span></li>
 </ul>
 </div>
 </nav>
 
-<div class="content" data-ice="content"><h1 data-ice="title">src/ballotBox.test.ts</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const bb = require(&apos;./ballotBox&apos;)
-const _const = require(&apos;./const&apos;)
-const Account = require(&apos;eth-lib/lib/account&apos;)
-
-
-test(&apos;create and verify proxy ballots&apos;, () =&gt; {
-    const privKey = &quot;0x0100000000000000000000000000000000000000000000000000000000000000&quot;
-    const acct = Account.fromPrivate(privKey)
-    const {address} = acct
-
-    const proxyVote = bb.mkSignedBallotForProxy(
-        &quot;0x0000000000000000053970000000000000000000000000000000000000000000&quot;, // some ballot id
-        1, // sequence num
-        &quot;0x4000000000000000000000000000000000000000000000000000000000000000&quot;, // some voteData
-        &quot;0x&quot;, // trivial extra
-        privKey
-    )
-
-    const verificationResp = bb.verifySignedBallotForProxy(proxyVote)
-
-    expect(verificationResp.address.toLowerCase()).toEqual(address.toLowerCase())
-    expect(verificationResp.verified).toEqual(true)
-})
-
-
-test(&apos;generates correct range3 voteData&apos;, () =&gt; {
-    // trivial case
-    expect(bb.genRange3VoteData([])).toEqual(_const.zeroHash)
-
-    // format for binary-no votes
-    expect(bb.genRange3VoteData([-1])).toEqual(&quot;0x4000000000000000000000000000000000000000000000000000000000000000&quot;)
-
-    // format for binary-yes votes
-    expect(bb.genRange3VoteData([1])).toEqual(&quot;0x8000000000000000000000000000000000000000000000000000000000000000&quot;)
-
-    // more complex examples
-
-    // raw vote bits: 000 001 010 011 100 101 110
-    expect(bb.genRange3VoteData([-3,-2,-1,0,1,2,3])).toEqual(&quot;0x0539700000000000000000000000000000000000000000000000000000000000&quot;)
-
-    // 000 000 010
-    expect(bb.genRange3VoteData([-3,-3,-1])).toEqual(&quot;0x0100000000000000000000000000000000000000000000000000000000000000&quot;)
-
-    // 000 000 010 000 000 100
-    expect(bb.genRange3VoteData([-3,-3,-1,-3,-3,1])).toEqual(&quot;0x0101000000000000000000000000000000000000000000000000000000000000&quot;)
-
-    // 000 000 100
-    expect(bb.genRange3VoteData([-3,-3,1])).toEqual(&quot;0x0200000000000000000000000000000000000000000000000000000000000000&quot;)
-})
+<div class="content" data-ice="content"><h1 data-ice="title">src/errors.ts</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">export class EthNetError extends Error {}
+export class HexError extends Error {}
+export class ApiError extends Error {}
+export class DecodeError extends Error {}
 </code></pre>
 
 </div>
