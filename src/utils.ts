@@ -4,12 +4,13 @@ import { PathReporter } from 'io-ts/lib/PathReporter'
 
 import { HexString, HexStringRT } from './runtimeTypes'
 import * as web3Utils from 'web3-utils'
-import { HexError } from './errors'
+import { HexError, DecodeError } from './errors'
 import * as t from 'io-ts'
 
-export const checkDecode = <S>(validationRes: t.Validation<S>): void => {
+export const checkDecode = <S>(validationRes: t.Validation<S>, ErrTyp?: Error): void => {
     if (validationRes.isLeft()) {
-        throw new HexError(PathReporter.report(validationRes).join('\n'))
+        const E = ErrTyp ? ErrTyp : DecodeError
+        throw new E(PathReporter.report(validationRes).join('\n'))
     }
 }
 
@@ -44,7 +45,7 @@ export const cleanEthHex = (hex: string) => {
 export const toEthHex = (hex: string) => {
     if (hex.length % 2 == 0 && web3Utils.isHexStrict(hex)) return hex
     const _hex = '0x' + hex
-    checkDecode(HexStringRT.decode(_hex))
+    checkDecode(HexStringRT.decode(_hex), HexError)
     return _hex
 }
 
