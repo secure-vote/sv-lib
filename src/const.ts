@@ -1,3 +1,4 @@
+import { EthNetError } from './errors'
 import { EthNetConf } from './types'
 
 export const zeroAddr = '0x0000000000000000000000000000000000000000'
@@ -105,9 +106,7 @@ export const getNetwork = (networkId: number, chainId: number): EthNetConf => {
         default:
             break
     }
-    throw Error(`Cannot find network with net_id ${networkId} and chainId ${chainId}`)
+    throw new EthNetError(`Cannot find network with net_id ${networkId} and chainId ${chainId}`)
 }
-
-export const doesNetHaveIndex = (networkId, chainId) => getNetwork(networkId, chainId).indexEnsName !== undefined
 
 export const Ed25519DelegatePrefix = 'SV-ED-ETH'

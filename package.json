@@ -29,6 +29,7 @@
     "eth-ens-namehash": "^2.0.8",
     "eth-lib": "^0.2.8",
     "ethereumjs-util": "^5.2.0",
+    "fp-ts": "^1.7.1",
     "io-ts": "^1.2.1",
     "ramda": "^0.25.0",
     "sha256": "^0.2.0",
