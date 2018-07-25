@@ -36,12 +36,9 @@ import UnsafeEd25519DelegationAbi from './smart_contracts/UnsafeEd25519Delegatio
 export const initializeSvLight = async (netConf: EthNetConf): Promise<SvNetwork> => {
     const { indexEnsName, ensResolver, httpProvider, auxContract } = netConf
 
-    const Web3 = require('web3')
     const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
     const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
 
-    // const indexAddress =
-    // console.log('indexAddress :', indexAddress);
     const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexEnsName))
     const backendAddress = await getBackendAddress({ index })
     const backend = new web3.eth.Contract(BackendAbi, backendAddress)
@@ -96,11 +93,11 @@ export const getDemocInfo = async ({ backend, democHash }) => {
 
 export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
     // Destructure and set the variables that are needed
-    const { index, backend, aux, svConfig } = svNetwork
+    const { index, backend, aux, netConf } = svNetwork
     const { democHash, nthBallot } = democBallotInfo
     const indexAddress = index._address
     const backendAddress = backend._address
-    const archiveUrl = { svConfig }
+    const archiveUrl = { netConf }
 
     const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(backendAddress, indexAddress, democHash, nthBallot).call()
 
@@ -176,8 +173,8 @@ export const getDemocBallots = async ({ svNetwork, democHash }) => {
 
 /** Takes in the svNetwork object and returns all relevant addresses */
 export const getContractAddresses = async ({ svNetwork }) => {
-    const { index, resolver, backend, aux, svConfig } = svNetwork
-    const { delegationContractName, lookupAddress } = svConfig
+    const { index, resolver, backend, aux, netConf } = svNetwork
+    const { delegationEnsName, lookupAddress } = netConf
 
     return {
         indexAddress: index._address,
@@ -186,7 +183,7 @@ export const getContractAddresses = async ({ svNetwork }) => {
         lookupAddress: lookupAddress,
         resolverAddress: resolver._address,
         communityAuctionAddress: await index.methods.getCommAuction().call(),
-        delegationAddress: await resolveEnsAddress({ resolver }, delegationContractName),
+        delegationAddress: await resolveEnsAddress({ resolver }, delegationEnsName),
         paymentsAddress: await index.methods.getPayments().call()
     }
 }
@@ -289,16 +286,14 @@ export const stellarPkToHex = (pubKey: string): string => {
  */
 export const getUnsafeEd25519Delegations = async (stellarPK: string, svNetwork): Promise<any> => {
     // TODO - Some assertions and stuff..
-
-    const { web3, svConfig } = svNetwork
-    const { unsafeEd25519DelegationAddr } = svConfig
+    const { web3, netConf } = svNetwork
+    const { unsafeEd25519DelegationAddr } = netConf
 
     const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)
     const delegations = await Ed25519Del.methods
         .getAllForPubKey(stellarPkToHex(stellarPK))
         .call()
         .catch(error => {
-            console.log('error :', error)
             throw error
         })
 
@@ -312,13 +307,17 @@ export const getUnsafeEd25519Delegations = async (stellarPK: string, svNetwork):
  * @returns {Bytes32} The hex string (with 0x prefix) of the delegation instruction
  */
 export const prepareEd25519Delegation = (address: string, nonce?: string): Bytes32 => {
-    // Delegate prefix (SV-ED-ETH)
+    // msg prefix (prevents attacks via malicious signature requests)
     const prefix = svUtils.cleanEthHex(web3Utils.toHex(svConst.Ed25519DelegatePrefix))
+    assert.equal(prefix.length, 9 * 2, 'Invalid prefix (${prefix}). It must be exactly 9 bytes')
+
     const _nonce = nonce && web3Utils.isHex(nonce) ? nonce : svUtils.genRandomHex(3)
+    const trimmedNonce = svUtils.cleanEthHex(_nonce)
+    assert.equal(trimmedNonce.length, 6, `Invalid nonce (${trimmedNonce}). It must be exactly 3 bytes (6 hex characters)`)
 
     const trimmedAddress = svUtils.cleanEthHex(address)
 
-    const dlgtPacked = `0x${prefix}${_nonce}${trimmedAddress}`.toLowerCase()
+    const dlgtPacked = `0x${prefix}${trimmedNonce}${trimmedAddress}`.toLowerCase()
 
     assert.equal(dlgtPacked.length, 2 + 64, 'dlgtPacked was not 32 bytes / 64 chars long. This should never happen.')
     return dlgtPacked
@@ -340,8 +339,8 @@ export const createEd25519DelegationTransaction = (
     signature: string,
     privKey: string
 ) => {
-    const { web3, svConfig } = svNetwork
-    const { unsafeEd25519DelegationAddr } = svConfig
+    const { web3, netConf } = svNetwork
+    const { unsafeEd25519DelegationAddr } = netConf
 
     // Initialise the contract
     const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)

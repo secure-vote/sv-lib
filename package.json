@@ -92,7 +92,7 @@
     "validate-commit-msg": "^2.12.2"
   },
   "scripts": {
-    "dev": "tsc -w",
+    "dev": "tsc -w --outDir dev-lib --declarationDir dev-lib",
     "docs": "rimraf docs && esdoc && cp CNAME_DOCS docs/CNAME",
     "prepublish": "true # yarn build",
     "lint": "tslint -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
