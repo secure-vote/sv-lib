@@ -313,7 +313,7 @@ export const getUnsafeEd25519Delegations = async (stellarPK: string, svNetwork):
 export const prepareEd25519Delegation = (address: string, nonce?: string): Bytes32 => {
     // Delegate prefix (SV-ED-ETH)
     const prefix = svUtils.cleanEthHex(web3Utils.toHex(svConst.Ed25519DelegatePrefix))
-    const _nonce = nonce && web3Utils.isHex(nonce) ? nonce : svUtils.genRandomHex(3)
+    const _nonce = nonce && web3Utils.isHex(nonce) ? nonce : svUtils.genRandomHex(3).slice(2)
 
     const trimmedAddress = svUtils.cleanEthHex(address)
 
