@@ -1,15 +1,27 @@
 window.esdocSearchIndex = [
   [
-    "sv-lib/src/runtimetypes.ts~bytes32",
-    "variable/index.html#static-variable-Bytes32",
-    "<span>Bytes32</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
+    "sv-lib/src/errors.ts~apierror",
+    "class/src/errors.ts~ApiError.html",
+    "<span>ApiError</span> <span class=\"search-result-import-path\">sv-lib/src/errors.ts</span>",
+    "class"
+  ],
+  [
+    "sv-lib/src/runtimetypes.ts~bytes32rt",
+    "variable/index.html#static-variable-Bytes32RT",
+    "<span>Bytes32RT</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
     "variable"
   ],
   [
-    "sv-lib/src/runtimetypes.ts~bytes64",
-    "variable/index.html#static-variable-Bytes64",
-    "<span>Bytes64</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
+    "sv-lib/src/runtimetypes.ts~bytes64rt",
+    "variable/index.html#static-variable-Bytes64RT",
+    "<span>Bytes64RT</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
     "variable"
+  ],
+  [
+    "sv-lib/src/errors.ts~decodeerror",
+    "class/src/errors.ts~DecodeError.html",
+    "<span>DecodeError</span> <span class=\"search-result-import-path\">sv-lib/src/errors.ts</span>",
+    "class"
   ],
   [
     "sv-lib/src/const.ts~ed25519delegateprefix",
@@ -18,9 +30,21 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
-    "sv-lib/src/runtimetypes.ts~hexstring",
-    "variable/index.html#static-variable-HexString",
-    "<span>HexString</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
+    "sv-lib/src/errors.ts~ethneterror",
+    "class/src/errors.ts~EthNetError.html",
+    "<span>EthNetError</span> <span class=\"search-result-import-path\">sv-lib/src/errors.ts</span>",
+    "class"
+  ],
+  [
+    "sv-lib/src/errors.ts~hexerror",
+    "class/src/errors.ts~HexError.html",
+    "<span>HexError</span> <span class=\"search-result-import-path\">sv-lib/src/errors.ts</span>",
+    "class"
+  ],
+  [
+    "sv-lib/src/runtimetypes.ts~hexstringrt",
+    "variable/index.html#static-variable-HexStringRT",
+    "<span>HexStringRT</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
     "variable"
   ],
   [
@@ -42,6 +66,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "sv-lib/src/utils.ts~checkdecode",
+    "function/index.html#static-function-checkDecode",
+    "<span>checkDecode</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/light.ts~checkifaddressiseditor",
     "function/index.html#static-function-checkIfAddressIsEditor",
     "<span>checkIfAddressIsEditor</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
@@ -57,6 +87,12 @@ window.esdocSearchIndex = [
     "sv-lib/src/light.ts~createed25519delegationtransaction",
     "function/index.html#static-function-createEd25519DelegationTransaction",
     "<span>createEd25519DelegationTransaction</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/utils.ts~doesnethaveindex",
+    "function/index.html#static-function-doesNetHaveIndex",
+    "<span>doesNetHaveIndex</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
     "function"
   ],
   [
@@ -84,10 +120,22 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "sv-lib/src/api.ts~extractdata",
+    "function/index.html#static-function-extractData",
+    "<span>extractData</span> <span class=\"search-result-import-path\">sv-lib/src/api.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/ballotbox.ts~flags",
     "variable/index.html#static-variable-flags",
     "<span>flags</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
     "variable"
+  ],
+  [
+    "sv-lib/src/utils.ts~genrandomhex",
+    "function/index.html#static-function-genRandomHex",
+    "<span>genRandomHex</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
+    "function"
   ],
   [
     "sv-lib/src/ballotbox.ts~genrange3votedata",
@@ -198,6 +246,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "sv-lib/src/light.ts~initializewindowweb3",
+    "function/index.html#static-function-initializeWindowWeb3",
+    "<span>initializeWindowWeb3</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/ballotbox.ts~mkpacked",
     "function/index.html#static-function-mkPacked",
     "<span>mkPacked</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
@@ -240,6 +294,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "sv-lib/src/api.ts~processapierror",
+    "function/index.html#static-function-processApiError",
+    "<span>processApiError</span> <span class=\"search-result-import-path\">sv-lib/src/api.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/light.ts~resolveensaddress",
     "function/index.html#static-function-resolveEnsAddress",
     "<span>resolveEnsAddress</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
@@ -249,6 +309,24 @@ window.esdocSearchIndex = [
     "sv-lib/src/light.ts~stellarpktohex",
     "function/index.html#static-function-stellarPkToHex",
     "<span>stellarPkToHex</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/light.ts~submited25519delegation",
+    "function/index.html#static-function-submitEd25519Delegation",
+    "<span>submitEd25519Delegation</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/api.ts~submited25519delegationurl",
+    "function/index.html#static-function-submitEd25519DelegationUrl",
+    "<span>submitEd25519DelegationUrl</span> <span class=\"search-result-import-path\">sv-lib/src/api.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/utils.ts~toethhex",
+    "function/index.html#static-function-toEthHex",
+    "<span>toEthHex</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
     "function"
   ],
   [
@@ -558,6 +636,12 @@ window.esdocSearchIndex = [
     "external"
   ],
   [
+    "src/api.ts",
+    "file/src/api.ts.html",
+    "src/api.ts",
+    "file"
+  ],
+  [
     "src/ballotbox.ts",
     "file/src/ballotBox.ts.html",
     "src/ballotBox.ts",
@@ -573,6 +657,12 @@ window.esdocSearchIndex = [
     "src/crypto.ts",
     "file/src/crypto.ts.html",
     "src/crypto.ts",
+    "file"
+  ],
+  [
+    "src/errors.ts",
+    "file/src/errors.ts.html",
+    "src/errors.ts",
     "file"
   ],
   [

@@ -1,4 +1,4 @@
-import { ApiError } from './api'
+import { ApiError } from './errors'
 import { EthNetConf } from './types'
 
 export const processApiError = err => {

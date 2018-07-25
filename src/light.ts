@@ -5,13 +5,17 @@ const sha256 = require('sha256')
 
 const Web3 = require('web3')
 const detectNetwork = require('web3-detect-network')
+import * as web3Utils from 'web3-utils'
 
-import * as svConst from './const'
-import * as svUtils from './utils'
 import * as StellarBase from 'stellar-base'
 import * as assert from 'assert'
 import * as detectNetwork from 'web3-detect-network'
-import * as web3Utils from 'web3-utils'
+
+import * as svConst from './const'
+import * as svUtils from './utils'
+import { WindowWeb3Init, EthNetConf, SvNetwork, EthTx } from './types'
+import * as API from './api'
+import { HexString, Bytes32 } from './runtimeTypes'
 
 // Lovely ABIs
 import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'
@@ -23,17 +27,14 @@ import AuxAbi from './smart_contracts/AuxAbi.abi.json'
 import AuctionAbi from './smart_contracts/CommAuctionIface.abi.json'
 import ERC20Abi from './smart_contracts/ERC20.abi.json'
 import UnsafeEd25519DelegationAbi from './smart_contracts/UnsafeEd25519Delegation.abi.json'
-import { WindowWeb3Init, EthNetConf, SvNetwork, SvNetwork } from './types'
-import * as API from './api'
-import { HexString, Bytes32 } from './runtimeTypes'
 
 /**
  * Return contract instances and web3 needed for SvLight usage
  * @param {EthNetConf} netConf Config file for all current network
- * @returns {SvNetwork} The SvNetwork object based on `netConf`
+ * @returns {Promise<SvNetwork>} The SvNetwork object based on `netConf`
  */
-export const initializeSvLight = async (netConf: EthNetConf): SvNetwork => {
-    const { indexContractName, ensResolver, httpProvider, auxContract } = netConf
+export const initializeSvLight = async (netConf: EthNetConf): Promise<SvNetwork> => {
+    const { indexEnsName, ensResolver, httpProvider, auxContract } = netConf
 
     const Web3 = require('web3')
     const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
@@ -41,7 +42,7 @@ export const initializeSvLight = async (netConf: EthNetConf): SvNetwork => {
 
     // const indexAddress =
     // console.log('indexAddress :', indexAddress);
-    const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexContractName))
+    const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexEnsName))
     const backendAddress = await getBackendAddress({ index })
     const backend = new web3.eth.Contract(BackendAbi, backendAddress)
     const aux = new web3.eth.Contract(AuxAbi, auxContract)
@@ -60,16 +61,17 @@ export const initializeSvLight = async (netConf: EthNetConf): SvNetwork => {
 
 /**
  * Initialise a Web3 instance based on the window's web3.currentProvider
- * @returns {WindowWeb3Init} Object containing the web3 instance and metadata
+ * @returns {Promise<WindowWeb3Init>} Object containing the web3 instance and metadata
  */
-export const initializeWindowWeb3 = async (): WindowWeb3Init => {
-    const windowWeb3 = (<any>window).web3
+export const initializeWindowWeb3 = async (): Promise<WindowWeb3Init> => {
+    // note: on the following line having (<any>window) instead of (window as any) breaks esdoc
+    const windowWeb3 = (window as any).web3
     const detected = typeof windowWeb3 !== 'undefined'
     if (!detected) {
         return { detected: false, loaded: true }
     }
     const network = await detectNetwork(windowWeb3.currentProvider)
-    const netHasIndex = svConst.doesNetHaveIndex(network.id, network.id)
+    const netHasIndex = svUtils.doesNetHaveIndex(network.id, network.id)
     const networkStatus = { id: network.id, type: network.type, hasIndex: netHasIndex }
     const web3 = new Web3(windowWeb3.currentProvider)
     return { detected, loaded: true, networkStatus, web3 }
@@ -77,10 +79,10 @@ export const initializeWindowWeb3 = async (): WindowWeb3Init => {
 
 /**
  * Resolve an ENS name to an address
- * @param {{resolver: Web3ResolverInstance}} contracts containing a `resolver` field w/ a web3 instance of a Resolver contract
- * @param {string} ensName
+ * @param {{resolver: any}} contracts containing a `resolver` field w/ a web3 instance of a Resolver contract
+ * @param {Promise<string>} ensName
  */
-export const resolveEnsAddress = async ({ resolver }, ensName) => {
+export const resolveEnsAddress = async ({ resolver }, ensName): Promise<string> => {
     return await resolver.methods.addr(NH.hash(ensName)).call()
 }
 
@@ -223,7 +225,7 @@ export const getCurrentGasPrice = async () => {
  *
  * @returns {boolean} Whether the ballotSpec matched the expected hash
  */
-export const checkBallotHashBSpec = (rawBallotSpecString, expectedSpecHash) => {
+export const checkBallotHashBSpec = (rawBallotSpecString, expectedSpecHash): boolean => {
     throw Error('Unimplemented (check code for details)')
 
     // NOTE: This function is unsafe - JSON does not have deterministic key order
@@ -280,11 +282,12 @@ export const stellarPkToHex = (pubKey: string): string => {
 }
 
 /**
- *
- * @param pubKey
- * @param svNetwork
+ * Get all ed25519 self delegations from a network.
+ * @param {string} stellarPK
+ * @param {SvNetwork} svNetwork
+ * @returns {Promise<any>}
  */
-export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => {
+export const getUnsafeEd25519Delegations = async (stellarPK: string, svNetwork): Promise<any> => {
     // TODO - Some assertions and stuff..
 
     const { web3, svConfig } = svNetwork
@@ -292,7 +295,7 @@ export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => 
 
     const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)
     const delegations = await Ed25519Del.methods
-        .getAllForPubKey(stellarPkToHex(pubKey))
+        .getAllForPubKey(stellarPkToHex(stellarPK))
         .call()
         .catch(error => {
             console.log('error :', error)
@@ -308,7 +311,7 @@ export const getUnsafeEd25519Delegations = async (pubKey: string, svNetwork) => 
  * @param nonce A nonce in hex that is 3 bytes (6 characters as hex)
  * @returns {Bytes32} The hex string (with 0x prefix) of the delegation instruction
  */
-export const prepareEd25519Delegation = (address: string, nonce?: string) => {
+export const prepareEd25519Delegation = (address: string, nonce?: string): Bytes32 => {
     // Delegate prefix (SV-ED-ETH)
     const prefix = svUtils.cleanEthHex(web3Utils.toHex(svConst.Ed25519DelegatePrefix))
     const _nonce = nonce && web3Utils.isHex(nonce) ? nonce : svUtils.genRandomHex(3)
@@ -328,7 +331,7 @@ export const prepareEd25519Delegation = (address: string, nonce?: string) => {
  * @param pubKey
  * @param signature
  * @param privKey
- * @returns {to: string, value: number, gas: number, data: string}
+ * @returns {EthTx}
  */
 export const createEd25519DelegationTransaction = (
     svNetwork: any,

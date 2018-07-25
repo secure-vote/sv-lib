@@ -97,7 +97,5 @@ export declare const prepareWeb3BBVoteTx: ({ txInfo }: {
     to: any;
     data: any;
     gas: any;
-    gasPrice: number;
-    from: any;
 }>;
 export declare const castProxyVote: (request: any, svConfig: any) => Promise<{}>;

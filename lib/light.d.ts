@@ -1,15 +1,23 @@
-export declare const initializeSvLight: (svConfig: any) => Promise<{
-    svConfig: any;
-    web3: any;
-    resolver: any;
-    index: any;
-    backend: any;
-    aux: any;
-    payments: any;
-}>;
+import { WindowWeb3Init, EthNetConf, SvNetwork } from './types';
+/**
+ * Return contract instances and web3 needed for SvLight usage
+ * @param {EthNetConf} netConf Config file for all current network
+ * @returns {Promise<SvNetwork>} The SvNetwork object based on `netConf`
+ */
+export declare const initializeSvLight: (netConf: EthNetConf) => Promise<SvNetwork>;
+/**
+ * Initialise a Web3 instance based on the window's web3.currentProvider
+ * @returns {Promise<WindowWeb3Init>} Object containing the web3 instance and metadata
+ */
+export declare const initializeWindowWeb3: () => Promise<WindowWeb3Init>;
+/**
+ * Resolve an ENS name to an address
+ * @param {{resolver: any}} contracts containing a `resolver` field w/ a web3 instance of a Resolver contract
+ * @param {Promise<string>} ensName
+ */
 export declare const resolveEnsAddress: ({ resolver }: {
     resolver: any;
-}, ensName: any) => Promise<any>;
+}, ensName: any) => Promise<string>;
 export declare const getBackendAddress: ({ index }: {
     index: any;
 }) => Promise<any>;
@@ -39,7 +47,7 @@ export declare const getContractAddresses: ({ svNetwork }: {
     lookupAddress: any;
     resolverAddress: any;
     communityAuctionAddress: any;
-    delegationAddress: any;
+    delegationAddress: string;
     paymentsAddress: any;
 }>;
 export declare const weiToCents: ({ payments }: {
@@ -68,16 +76,17 @@ export declare const getCurrentGasPrice: () => Promise<{
  *
  * @returns {boolean} Whether the ballotSpec matched the expected hash
  */
-export declare const checkBallotHashBSpec: (rawBallotSpecString: any, expectedSpecHash: any) => never;
-export declare const checkBallotHashGBallot: (ballotObject: any) => never;
+export declare const checkBallotHashBSpec: (rawBallotSpecString: any, expectedSpecHash: any) => boolean;
+export declare const checkBallotHashGBallot: (ballotObject: any) => boolean;
 export declare const getSingularCleanAbi: (requestedAbiName: any, methodName: any) => any;
 export declare const stellarPkToHex: (pubKey: string) => string;
 /**
- *
- * @param pubKey
- * @param svNetwork
+ * Get all ed25519 self delegations from a network.
+ * @param {string} stellarPK
+ * @param {SvNetwork} svNetwork
+ * @returns {Promise<any>}
  */
-export declare const getUnsafeEd25519Delegations: (pubKey: string, svNetwork: any) => Promise<any>;
+export declare const getUnsafeEd25519Delegations: (stellarPK: string, svNetwork: any) => Promise<any>;
 /**
  * Generate a packed Ed25519Delegation instruction for use with the smart contract or API
  * @param address An ethereum address to delegate to
@@ -92,7 +101,7 @@ export declare const prepareEd25519Delegation: (address: string, nonce?: string)
  * @param pubKey
  * @param signature
  * @param privKey
- * @returns {to: string, value: number, gas: number, data: string}
+ * @returns {EthTx}
  */
 export declare const createEd25519DelegationTransaction: (svNetwork: any, dlgtRequest: string, pubKey: string, signature: string, privKey: string) => {
     to: any;
@@ -108,3 +117,12 @@ export declare const createEd25519DelegationTransaction: (svNetwork: any, dlgtRe
  * @returns {boolean}
  */
 export declare const ed25519DelegationIsValid: (dlgtRequest: string, pubKey: string, signature: string) => any;
+/**
+ *
+ * @param ethNetConf
+ * @param dlgtRequest
+ * @param stellarPK
+ * @param _signature
+ * @param opts
+ */
+export declare const submitEd25519Delegation: (ethNetConf: EthNetConf, dlgtRequest: string, stellarPK: string, _signature: string, opts?: any) => Promise<any>;

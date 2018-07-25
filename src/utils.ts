@@ -7,10 +7,10 @@ import * as web3Utils from 'web3-utils'
 import { HexError, DecodeError } from './errors'
 import * as t from 'io-ts'
 
-export const checkDecode = <S>(validationRes: t.Validation<S>, ErrTyp?: Error): void => {
+export const checkDecode = <S, E extends Error>(validationRes: t.Validation<S>, mkErr?: ((s: string) => E)): void => {
     if (validationRes.isLeft()) {
-        const E = ErrTyp ? ErrTyp : DecodeError
-        throw new E(PathReporter.report(validationRes).join('\n'))
+        const msg = PathReporter.report(validationRes).join('\n')
+        throw mkErr ? mkErr(msg) : new DecodeError(msg)
     }
 }
 
@@ -45,7 +45,7 @@ export const cleanEthHex = (hex: string) => {
 export const toEthHex = (hex: string) => {
     if (hex.length % 2 == 0 && web3Utils.isHexStrict(hex)) return hex
     const _hex = '0x' + hex
-    checkDecode(HexStringRT.decode(_hex), HexError)
+    checkDecode(HexStringRT.decode(_hex), msg => new HexError(msg))
     return _hex
 }
 

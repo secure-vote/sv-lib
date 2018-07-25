@@ -1,3 +1,5 @@
+import { HexString } from './runtimeTypes'
+
 export type ProxyVote = {
     // these should be `bytes32` hexstrings
     proxyReq: [string, string, string, string, string]
@@ -41,3 +43,5 @@ export type SvNetwork = {
     aux: any
     payments: any
 }
+
+export type EthTx = { to: string; value: number; gas: number | HexString; data: string }
