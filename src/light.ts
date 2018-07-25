@@ -286,10 +286,7 @@ export const stellarPkToHex = (pubKey: string): string => {
  */
 export const getUnsafeEd25519Delegations = async (stellarPK: string, svNetwork): Promise<any> => {
     // TODO - Some assertions and stuff..
-    console.log('svNetwork :', svNetwork)
-
     const { web3, netConf } = svNetwork
-    console.log('netConf :', netConf)
     const { unsafeEd25519DelegationAddr } = netConf
 
     const Ed25519Del = new web3.eth.Contract(UnsafeEd25519DelegationAbi, unsafeEd25519DelegationAddr)
@@ -297,7 +294,6 @@ export const getUnsafeEd25519Delegations = async (stellarPK: string, svNetwork):
         .getAllForPubKey(stellarPkToHex(stellarPK))
         .call()
         .catch(error => {
-            console.log('error :', error)
             throw error
         })
 
