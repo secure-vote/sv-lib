@@ -254,7 +254,7 @@ export const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) => {
     return web3Tx
 }
 
-export const castProxyVote = async (request, svConfig) => {
+export const castProxyVote = async (request, netConf) => {
     assert.equal(web3Utils.isBN(request.ballotId), true, 'Ballot id is not a BN')
     assert.equal(request.proxyReq.length == 5, true, 'Proxy vote req does not contain the correct number of parameters')
     assert.equal(
@@ -263,8 +263,10 @@ export const castProxyVote = async (request, svConfig) => {
         'Request does not contain extra and democ hash data'
     )
 
+    console.log('netConf :', netConf)
+
     return new Promise((resolve, reject) => {
-        const svApiUrl = svConfig.svApiUrl
+        const svApiUrl = netConf.svApiUrl
         const proxyVotePath = '/sv/light/submitProxyVote'
         const requestUrl = `${svApiUrl}${proxyVotePath}`
         axios
