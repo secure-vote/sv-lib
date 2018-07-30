@@ -1,6 +1,7 @@
 import * as Account from 'eth-lib/lib/account'
 import * as Hash from 'eth-lib/lib/hash'
 import * as web3Utils from 'web3-utils'
+import * as sha256 from 'sha256'
 
 /**
  * Like web3.eth.accounts.hashMessage without the envelope.
@@ -12,9 +13,9 @@ import * as web3Utils from 'web3-utils'
  *  The hashed message (using keccak256)
  */
 export const hashMsgRaw = (data: string | number[]): string => {
-  const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data
-  const msgBuffer = Buffer.from(msg)
-  return Hash.keccak256s(msgBuffer)
+    const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data
+    const msgBuffer = Buffer.from(msg)
+    return Hash.keccak256s(msgBuffer)
 }
 
 /**
@@ -29,17 +30,17 @@ export const hashMsgRaw = (data: string | number[]): string => {
  * @returns {{messageHash: string, r: string, s: string, v: string}}
  */
 export const ethSignHash = (messageHash: string, privateKey: string) => {
-  // near identical to web3-eth-accounts (web3 v1)
-  // the main difference is we don't envelop the data.
-  const signature = Account.sign(messageHash, privateKey)
-  const vrs = Account.decodeSignature(signature)
-  return {
-    messageHash,
-    v: vrs[0],
-    r: vrs[1],
-    s: vrs[2],
-    signature
-  }
+    // near identical to web3-eth-accounts (web3 v1)
+    // the main difference is we don't envelop the data.
+    const signature = Account.sign(messageHash, privateKey)
+    const vrs = Account.decodeSignature(signature)
+    return {
+        messageHash,
+        v: vrs[0],
+        r: vrs[1],
+        s: vrs[2],
+        signature
+    }
 }
 
 export /**
@@ -51,12 +52,13 @@ export /**
  * @returns {{verified: bool, address: EthAddress}}
  */
 const ethVerifySig = (messageHash: string, [v, r, s]: string[]) => {
-  const address = Account.recover(
-    messageHash,
-    Account.encodeSignature([v, r, s])
-  )
-  return {
-    verified: true,
-    address
-  }
+    const address = Account.recover(messageHash, Account.encodeSignature([v, r, s]))
+    return {
+        verified: true,
+        address
+    }
+}
+
+export const sha256HashString = (stringToHash: string) => {
+    return sha256(stringToHash)
 }
