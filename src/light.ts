@@ -99,11 +99,11 @@ export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
     const backendAddress = backend._address
     const archiveUrl = { netConf }
 
-    const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(backendAddress, indexAddress, democHash, nthBallot).call()
+    const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(indexAddress, democHash, nthBallot).call()
 
-    const { id, bbFarmAddress } = bbFarmAndBallotId
+    const { ballotId, bbFarmAddress } = bbFarmAndBallotId
     const userEthAddress = '0x0000000000000000000000000000000000000000'
-    const ethBallotDetails = await aux.methods.getBallotDetails(id, bbFarmAddress, userEthAddress).call()
+    const ethBallotDetails = await aux.methods.getBallotDetails(ballotId, bbFarmAddress, userEthAddress).call()
 
     const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
 

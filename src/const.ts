@@ -7,7 +7,7 @@ export const zeroHash = '0x00000000000000000000000000000000000000000000000000000
 const _raw_networkVars: { [netName: string]: EthNetConf } = {
     kovan: {
         indexEnsName: 'index.kov.sv',
-        auxContract: '0x0d31706febd1b8177c722fe39432f3e47143ccd9',
+        auxContract: '0x8d9d49f602e1e95b8dca42af1766963c3e4f7565',
         httpProvider: 'https://kovan.eth.secure.vote/tokenvote-dev',
         delegationEnsName: 'delegation-2018-06-19.kov.sv',
         ensResolver: '0xc8c73829348cb15da4b0785a110017464fb8af51',
@@ -22,7 +22,7 @@ const _raw_networkVars: { [netName: string]: EthNetConf } = {
     },
     mainnet: {
         indexEnsName: 'index.tokenvote.eth',
-        auxContract: '0xff553fe4183f27e2165299b3fc0ae8c3b5c07084',
+        auxContract: '0x91f34190ffcd934115bb2bd04c29e89362989121',
         httpProvider: 'https://mainnet.eth.secure.vote/tokenvote',
         delegationEnsName: 'delegate.secvote.eth',
         ensResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
