@@ -13,7 +13,7 @@ import * as detectNetwork from 'web3-detect-network'
 
 import * as svConst from './const'
 import * as svUtils from './utils'
-import { WindowWeb3Init, EthNetConf, SvNetwork, EthTx } from './types'
+import { WindowWeb3Init, EthNetConf, SvNetwork, EthTx, BallotSpecV2 } from './types'
 import * as API from './api'
 import { HexString, Bytes32, Bytes64 } from './runtimeTypes'
 import { ed25519SignatureIsValid } from './crypto'
@@ -113,7 +113,7 @@ export const getBallotSpec = (archiveUrl, ballotSpecHash): Promise<{ data: any }
     })
 }
 
-export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
+export const getDemocNthBallot = async (svNetwork: SvNetwork, democBallotInfo) => {
     // Destructure and set the variables that are needed
     const { index, backend, aux, netConf } = svNetwork
     const { democHash, nthBallot } = democBallotInfo
@@ -188,7 +188,7 @@ export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64) 
     const numBallots = democInfo.nBallots
     const ballotsArray = []
     for (let i = 0; i < numBallots; i++) {
-        ballotsArray[i] = await getDemocNthBallot({ svNetwork }, { democHash: democHash, nthBallot: i })
+        ballotsArray[i] = await getDemocNthBallot(svNetwork, { democHash: democHash, nthBallot: i })
     }
 
     return ballotsArray
@@ -199,11 +199,14 @@ export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Byt
 
     // Check each ballot for valid signature
     const verifiedBallots = []
+    const unverifiedBallots = []
     for (let i = 0; i < allDemocBallots.length; i++) {
         const currentBallot = allDemocBallots[i]
         const { rawBallotSpecString } = currentBallot
         if (verifyEd25519SignedBallot(rawBallotSpecString)) {
             verifiedBallots.push(currentBallot)
+        } else {
+            unverifiedBallots.push(currentBallot) // We don't currently return this
         }
     }
 
