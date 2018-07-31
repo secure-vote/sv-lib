@@ -15,7 +15,7 @@ import * as svConst from './const'
 import * as svUtils from './utils'
 import { WindowWeb3Init, EthNetConf, SvNetwork, EthTx } from './types'
 import * as API from './api'
-import { HexString, Bytes32 } from './runtimeTypes'
+import { HexString, Bytes32, Bytes64 } from './runtimeTypes'
 
 // Lovely ABIs
 import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'
@@ -91,32 +91,7 @@ export const getDemocInfo = async ({ backend, democHash }) => {
     return await backend.methods.getDInfo(democHash).call()
 }
 
-export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
-    // Destructure and set the variables that are needed
-    const { index, backend, aux, netConf } = svNetwork
-    const { democHash, nthBallot } = democBallotInfo
-    const indexAddress = index._address
-    const backendAddress = backend._address
-    const archiveUrl = { netConf }
-
-    const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(indexAddress, democHash, nthBallot).call()
-
-    const { ballotId, bbFarmAddress } = bbFarmAndBallotId
-    const userEthAddress = '0x0000000000000000000000000000000000000000'
-    const ethBallotDetails = await aux.methods.getBallotDetails(ballotId, bbFarmAddress, userEthAddress).call()
-
-    const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
-
-    const ballotObject = {
-        ...bbFarmAndBallotId,
-        ...ethBallotDetails,
-        data: { ...ballotSpec.data }
-    }
-
-    return ballotObject
-}
-
-export const getBallotSpec = async (archiveUrl, ballotSpecHash): Promise<{ data: any }> => {
+export const getBallotSpec = (archiveUrl, ballotSpecHash): Promise<{ data: any }> => {
     // TODO refactor to be a bit more elegant
     return new Promise<{ data: any }>((res, rej) => {
         let done = false
@@ -137,7 +112,31 @@ export const getBallotSpec = async (archiveUrl, ballotSpecHash): Promise<{ data:
     })
 }
 
+export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
+    // Destructure and set the variables that are needed
+    const { index, backend, aux, netConf } = svNetwork
+    const { democHash, nthBallot } = democBallotInfo
+    const indexAddress = index._address
+    const backendAddress = backend._address
+    const { archiveUrl } = netConf
+
+    const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(indexAddress, democHash, nthBallot).call()
+
+    const { ballotId, bbFarmAddress } = bbFarmAndBallotId
+    const userEthAddress = '0x0000000000000000000000000000000000000000'
+    const ethBallotDetails = await aux.methods.getBallotDetails(ballotId, bbFarmAddress, userEthAddress).call()
+
+    const { data } = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
+
+    return {
+        ...bbFarmAndBallotId,
+        ...ethBallotDetails,
+        data: { ...data }
+    }
+}
+
 export const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) => {
+    console.log('archiveUrl :', archiveUrl)
     return axios.get(archiveUrl + ballotSpecHash + '.json')
 }
 
@@ -150,7 +149,7 @@ export const getBallotObjectFromIpfs = async ballotSpecHash => {
 }
 
 // Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array
-export const getDemocBallots = async ({ svNetwork, democHash }) => {
+export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64) => {
     const { backend } = svNetwork
     const democInfo = await getDemocInfo({ backend, democHash })
 
@@ -169,6 +168,11 @@ export const getDemocBallots = async ({ svNetwork, democHash }) => {
     }
 
     return ballotsArray
+}
+
+export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64, tokenId: string) => {
+    const allDemocBallots = await getDemocBallots(svNetwork, democHash)
+    return allDemocBallots.filter(ballot => ballot.data.subgroupInner.tokenId === tokenId)
 }
 
 /** Takes in the svNetwork object and returns all relevant addresses */

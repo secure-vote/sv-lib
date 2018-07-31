@@ -1,4 +1,4 @@
-import { ProxyVote } from './types'
+import { ProxyVote, EthNetConf } from './types'
 
 const BN = require('bn.js')
 import * as R from 'ramda'
@@ -263,8 +263,6 @@ export const castProxyVote = async (request, netConf) => {
         'Request does not contain extra and democ hash data'
     )
 
-    console.log('netConf :', netConf)
-
     return new Promise((resolve, reject) => {
         const svApiUrl = netConf.svApiUrl
         const proxyVotePath = '/sv/light/submitProxyVote'
@@ -280,4 +278,31 @@ export const castProxyVote = async (request, netConf) => {
                 reject(error)
             })
     })
+}
+
+// const ProxyProposalInputRT = t.type({
+//     ballotSpec: t.string,
+//     democHash: t.string,
+//     startTime: t.Integer,
+//     endTime: t.Integer,
+//     networkId: t.string
+// })
+
+export const deployProxyBallot = async (
+    netConf: EthNetConf,
+    ballotSpec: string,
+    democHash: string,
+    startTime: number,
+    endTime: number,
+    networkId: string
+) => {
+    // Check the network
+    const { svApiUrl } = netConf
+    const requestUrl = `${svApiUrl}/sv/light/submitProxyProposal`
+
+    const response = await axios.post(requestUrl, { ballotSpec, democHash, startTime, endTime, networkId })
+
+    console.log('Posted to api', response)
+
+    return response
 }

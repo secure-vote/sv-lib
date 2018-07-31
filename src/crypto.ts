@@ -2,6 +2,7 @@ import * as Account from 'eth-lib/lib/account'
 import * as Hash from 'eth-lib/lib/hash'
 import * as web3Utils from 'web3-utils'
 import * as sha256 from 'sha256'
+import { toEthHex } from './utils'
 
 /**
  * Like web3.eth.accounts.hashMessage without the envelope.
@@ -60,5 +61,5 @@ const ethVerifySig = (messageHash: string, [v, r, s]: string[]) => {
 }
 
 export const sha256HashString = (stringToHash: string) => {
-    return sha256(stringToHash)
+    return toEthHex(sha256(stringToHash))
 }
