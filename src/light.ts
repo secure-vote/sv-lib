@@ -16,6 +16,7 @@ import * as svUtils from './utils'
 import { WindowWeb3Init, EthNetConf, SvNetwork, EthTx } from './types'
 import * as API from './api'
 import { HexString, Bytes32, Bytes64 } from './runtimeTypes'
+import { ed25519SignatureIsValid } from './crypto'
 
 // Lovely ABIs
 import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'
@@ -126,18 +127,31 @@ export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
     const userEthAddress = '0x0000000000000000000000000000000000000000'
     const ethBallotDetails = await aux.methods.getBallotDetails(ballotId, bbFarmAddress, userEthAddress).call()
 
-    const { data } = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
+    const response = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
+
+    const data = response.data
 
     return {
         ...bbFarmAndBallotId,
         ...ethBallotDetails,
-        data: { ...data }
+        rawBallotSpecString: data,
+        data: JSON.parse(data)
     }
 }
 
 export const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) => {
     console.log('archiveUrl :', archiveUrl)
-    return axios.get(archiveUrl + ballotSpecHash + '.json')
+    const requestUrl = `${archiveUrl}${ballotSpecHash}.json`
+    const axiosResponse = await axios.get(requestUrl, {
+        headers: {
+            'Content-Type': 'text/plain'
+        },
+        transformResponse: res => {
+            return res
+        },
+        responseType: 'text'
+    })
+    return axiosResponse
 }
 
 export const getBallotObjectFromIpfs = async ballotSpecHash => {
@@ -145,10 +159,20 @@ export const getBallotObjectFromIpfs = async ballotSpecHash => {
     const cidHex = '1220' + ballotSpecHash.substr(2)
     const bytes = Buffer.from(cidHex, 'hex')
     const cid = bs58.encode(bytes)
-    return await axios.get(ipfsUrl + cid)
+    const requestUrl = ipfsUrl + cid
+    const axiosResponse = await axios.get(requestUrl, {
+        headers: {
+            'Content-Type': 'text/plain'
+        },
+        transformResponse: res => {
+            return res
+        },
+        responseType: 'text'
+    })
+    return axiosResponse
 }
 
-// Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array
+// Take the svNetwork object and a democHash, will return all of the bal       lots from the democracy in an array
 export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64) => {
     const { backend } = svNetwork
     const democInfo = await getDemocInfo({ backend, democHash })
@@ -172,7 +196,28 @@ export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64) 
 
 export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64, tokenId: string) => {
     const allDemocBallots = await getDemocBallots(svNetwork, democHash)
-    return allDemocBallots.filter(ballot => ballot.data.subgroupInner.tokenId === tokenId)
+
+    // Check each ballot for valid signature
+    const verifiedBallots = []
+    for (let i = 0; i < allDemocBallots.length; i++) {
+        const currentBallot = allDemocBallots[i]
+        const { rawBallotSpecString } = currentBallot
+        if (verifyEd25519SignedBallot(rawBallotSpecString)) {
+            verifiedBallots.push(currentBallot)
+        }
+    }
+
+    return verifiedBallots.filter(ballot => ballot.data.subgroupInner.tokenId === tokenId)
+}
+
+export const verifyEd25519SignedBallot = (ballotSpec: any): boolean => {
+    const { signature, proposerPk } = JSON.parse(ballotSpec).subgroupInner
+
+    if (typeof signature === 'undefined' || typeof proposerPk === 'undefined') {
+        return false
+    }
+    const placeholderBallotSpec = ballotSpec.replace(signature, '**SIG_1**')
+    return ed25519SignatureIsValid(placeholderBallotSpec, proposerPk, signature)
 }
 
 /** Takes in the svNetwork object and returns all relevant addresses */
@@ -370,19 +415,10 @@ export const createEd25519DelegationTransaction = (
  * @param pubKey stellar pubkey
  * @param signature 64 byte signature as eth hex
  * @returns {boolean}
+ * This function has been deprecated in favour of more general ed25519SignatureIsValid function in /crypto
  */
 export const ed25519DelegationIsValid = (dlgtRequest: string, pubKey: string, signature: string) => {
-    const _sig = svUtils.cleanEthHex(signature)
-    assert.equal(_sig.length, 128, 'Invalid signature, should be a 64 byte hex string')
-
-    // Create the keypair from the public key
-    const kp = StellarBase.Keypair.fromPublicKey(pubKey)
-
-    // Create a buffer from the signature
-    const sigBuffer = Buffer.from(svUtils.hexToUint8Array(_sig))
-
-    // Verify the request against the signature
-    return kp.verify(dlgtRequest, sigBuffer)
+    return ed25519SignatureIsValid(dlgtRequest, pubKey, signature)
 }
 
 /**
