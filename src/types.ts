@@ -1,4 +1,4 @@
-import { HexString } from './runtimeTypes'
+import { HexString, Bytes32 } from './runtimeTypes'
 
 export type ProxyVote = {
     // these should be `bytes32` hexstrings
@@ -42,6 +42,32 @@ export type SvNetwork = {
     backend: any
     aux: any
     payments: any
+}
+
+export type BallotSpecV2 = {
+    ballotVersion: number
+    ballotInner: {
+        ballotTitle: string
+        shortDesc: string
+        longDesc: string
+        discussionLink?: string
+        encyptionPK?: string
+        subGroup?: any
+    }
+    optionsVersion: number
+    optionsInner?: {
+        options?: any
+        aux?: any
+    }
+    subgroupVersion: number
+    subgroupInner?: {
+        tokenId: string
+        networkId: [number, number]
+        delegationSc: string
+        signature: string
+        proposerPk: string
+        sigType: string
+    }
 }
 
 export type EthTx = { to: string; value: number; gas: number | HexString; data: string }
