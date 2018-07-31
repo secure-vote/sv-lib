@@ -422,3 +422,7 @@ export const submitEd25519Delegation = async (
         .then(API.extractData)
         .catch(API.processApiError)
 }
+
+export const testFunction = () => {
+    return 'The function works from github!'
+}
