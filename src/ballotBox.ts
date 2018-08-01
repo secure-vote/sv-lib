@@ -264,21 +264,18 @@ export const castProxyVote = async (request, netConf) => {
         'Request does not contain extra and democ hash data'
     )
 
-    return new Promise((resolve, reject) => {
-        const svApiUrl = netConf.svApiUrl
-        const proxyVotePath = '/sv/light/submitProxyVote'
-        const requestUrl = `${svApiUrl}${proxyVotePath}`
-        axios
-            .post(requestUrl, request)
-            .then(response => {
-                const { data } = response
-                resolve(data)
-            })
-            .catch(error => {
-                console.log('error :', error.response)
-                reject(error)
-            })
-    })
+    const svApiUrl = netConf.svApiUrl
+    const proxyVotePath = '/sv/light/submitProxyVote'
+    const requestUrl = `${svApiUrl}${proxyVotePath}`
+    return await axios
+        .post(requestUrl, request)
+        .then(response => {
+            const { data } = response
+            return data
+        })
+        .catch(error => {
+            throw error
+        })
 }
 
 // const ProxyProposalInputRT = t.type({
@@ -317,6 +314,7 @@ export const deployProxyBallot = async (
  */
 export const deployBallotSpec = async (archivePushUrl: string, rawBallotSpecString: string) => {
     // todo - assertions and such
+    assert.equal(typeof rawBallotSpecString === 'string', true, 'This method requires the ballotspec as a string')
     assert.ok(JSON.parse(rawBallotSpecString), 'Unable to parse JSON from ballot spec string')
 
     const parsedBallotSpec: BallotSpecV2 = JSON.parse(rawBallotSpecString)
@@ -349,3 +347,5 @@ export const deployBallotSpec = async (archivePushUrl: string, rawBallotSpecStri
         return ballotHash
     }
 }
+
+export const
