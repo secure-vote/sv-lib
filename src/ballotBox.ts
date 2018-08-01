@@ -1,12 +1,13 @@
-import { ProxyVote, EthNetConf } from './types'
+import { ProxyVote, EthNetConf, BallotSpecV2 } from './types'
 
 const BN = require('bn.js')
 import * as R from 'ramda'
 import * as assert from 'assert'
 import * as web3Utils from 'web3-utils'
-import * as svCrypto from './crypto'
+import { sha256HashString, ethSignHash, ethVerifySig } from './crypto'
 import axios from 'axios'
 import * as Light from './light'
+const btoa = require('btoa')
 
 import BBFarmAbi from './smart_contracts/BBFarm.abi.json'
 
@@ -132,7 +133,7 @@ export const mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, priv
         { t: 'bytes', v: extra }
     )
 
-    const { v, r, s } = svCrypto.ethSignHash(messageHash, privateKey)
+    const { v, r, s } = ethSignHash(messageHash, privateKey)
 
     const vBytes = web3Utils.hexToBytes(v)
     const midBytes = web3Utils.hexToBytes(web3Utils.padRight('0x', 54))
@@ -170,7 +171,7 @@ export const verifySignedBallotForProxy = (proxyVote: ProxyVote, opts: any = {})
         { t: 'bytes', v: extra }
     )
 
-    return svCrypto.ethVerifySig(messageHash, [v, r, s])
+    return ethVerifySig(messageHash, [v, r, s])
 }
 
 /**
@@ -305,4 +306,46 @@ export const deployProxyBallot = async (
     console.log('Posted to api', response)
 
     return response
+}
+
+/**
+ * Attempts to deploy the a raw ballot spec to IPFS and the ballot archive
+ * @param {string} archivePushUrl - Url for the ballot to be deployed to
+ * @param {string} rawBallotSpecString - the stringified ballot spec
+ *
+ * @returns {string} if successful, will return the ballot hash as a string
+ */
+export const deployBallotSpec = async (archivePushUrl: string, rawBallotSpecString: string) => {
+    // todo - assertions and such
+    assert.ok(JSON.parse(rawBallotSpecString), 'Unable to parse JSON from ballot spec string')
+
+    const parsedBallotSpec: BallotSpecV2 = JSON.parse(rawBallotSpecString)
+
+    assert.equal(parsedBallotSpec.hasOwnProperty('ballotInner'), true, 'Ballot spec does not contain ballotInner property')
+    assert.equal(
+        typeof parsedBallotSpec.ballotVersion == 'number' && typeof parsedBallotSpec.optionsVersion == 'number',
+        true,
+        'Ballot spec does not specify correct version information'
+    )
+
+    // If the the function is running in the browser, we must use btoa to get the base64 data
+    const isBrowser = typeof window === 'undefined' ? false : true
+    const ballotBase64 = isBrowser
+        ? btoa(unescape(encodeURIComponent(rawBallotSpecString)))
+        : Buffer.from(rawBallotSpecString).toString('base64')
+    const ballotHash = sha256HashString(rawBallotSpecString)
+
+    const requestData = { ballotBase64: ballotBase64, assertSpecHash: ballotHash }
+    const requestHeaders = { 'Content-Type': 'application/json', 'x-api-key': 'UmNrB7cifZ2N1LlnyM4RXK1xuK2VpIQaamgmlSBb' }
+
+    const response: any = await axios.post(archivePushUrl, requestData, { headers: requestHeaders }).catch(error => {
+        throw error
+    })
+
+    const { data } = response
+    if (data !== ballotHash) {
+        throw new Error('Invalid response from ballot archive')
+    } else {
+        return ballotHash
+    }
 }
