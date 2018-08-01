@@ -4,7 +4,7 @@ import * as C from '../src/const'
 import { EthNetConf } from '../src/types'
 
 import * as R from 'ramda'
-import { ApiError } from '../src/api'
+import { ApiError } from '../src/errors'
 import { AssertionError } from 'assert'
 
 test('prepareEd25519Delegation works', () => {
@@ -12,6 +12,7 @@ test('prepareEd25519Delegation works', () => {
 })
 
 test('submitEd25519Delegation works', async () => {
+    jest.setTimeout(10000)
     const svNetwork = C.getNetwork(42, 42)
 
     const testGood = {
@@ -26,8 +27,16 @@ test('submitEd25519Delegation works', async () => {
     // this should throw early due to empty EthNetConf
     await expect(L.submitEd25519Delegation({} as EthNetConf, testGood.req, testGood.pk, testGood.sig)).rejects.toThrow()
 
-    const runBadTest = (tObj, ErrType) =>
-        expect(L.submitEd25519Delegation(svNetwork, tObj.req, tObj.pk, tObj.sig, { broadcast: false })).rejects.toThrow(ErrType)
+    const runBadTest = async (tObj, ErrType) =>
+        await expect(L.submitEd25519Delegation(svNetwork, tObj.req, tObj.pk, tObj.sig, { broadcast: false })).rejects.toThrow(ErrType)
     await runBadTest(testTooLong, AssertionError)
     await runBadTest(testBadReqHdr, ApiError)
+})
+
+test('ABIs are imported and work', async () => {
+    const net = C.getNetwork(1, 1)
+    const svNet = await L.initializeSvLight(net)
+
+    const v = await svNet.index.methods.getVersion().call()
+    expect(parseInt(v)).toBeGreaterThan(0)
 })

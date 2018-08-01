@@ -19,15 +19,16 @@ import { HexString, Bytes32, Bytes64 } from './runtimeTypes'
 import { ed25519SignatureIsValid } from './crypto'
 
 // Lovely ABIs
-import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'
-import IndexAbi from './smart_contracts/SVLightIndex.abi.json'
-import BackendAbi from './smart_contracts/SVLightIndexBackend.abi.json'
-import BBFarmAbi from './smart_contracts/BBFarm.abi.json'
-import PaymentsAbi from './smart_contracts/SVPayments.abi.json'
-import AuxAbi from './smart_contracts/AuxAbi.abi.json'
-import AuctionAbi from './smart_contracts/CommAuctionIface.abi.json'
-import ERC20Abi from './smart_contracts/ERC20.abi.json'
-import UnsafeEd25519DelegationAbi from './smart_contracts/UnsafeEd25519Delegation.abi.json'
+// Note - have changed this from import to require as the import was not working on the nod
+const ResolverAbi = require('./smart_contracts/SV_ENS_Resolver.abi.json')
+const IndexAbi = require('./smart_contracts/SVLightIndex.abi.json')
+const BackendAbi = require('./smart_contracts/SVLightIndexBackend.abi.json')
+const BBFarmAbi = require('./smart_contracts/BBFarm.abi.json')
+const PaymentsAbi = require('./smart_contracts/SVPayments.abi.json')
+const AuxAbi = require('./smart_contracts/AuxAbi.abi.json')
+const AuctionAbi = require('./smart_contracts/CommAuctionIface.abi.json')
+const ERC20Abi = require('./smart_contracts/ERC20.abi.json')
+const UnsafeEd25519DelegationAbi = require('./smart_contracts/UnsafeEd25519Delegation.abi.json')
 
 /**
  * Return contract instances and web3 needed for SvLight usage
@@ -39,11 +40,16 @@ export const initializeSvLight = async (netConf: EthNetConf): Promise<SvNetwork>
 
     const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
     console.log('web3 :', web3)
-    const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
-    console.log('resolver :', resolver)
-
-    const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexEnsName))
+    console.log('ensResolver :', ensResolver)
+    console.log('ResolverAbi :', ResolverAbi)
+    const resolver = {}
+    // const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
+    // const indexAddress = await resolveEnsAddress({ resolver }, indexEnsName)
+    // console.log('indexAddress :', indexAddress);
+    const index = new web3.eth.Contract(IndexAbi, '0xcad76eE606FB794dD1DA2c7E3C8663F648ba431d')
+    console.log('index :', index)
     const backendAddress = await index.methods.getBackend().call()
+    console.log('backendAddress :', backendAddress)
     const backend = new web3.eth.Contract(BackendAbi, backendAddress)
     const aux = new web3.eth.Contract(AuxAbi, auxContract)
     const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())
@@ -83,7 +89,9 @@ export const initializeWindowWeb3 = async (): Promise<WindowWeb3Init> => {
  * @param {Promise<string>} ensName
  */
 export const resolveEnsAddress = async ({ resolver }, ensName): Promise<string> => {
-    return await resolver.methods.addr(NH.hash(ensName)).call()
+    console.log('NH.hash(ensName) :', NH.hash(ensName))
+    const addr = await resolver.methods.addr(NH.hash(ensName)).call()
+    return addr
 }
 
 /**
@@ -497,6 +505,25 @@ export const submitEd25519Delegation = async (
         .catch(API.processApiError)
 }
 
-export const testFunction = () => {
-    return 'The function works from github!'
+// Maybe this does make more sense just to happen on the API?
+export const genDeployBallotTxData = async (web3: any, indexAddress: string, deployBallotArgs: any): Promise<string> => {
+    const { democHash, ballotHash, extraData, packed } = deployBallotArgs
+    const indexContract = new web3.eth.Contract(IndexAbi, indexAddress)
+    const deployBallot = indexContract.methods.dDeployBallot(democHash, ballotHash, extraData, packed)
+    return deployBallot.encodeABI()
+}
+
+export const signTx = async (web3: any, txData: string, privKey: Bytes64) => {
+    return await web3.eth.accounts.signTransaction(txData, privKey)
+}
+
+export const publishSignedTx = async (web3: any, rawTx: string): Promise<string> => {
+    return await web3.eth
+        .sendSignedTransaction(rawTx)
+        .then(r => {
+            return r.transactionHash
+        })
+        .catch(e => {
+            return e
+        })
 }

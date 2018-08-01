@@ -57,15 +57,11 @@
   "devDependencies": {
     "@types/jest": "^23.3.0",
     "@types/node": "^10.5.2",
-    "buffer": "^5.1.0",
-    "commitizen": "^2.9.6",
     "coveralls": "^3.0.0",
     "cross-env": "^5.0.1",
-    "cz-conventional-changelog": "^2.0.0",
     "esdoc": "^1.1.0",
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-standard-plugin": "^1.0.0",
-    "husky": "^0.14.0",
     "jest": "^23.4.1",
     "lint-staged": "^7.1.3",
     "lodash.camelcase": "^4.3.0",
@@ -126,8 +122,8 @@
     }
   },
   "jest": {
-    "verbose": true,
-    "testURL": "http://localhost/",
+    "testEnvironment": "node",
+    "verbose": false,
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
@@ -140,7 +136,7 @@
       "json",
       "node"
     ],
-    "coverageThreshold-commented": {
+    "coverageThreshold": {
       "global": {
         "branches": 90,
         "functions": 95,
@@ -150,8 +146,14 @@
     },
     "collectCoverage": false,
     "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/dist"
+      "<rootDir>/node_modules/",
+      "<rootDir>/node_modules.back/",
+      "<rootDir>/dev-lib/",
+      "<rootDir>/dist/",
+      "<rootDir>/lib/"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/node_modules.back/"
     ]
   },
   "prettier": {

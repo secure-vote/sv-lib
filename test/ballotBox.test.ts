@@ -64,39 +64,22 @@ test('generates correct range3 voteData', () => {
     expect(bb.genRange3VoteData([-3, -3, 1])).toEqual('0x0200000000000000000000000000000000000000000000000000000000000000')
 })
 
-test('ballot deploys correctly', () => {
+test('ballot deploys correctly', async () => {
     const goodBSpecString =
         '{"ballotVersion":2,"ballotInner":{"ballotTitle":"Testing","shortDesc":"Testing","longDesc":"Testing","subgroup":null,"discussionLink":null,"encryptionPK":null},"optionsVersion":2,"optionsInner":{"options":null,"aux":null},"subgroupVersion":1,"subgroupInner":{"tokenId":"testing_id_3","networkId":[42,42],"delegationSc":"0x005645072d7c244476e3099619a6089245b6a958","signature":"**SIG_1**","sigType":"ed25519","proposerPk":"GBQLUYK4AWPXZT7TUHUM3QA4XL5XUHLWXIXZP3IJDLS4QD77UASNNKGX"}}'
     const incompleteBSpecString =
         '{"ballotVersion":2,"optionsVersion":2,"optionsInner":{"options":null,"aux":null},"subgroupVersion":1,"subgroupInner":{"tokenId":"testing_id_3","networkId":[42,42],"delegationSc":"0x005645072d7c244476e3099619a6089245b6a958","signature":"**SIG_1**","sigType":"ed25519","proposerPk":"GBQLUYK4AWPXZT7TUHUM3QA4XL5XUHLWXIXZP3IJDLS4QD77UASNNKGX"}}'
     const junkString = 'thisisarandomstring'
-    const bSpecJson = {
-        ballotVersion: 2,
-        ballotInner: {
-            ballotTitle: 'Testing',
-            shortDesc: 'Testing',
-            longDesc: 'Testing',
-            subgroup: null,
-            discussionLink: null,
-            encryptionPK: null
-        },
-        optionsVersion: 2,
-        optionsInner: { options: null, aux: null },
-        subgroupVersion: 1,
-        subgroupInner: {
-            tokenId: 'testing_id_3',
-            networkId: [42, 42],
-            delegationSc: '0x005645072d7c244476e3099619a6089245b6a958',
-            signature: '**SIG_1**',
-            sigType: 'ed25519',
-            proposerPk: 'GBQLUYK4AWPXZT7TUHUM3QA4XL5XUHLWXIXZP3IJDLS4QD77UASNNKGX'
-        }
-    }
+    const bSpecJson = JSON.parse(goodBSpecString)
 
     const testUrl = 'https://archive.test.push.secure.vote/'
 
-    expect(bb.deployBallotSpec(testUrl, goodBSpecString)).resolves.toHaveReturned()
-    expect(bb.deployBallotSpec(testUrl, incompleteBSpecString)).rejects.toThrow()
-    expect(bb.deployBallotSpec(testUrl, junkString)).rejects.toThrow()
-    expect(bb.deployBallotSpec(testUrl, bSpecJson)).rejects.toThrow()
+    // constant hash for the above goodBSpecString -- if that changes this will need to change also
+    await expect(bb.deployBallotSpec(testUrl, goodBSpecString)).resolves.toBe(
+        '0xbefb05d4714e4822b8624a0e92af3103f8500fb3b54d2e44782e19f39e939291'
+    )
+    expect(await bb.deployBallotSpec(testUrl, goodBSpecString)).toBe('0xbefb05d4714e4822b8624a0e92af3103f8500fb3b54d2e44782e19f39e939291')
+    await expect(bb.deployBallotSpec(testUrl, incompleteBSpecString)).rejects.toThrow()
+    await expect(bb.deployBallotSpec(testUrl, junkString)).rejects.toThrow()
+    await expect(bb.deployBallotSpec(testUrl, bSpecJson)).rejects.toThrow()
 })

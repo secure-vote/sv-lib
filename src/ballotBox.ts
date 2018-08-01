@@ -342,10 +342,8 @@ export const deployBallotSpec = async (archivePushUrl: string, rawBallotSpecStri
 
     const { data } = response
     if (data !== ballotHash) {
-        throw new Error('Invalid response from ballot archive')
+        throw new Error(`Invalid response from ballot archive. Expected ${ballotHash}, got ${data}`)
     } else {
         return ballotHash
     }
 }
-
-export const
