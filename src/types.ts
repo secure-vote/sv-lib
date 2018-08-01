@@ -70,4 +70,21 @@ export type BallotSpecV2 = {
     }
 }
 
+export type GlobalBallot = {
+    data: BallotSpecV2
+    rawBallotSpecString: string
+    ballotId: string
+    ballotOwner: string
+    bbFarmAddress: string
+    deprecated: boolean
+    startTime: string
+    endTime: string
+    extraData: string
+    hasVoted: boolean
+    nVotesCast: string
+    secKey: string
+    specHash: string
+    submissionBits: string
+}
+
 export type EthTx = { to: string; value: number; gas: number | HexString; data: string }

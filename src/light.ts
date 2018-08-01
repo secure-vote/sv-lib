@@ -13,7 +13,7 @@ import * as detectNetwork from 'web3-detect-network'
 
 import * as svConst from './const'
 import * as svUtils from './utils'
-import { WindowWeb3Init, EthNetConf, SvNetwork, EthTx, BallotSpecV2 } from './types'
+import { WindowWeb3Init, EthNetConf, SvNetwork, EthTx, BallotSpecV2, GlobalBallot } from './types'
 import * as API from './api'
 import { HexString, Bytes32, Bytes64 } from './runtimeTypes'
 import { ed25519SignatureIsValid } from './crypto'
@@ -38,10 +38,12 @@ export const initializeSvLight = async (netConf: EthNetConf): Promise<SvNetwork>
     const { indexEnsName, ensResolver, httpProvider, auxContract } = netConf
 
     const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
+    console.log('web3 :', web3)
     const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
+    console.log('resolver :', resolver)
 
     const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexEnsName))
-    const backendAddress = await getBackendAddress({ index })
+    const backendAddress = await index.methods.getBackend().call()
     const backend = new web3.eth.Contract(BackendAbi, backendAddress)
     const aux = new web3.eth.Contract(AuxAbi, auxContract)
     const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())
@@ -84,17 +86,15 @@ export const resolveEnsAddress = async ({ resolver }, ensName): Promise<string> 
     return await resolver.methods.addr(NH.hash(ensName)).call()
 }
 
-export const getBackendAddress = async ({ index }) => {
-    return await index.methods.getBackend().call()
-}
-
-export const getDemocInfo = async ({ backend, democHash }) => {
-    return await backend.methods.getDInfo(democHash).call()
-}
-
-export const getBallotSpec = (archiveUrl, ballotSpecHash): Promise<{ data: any }> => {
+/**
+ * Attempts to retrieve a ballotSpec from ipfs and falls back to archive
+ * @param {string} archiveUrl - the http archive url
+ * @param {Bytes64} ballotSpecHash - the hash of the url
+ * @returns {Promise<string>} the raw string of the ballot spec
+ */
+export const getBallotSpec = (archiveUrl: string, ballotSpecHash: Bytes64): Promise<string> => {
     // TODO refactor to be a bit more elegant
-    return new Promise<{ data: any }>((res, rej) => {
+    return new Promise<string>((res, rej) => {
         let done = false
         const doRes = obj => {
             if (!done) {
@@ -113,7 +113,58 @@ export const getBallotSpec = (archiveUrl, ballotSpecHash): Promise<{ data: any }
     })
 }
 
-export const getDemocNthBallot = async (svNetwork: SvNetwork, democBallotInfo) => {
+/**
+ * Attempts to retrieve a ballotSpec from S3
+ * @param {string} archiveUrl - the url for the http archive
+ * @param {Bytes64} ballotSpecHash - the hash of the ballot spec
+ * @returns {Promise<string>} the raw string of the ballot spec
+ */
+const getBallotObjectFromS3 = async (archiveUrl: string, ballotSpecHash: Bytes64): Promise<string> => {
+    console.log('archiveUrl :', archiveUrl)
+    const requestUrl = `${archiveUrl}${ballotSpecHash}.json`
+    const { data } = await axios.get(requestUrl, {
+        // We need to specify this transformResponse in order to avoid axios's default of parsing JSON
+        transformResponse: res => {
+            return res
+        },
+        responseType: 'text'
+    })
+    return data
+}
+
+/**
+ * Attempts to retrieve a ballotSpec from ipfs
+ * @param {Bytes64} ballotSpecHash - the hash of the ballot spec
+ * @returns {Promise<string>} the raw string of the ballot spec
+ */
+const getBallotObjectFromIpfs = async (ballotSpecHash: Bytes64): Promise<string> => {
+    const ipfsUrl = 'https://ipfs.infura.io/api/v0/block/get?arg='
+    const cidHex = '1220' + ballotSpecHash.substr(2)
+    const bytes = Buffer.from(cidHex, 'hex')
+    const cid = bs58.encode(bytes)
+    const requestUrl = ipfsUrl + cid
+    const { data } = await axios.get(requestUrl, {
+        // We need to specify this transformResponse in order to avoid axios's default of parsing JSON
+        transformResponse: res => {
+            return res
+        },
+        responseType: 'text'
+    })
+    return data
+}
+
+/**
+ * Attempts to retrieve a ballotSpec from ipfs and falls back to archive
+ * @param {SvNetwork} svNetwork
+ * @param {Object} democBallotInfo - object containing the information about what ballot to retrieve
+ * @param {Bytes64} democBallotInfo.democHash - the democracy hash
+ * @param {number} democBallotInfo.nthBallot - the number of the ballot to retrieve
+ * @returns {GlobalBallot} global ballot object containing all required ballot information
+ */
+export const getDemocNthBallot = async (
+    svNetwork: SvNetwork,
+    democBallotInfo: { democHash: string; nthBallot: number }
+): Promise<GlobalBallot> => {
     // Destructure and set the variables that are needed
     const { index, backend, aux, netConf } = svNetwork
     const { democHash, nthBallot } = democBallotInfo
@@ -127,55 +178,25 @@ export const getDemocNthBallot = async (svNetwork: SvNetwork, democBallotInfo) =
     const userEthAddress = '0x0000000000000000000000000000000000000000'
     const ethBallotDetails = await aux.methods.getBallotDetails(ballotId, bbFarmAddress, userEthAddress).call()
 
-    const response = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
-
-    const data = response.data
+    const rawBallotSpecString: string = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
 
     return {
         ...bbFarmAndBallotId,
         ...ethBallotDetails,
-        rawBallotSpecString: data,
-        data: JSON.parse(data)
+        rawBallotSpecString,
+        data: JSON.parse(rawBallotSpecString)
     }
 }
 
-export const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) => {
-    console.log('archiveUrl :', archiveUrl)
-    const requestUrl = `${archiveUrl}${ballotSpecHash}.json`
-    const axiosResponse = await axios.get(requestUrl, {
-        headers: {
-            'Content-Type': 'text/plain'
-        },
-        transformResponse: res => {
-            return res
-        },
-        responseType: 'text'
-    })
-    return axiosResponse
-}
-
-export const getBallotObjectFromIpfs = async ballotSpecHash => {
-    const ipfsUrl = 'https://ipfs.infura.io/api/v0/block/get?arg='
-    const cidHex = '1220' + ballotSpecHash.substr(2)
-    const bytes = Buffer.from(cidHex, 'hex')
-    const cid = bs58.encode(bytes)
-    const requestUrl = ipfsUrl + cid
-    const axiosResponse = await axios.get(requestUrl, {
-        headers: {
-            'Content-Type': 'text/plain'
-        },
-        transformResponse: res => {
-            return res
-        },
-        responseType: 'text'
-    })
-    return axiosResponse
-}
-
-// Take the svNetwork object and a democHash, will return all of the bal       lots from the democracy in an array
-export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64) => {
+/**
+ * Returns an array of all ballots from a democracy
+ * @param {SvNetwork} svNetwork
+ * @param {Bytes64} ballotSpecHash - the hash of the ballot spec
+ * @returns {Promise<string>} the raw string of the ballot spec
+ */
+export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64): Promise<GlobalBallot[]> => {
     const { backend } = svNetwork
-    const democInfo = await getDemocInfo({ backend, democHash })
+    const democInfo = await backend.methods.getDInfo(democHash).call()
 
     // Throw an error if the democ info is not correct
     const { erc20, owner } = democInfo
@@ -194,8 +215,17 @@ export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64) 
     return ballotsArray
 }
 
+/**
+ * Return contract instances and web3 needed for SvLight usage
+ * @param {SvNetwork} svNetwork
+ * @param {Bytes64} democHash of the democracy we want to get the ballots from
+ * @param {string} tokenId the id of the token subgroup we want to retrieve
+ * @returns {globalBallot[]} boolean value representing if the signature valid
+ */
 export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64, tokenId: string) => {
     const allDemocBallots = await getDemocBallots(svNetwork, democHash)
+
+    console.log('allDemocBallots :', allDemocBallots)
 
     // Check each ballot for valid signature
     const verifiedBallots = []
@@ -203,7 +233,7 @@ export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Byt
     for (let i = 0; i < allDemocBallots.length; i++) {
         const currentBallot = allDemocBallots[i]
         const { rawBallotSpecString } = currentBallot
-        if (verifyEd25519SignedBallot(rawBallotSpecString)) {
+        if (isEd25519SignedBallotValid(rawBallotSpecString)) {
             verifiedBallots.push(currentBallot)
         } else {
             unverifiedBallots.push(currentBallot) // We don't currently return this
@@ -213,13 +243,18 @@ export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Byt
     return verifiedBallots.filter(ballot => ballot.data.subgroupInner.tokenId === tokenId)
 }
 
-export const verifyEd25519SignedBallot = (ballotSpec: any): boolean => {
-    const { signature, proposerPk } = JSON.parse(ballotSpec).subgroupInner
+/**
+ * Return contract instances and web3 needed for SvLight usage
+ * @param {string} rawBallotSpecString raw string of the ballot spec retrieved from ipfs
+ * @returns {boolean} boolean value representing if the signature valid
+ */
+export const isEd25519SignedBallotValid = (rawBallotSpecString: any): boolean => {
+    const { signature, proposerPk } = JSON.parse(rawBallotSpecString).subgroupInner
 
     if (typeof signature === 'undefined' || typeof proposerPk === 'undefined') {
         return false
     }
-    const placeholderBallotSpec = ballotSpec.replace(signature, '**SIG_1**')
+    const placeholderBallotSpec = rawBallotSpecString.replace(signature, '**SIG_1**')
     return ed25519SignatureIsValid(placeholderBallotSpec, proposerPk, signature)
 }
 
