@@ -33,23 +33,15 @@ const UnsafeEd25519DelegationAbi = require('./smart_contracts/UnsafeEd25519Deleg
  * @returns {Promise<SvNetwork>} The SvNetwork object based on `netConf`
  */
 export const initializeSvLight = async (netConf: EthNetConf): Promise<SvNetwork> => {
-
     const { indexEnsName, ensResolver, webSocketsProvider, httpProvider, auxContract } = netConf
 
-    const Web3 = require('web3');
-
     const web3 = new Web3(new Web3.providers.WebsocketProvider(webSocketsProvider));
+    console.log('web3 :', web3);
 
     const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
     const indexAddress = await resolveEnsAddress({ resolver }, indexEnsName)
-    console.log('indexAddress :', indexAddress);
     const index = new web3.eth.Contract(IndexAbi, indexAddress)
-    const version = await index.methods.getVersion().call()
-    console.log('version :', version);
-
-    console.log('index :', index)
     const backendAddress = await index.methods.getBackend().call()
-    console.log('backendAddress :', backendAddress)
     const backend = new web3.eth.Contract(BackendAbi, backendAddress)
     const aux = new web3.eth.Contract(AuxAbi, auxContract)
     const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())
@@ -89,7 +81,6 @@ export const initializeWindowWeb3 = async (): Promise<WindowWeb3Init> => {
  * @param {Promise<string>} ensName
  */
 export const resolveEnsAddress = async ({ resolver }, ensName): Promise<string> => {
-    console.log('NH.hash(ensName) :', NH.hash(ensName))
     const addr = await resolver.methods.addr(NH.hash(ensName)).call()
     return addr
 }
@@ -128,7 +119,6 @@ export const getBallotSpec = (archiveUrl: string, ballotSpecHash: Bytes64): Prom
  * @returns {Promise<string>} the raw string of the ballot spec
  */
 const getBallotObjectFromS3 = async (archiveUrl: string, ballotSpecHash: Bytes64): Promise<string> => {
-    console.log('archiveUrl :', archiveUrl)
     const requestUrl = `${archiveUrl}${ballotSpecHash}.json`
     const { data } = await axios.get(requestUrl, {
         // We need to specify this transformResponse in order to avoid axios's default of parsing JSON
@@ -232,8 +222,6 @@ export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64):
  */
 export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64, tokenId: string) => {
     const allDemocBallots = await getDemocBallots(svNetwork, democHash)
-
-    console.log('allDemocBallots :', allDemocBallots)
 
     // Check each ballot for valid signature
     const verifiedBallots = []
