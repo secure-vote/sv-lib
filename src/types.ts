@@ -22,6 +22,7 @@ export type EthNetConf = {
     indexEnsName: string
     auxContract: string
     httpProvider: string
+    webSocketsProvider: string
     delegationEnsName: string
     ensResolver: string
     ens: string

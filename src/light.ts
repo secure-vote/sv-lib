@@ -36,17 +36,20 @@ const UnsafeEd25519DelegationAbi = require('./smart_contracts/UnsafeEd25519Deleg
  * @returns {Promise<SvNetwork>} The SvNetwork object based on `netConf`
  */
 export const initializeSvLight = async (netConf: EthNetConf): Promise<SvNetwork> => {
-    const { indexEnsName, ensResolver, httpProvider, auxContract } = netConf
 
-    const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
-    console.log('web3 :', web3)
-    console.log('ensResolver :', ensResolver)
-    console.log('ResolverAbi :', ResolverAbi)
-    const resolver = {}
-    // const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
-    // const indexAddress = await resolveEnsAddress({ resolver }, indexEnsName)
-    // console.log('indexAddress :', indexAddress);
-    const index = new web3.eth.Contract(IndexAbi, '0xcad76eE606FB794dD1DA2c7E3C8663F648ba431d')
+    const { indexEnsName, ensResolver, webSocketsProvider, httpProvider, auxContract } = netConf
+
+    const Web3 = require('web3');
+
+    const web3 = new Web3(new Web3.providers.WebsocketProvider(webSocketsProvider));
+
+    const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
+    const indexAddress = await resolveEnsAddress({ resolver }, indexEnsName)
+    console.log('indexAddress :', indexAddress);
+    const index = new web3.eth.Contract(IndexAbi, indexAddress)
+    const version = await index.methods.getVersion().call()
+    console.log('version :', version);
+
     console.log('index :', index)
     const backendAddress = await index.methods.getBackend().call()
     console.log('backendAddress :', backendAddress)
