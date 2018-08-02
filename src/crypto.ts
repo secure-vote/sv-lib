@@ -2,7 +2,7 @@ import * as Account from 'eth-lib/lib/account'
 import * as StellarBase from 'stellar-base'
 import * as Hash from 'eth-lib/lib/hash'
 import * as web3Utils from 'web3-utils'
-import sha256 from 'sha256'
+const sha256 = require('sha256')
 import { toEthHex, cleanEthHex, hexToUint8Array } from './utils'
 import * as assert from 'assert'
 import { Bytes64 } from './runtimeTypes'
