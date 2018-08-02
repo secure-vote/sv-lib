@@ -6,7 +6,7 @@ import axios from 'axios'
 import * as web3Utils from 'web3-utils'
 import * as StellarBase from 'stellar-base'
 import * as assert from 'assert'
-import * as detectNetwork from 'web3-detect-network'
+const detectNetwork = require('web3-detect-network')
 
 import * as svConst from './const'
 import * as svUtils from './utils'
