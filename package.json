@@ -101,7 +101,7 @@
     "build": "tsc --module commonjs && cp -a ./src/smart_contracts ./lib/smart_contracts && yarn build:rollup && yarn docs # typedoc --out docs --target es6 --theme minimal --mode file src",
     "build:rollup": "rollup -c rollup.config.ts",
     "start": "rollup -c rollup.config.ts -w",
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "test:watch": "jest --watch",
     "test:prod": "npm run lint && npm run test -- --coverage --no-cache",
     "report-coverage": "cat ./coverage/lcov.info | coveralls",
