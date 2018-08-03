@@ -19,6 +19,7 @@
   "dependencies": {
     "@types/bn.js": "^4.11.1",
     "@types/bs58": "^3.0.30",
+    "@types/btoa": "^1.2.0",
     "@types/ramda": "^0.25.35",
     "assert": "^1.4.1",
     "axios": "^0.18.0",

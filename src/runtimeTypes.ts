@@ -12,3 +12,11 @@ export type Bytes32 = t.TypeOf<typeof Bytes32RT>
 
 export const Bytes64RT = t.refinement(HexStringRT, v => v.length === 64 * 2 + 2, 'Bytes64')
 export type Bytes64 = t.TypeOf<typeof Bytes64RT>
+
+
+export const TimestampRT = t.refinement(t.Integer, i => 1500000000 <= i && i <= 2 ** 40, 'Timestamp')
+export type Timestamp = t.TypeOf<typeof TimestampRT>
+
+export const validNetworkNames = ["mainnet", "testnet"]
+export const NetworkNameRT = t.refinement(t.string, s => s in validNetworkNames, 'NetworkName')
+export type NetworkName = t.TypeOf<typeof NetworkNameRT>

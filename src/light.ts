@@ -36,7 +36,7 @@ export const initializeSvLight = async (netConf: EthNetConf): Promise<SvNetwork>
     const { indexEnsName, ensResolver, webSocketsProvider, httpProvider, auxContract } = netConf
 
     const web3 = new Web3(new Web3.providers.WebsocketProvider(webSocketsProvider));
-    console.log('web3 :', web3);
+    svUtils.debugLog('initializeSvLight', `Web3 loaded: ${!!web3}`)
 
     const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
     const indexAddress = await resolveEnsAddress({ resolver }, indexEnsName)

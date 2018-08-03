@@ -1,17 +1,19 @@
-import { ProxyVote, EthNetConf, BallotSpecV2, SvNetwork } from './types'
-
+const btoa = require('btoa')
 const BN = require('bn.js')
 import * as R from 'ramda'
 import * as assert from 'assert'
 import * as web3Utils from 'web3-utils'
-import { sha256HashString, ethSignHash, ethVerifySig } from './crypto'
-import { cleanEthHex } from './utils'
 import axios from 'axios'
+import * as t from 'io-ts'
+
+import { sha256HashString, ethSignHash, ethVerifySig } from './crypto'
+import { cleanEthHex, checkDecode, debugLog } from './utils'
 import * as Light from './light'
-const btoa = require('btoa')
+
+import { Bytes64, Bytes32, TimestampRT, NetworkNameRT, Bytes32RT } from './runtimeTypes';
+import { ProxyVote, EthNetConf, BallotSpecV2, SvNetwork } from './types'
 
 const BBFarmAbi = require('./smart_contracts/BBFarm.abi.json')
-import { Bytes64, Bytes32 } from './runtimeTypes';
 
 /**
  * This object tracks the flags used for SV ballot boxes. They determine the submission
@@ -112,7 +114,9 @@ export const mkSubmissionBits = (...toCombine) => {
  *  { proxyReq (bytes32[5]), extra (bytes) } in the required format for `submitProxyVote`
  */
 export const mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts: any = {}): ProxyVote => {
-    if (opts.skipSequenceSizeCheck !== true) assert.equal(0 < sequence && sequence < 2 ** 32, true, 'sequence number out of bounds')
+    if (opts.skipSequenceSizeCheck !== true) {
+        assert.equal(0 < sequence && sequence < 2 ** 32, true, 'sequence number out of bounds')
+    }
     assert.equal(web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId), true, 'ballotId incorrect format (either not a BN or not hex)')
     assert.equal(web3Utils.isHexStrict(voteData), true, 'vote data is not hex (strict)')
     assert.equal(web3Utils.isHexStrict(extra), true, 'extra param is not hex (strict)')
@@ -253,7 +257,7 @@ export const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) => {
     return web3Tx
 }
 
-export const castProxyVote = async (request, netConf) => {
+export const castProxyVote = async (request, netConf: EthNetConf) => {
     assert.equal(web3Utils.isHexStrict(request.ballotId), true, 'ballotId is not hex')
     assert.equal(request.ballotId.length, 66, 'ballotId incorrect length')
     assert.equal(request.proxyReq.length == 5, true, 'Proxy vote req does not contain the correct number of parameters')
@@ -279,29 +283,27 @@ export const castProxyVote = async (request, netConf) => {
         })
 }
 
-// const ProxyProposalInputRT = t.type({
-//     ballotSpec: t.string,
-//     democHash: t.string,
-//     startTime: t.Integer,
-//     endTime: t.Integer,
-//     networkId: t.string
-// })
+const ProxyProposalInputRT = t.type({
+    ballotSpec: Bytes32RT,
+    democHash: Bytes32RT,
+    startTime: TimestampRT,
+    endTime: TimestampRT,
+    networkName: NetworkNameRT
+})
+type ProxyProposalRequest = t.TypeOf<typeof ProxyProposalInputRT>
 
 export const deployProxyBallot = async (
     netConf: EthNetConf,
-    ballotSpec: string,
-    democHash: string,
-    startTime: number,
-    endTime: number,
-    networkId: string
+    proxyProposalReq: ProxyProposalRequest
 ) => {
+    checkDecode(ProxyProposalInputRT.decode(proxyProposalReq))
     // Check the network
     const { svApiUrl } = netConf
     const requestUrl = `${svApiUrl}/sv/light/submitProxyProposal`
 
-    const response = await axios.post(requestUrl, { ballotSpec, democHash, startTime, endTime, networkId })
+    const response = await axios.post(requestUrl, proxyProposalReq)
 
-    console.log('Posted to api', response)
+    debugLog("deployProxyBallot", `Recieved response: ${response}`)
 
     return response
 }
