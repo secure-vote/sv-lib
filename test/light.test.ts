@@ -33,7 +33,7 @@ test('submitEd25519Delegation works', async () => {
     await runBadTest(testBadReqHdr, ApiError)
 })
 
-test('ABIs are imported', async () => {
+test('ABIs are imported and methods exist', async () => {
     const net = C.getNetwork(42, 42)
     const svNet = await L.initializeSvLight(net)
     expect(svNet.index.methods).toBeDefined()

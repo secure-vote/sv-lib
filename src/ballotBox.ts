@@ -1,15 +1,17 @@
-import { ProxyVote, EthNetConf, BallotSpecV2 } from './types'
+import { ProxyVote, EthNetConf, BallotSpecV2, SvNetwork } from './types'
 
 const BN = require('bn.js')
 import * as R from 'ramda'
 import * as assert from 'assert'
 import * as web3Utils from 'web3-utils'
 import { sha256HashString, ethSignHash, ethVerifySig } from './crypto'
+import { cleanEthHex } from './utils'
 import axios from 'axios'
 import * as Light from './light'
 const btoa = require('btoa')
 
-import BBFarmAbi from './smart_contracts/BBFarm.abi.json'
+const BBFarmAbi = require('./smart_contracts/BBFarm.abi.json')
+import { Bytes64, Bytes32 } from './runtimeTypes';
 
 /**
  * This object tracks the flags used for SV ballot boxes. They determine the submission
@@ -111,11 +113,7 @@ export const mkSubmissionBits = (...toCombine) => {
  */
 export const mkSignedBallotForProxy = (ballotId, sequence, voteData, extra, privateKey, opts: any = {}): ProxyVote => {
     if (opts.skipSequenceSizeCheck !== true) assert.equal(0 < sequence && sequence < 2 ** 32, true, 'sequence number out of bounds')
-    assert.equal(
-        web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId),
-        true,
-        'ballotId incorrect format (either not a BN or not hex)'
-    )
+    assert.equal(web3Utils.isHexStrict(ballotId) || web3Utils.isBN(ballotId), true, 'ballotId incorrect format (either not a BN or not hex)')
     assert.equal(web3Utils.isHexStrict(voteData), true, 'vote data is not hex (strict)')
     assert.equal(web3Utils.isHexStrict(extra), true, 'extra param is not hex (strict)')
 
@@ -256,19 +254,22 @@ export const prepareWeb3BBVoteTx = async ({ txInfo }, { svNetwork }) => {
 }
 
 export const castProxyVote = async (request, netConf) => {
-    assert.equal(web3Utils.isBN(request.ballotId), true, 'Ballot id is not a BN')
+    assert.equal(web3Utils.isHexStrict(request.ballotId), true, 'ballotId is not hex')
+    assert.equal(request.ballotId.length, 66, 'ballotId incorrect length')
     assert.equal(request.proxyReq.length == 5, true, 'Proxy vote req does not contain the correct number of parameters')
-    assert.equal(
-        request.hasOwnProperty('extra') && request.hasOwnProperty('democHash'),
-        true,
-        'Request does not contain extra and democ hash data'
-    )
+    assert.equal(request.hasOwnProperty('extra') && request.hasOwnProperty('democHash'), true, 'Request does not contain extra and democ hash data')
+
 
     const svApiUrl = netConf.svApiUrl
     const proxyVotePath = '/sv/light/submitProxyVote'
     const requestUrl = `${svApiUrl}${proxyVotePath}`
-    return await axios
-        .post(requestUrl, request)
+
+    const testing = verifySignedBallotForProxy(request)
+
+    request.netConf = netConf
+    console.log('request going to cast proxy vote API:', request);
+
+    return await axios.post(requestUrl, request)
         .then(response => {
             const { data } = response
             return data
@@ -346,4 +347,28 @@ export const deployBallotSpec = async (archivePushUrl: string, rawBallotSpecStri
     } else {
         return ballotHash
     }
+}
+
+/**
+ * Retrieves the sequence number for a proxy voting address on a particular ballot
+ * @param {SvNetwork} svNetwork
+ * @param {Bytes64} ballotId
+ * @param {Bytes32} voterAddress - the voting PK of the voter
+ *
+ * @returns {number} the sequence number for the voter to use
+ */
+export const getProxySequenceNumber = async (svNetwork: SvNetwork, ballotId: Bytes64, voterAddress: Bytes32):Promise<number> => {
+    assert.equal(web3Utils.isAddress(voterAddress), true, 'BBFarm address supplied is not a valid ethereum address.')
+    assert.equal(web3Utils.isHexStrict(ballotId), true, 'ballotId is not hex')
+    assert.equal(ballotId.length, 66, 'ballotId incorrect length')
+
+    // Determine the address of the ballot box
+    const { web3, index } = svNetwork
+    const bbFarmNamespace = ballotId.slice(0, 10)
+    const bbFarmId = await index.methods.getBBFarmID(bbFarmNamespace).call()
+    const bbFarmAddress = await index.methods.getBBFarm(bbFarmId).call()
+
+    // Get and return the sequence number
+    const bbFarmContract = new web3.eth.Contract(BBFarmAbi, bbFarmAddress)
+    return await bbFarmContract.methods.getSequenceNumber(ballotId, voterAddress).call()
 }
