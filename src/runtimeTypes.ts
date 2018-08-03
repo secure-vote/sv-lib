@@ -1,4 +1,5 @@
 import * as t from 'io-ts'
+import { isAddress } from 'web3-utils'
 
 export const HexStringRT = t.refinement(
     t.string,
@@ -20,3 +21,9 @@ export type Timestamp = t.TypeOf<typeof TimestampRT>
 export const validNetworkNames = ["mainnet", "testnet"]
 export const NetworkNameRT = t.refinement(t.string, s => s in validNetworkNames, 'NetworkName')
 export type NetworkName = t.TypeOf<typeof NetworkNameRT>
+
+export const EthAddressRT = t.refinement(t.string, a => isAddress(a), 'Ethereum Address')
+export type EthAddress = t.TypeOf<typeof EthAddressRT>
+
+export const StellarAddressRT = t.refinement(t.string, () => true, "Stellar Address")
+export type StellarAddress = t.TypeOf<typeof StellarAddressRT>

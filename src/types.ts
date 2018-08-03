@@ -1,4 +1,4 @@
-import { HexString, Bytes32 } from './runtimeTypes'
+import { HexString, Bytes32, EthAddress, StellarAddress } from './runtimeTypes'
 
 export type ProxyVote = {
     // these should be `bytes32` hexstrings
@@ -89,3 +89,5 @@ export type GlobalBallot = {
 }
 
 export type EthTx = { to: string; value: number; gas: number | HexString; data: string }
+
+export type Ed25519DelegationResp = {to: EthAddress, from: StellarAddress, txid: Bytes32}

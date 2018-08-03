@@ -2,4 +2,4 @@
 
 set -e
 
-yarn test
+npm run test

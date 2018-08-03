@@ -485,12 +485,7 @@ export const submitEd25519Delegation = async (
         broadcast: opts && opts.broadcast === false ? false : true
     }
 
-    const requestUrl = API.submitEd25519DelegationUrl(ethNetConf)
-
-    return await axios
-        .post(requestUrl, delegationRequest)
-        .then(API.extractData)
-        .catch(API.processApiError)
+    return await API.postEd25519Delegation(ethNetConf, delegationRequest)
 }
 
 // Maybe this does make more sense just to happen on the API?
