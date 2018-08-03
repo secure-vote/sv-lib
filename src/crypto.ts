@@ -3,7 +3,7 @@ import * as StellarBase from 'stellar-base'
 import * as Hash from 'eth-lib/lib/hash'
 import * as web3Utils from 'web3-utils'
 const sha256 = require('sha256')
-import { toEthHex, cleanEthHex, hexToUint8Array } from './utils'
+import { toEthHex, cleanEthHex, hexToUint8Array, debugLog } from './utils'
 import * as assert from 'assert'
 import { Bytes64 } from './runtimeTypes'
 const Web3 = require('web3')
@@ -57,16 +57,7 @@ export /**
  * @returns {{verified: bool, address: EthAddress}}
  */
 const ethVerifySig = (messageHash: string, [v, r, s]: string[]) => {
-    console.log('messageHash :', messageHash);
-    const address = Account.recover(messageHash, Account.encodeSignature([v, r, s]))
-    return {
-        verified: true,
-        address
-    }
-}
-
-const web3EthVerifySig = (messageHash: string, [v, r, s]: string[]) => {
-    console.log('messageHash :', messageHash)
+    debugLog('ethVerifySig', `verifying messageHash: ${messageHash}`);
     const address = Account.recover(messageHash, Account.encodeSignature([v, r, s]))
     return {
         verified: true,
