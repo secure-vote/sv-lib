@@ -10,7 +10,7 @@ import { sha256HashString, ethSignHash, ethVerifySig } from './crypto'
 import { cleanEthHex, checkDecode, debugLog } from './utils'
 import * as Light from './light'
 
-import { Bytes64, Bytes32, TimestampRT, NetworkNameRT, Bytes32RT } from './runtimeTypes';
+import { Bytes64, Bytes32, TimestampRT, NetworkNameRT, Bytes32RT, EthAddress, EthAddressRT } from './runtimeTypes';
 import { ProxyVote, EthNetConf, BallotSpecV2, SvNetwork } from './types'
 
 const BBFarmAbi = require('./smart_contracts/BBFarm.abi.json')
@@ -354,15 +354,14 @@ export const deployBallotSpec = async (archivePushUrl: string, rawBallotSpecStri
 /**
  * Retrieves the sequence number for a proxy voting address on a particular ballot
  * @param {SvNetwork} svNetwork
- * @param {Bytes64} ballotId
- * @param {Bytes32} voterAddress - the voting PK of the voter
+ * @param {Bytes32} ballotId
+ * @param {EthAddress} voterAddress - the voting PK of the voter
  *
  * @returns {number} the sequence number for the voter to use
  */
-export const getProxySequenceNumber = async (svNetwork: SvNetwork, ballotId: Bytes64, voterAddress: Bytes32):Promise<number> => {
-    assert.equal(web3Utils.isAddress(voterAddress), true, 'BBFarm address supplied is not a valid ethereum address.')
-    assert.equal(web3Utils.isHexStrict(ballotId), true, 'ballotId is not hex')
-    assert.equal(ballotId.length, 66, 'ballotId incorrect length')
+export const getProxySequenceNumber = async (svNetwork: SvNetwork, ballotId: Bytes32, voterAddress: EthAddress):Promise<number> => {
+    checkDecode(Bytes32RT.decode(ballotId))
+    checkDecode(EthAddressRT.decode(voterAddress))
 
     // Determine the address of the ballot box
     const { web3, index } = svNetwork

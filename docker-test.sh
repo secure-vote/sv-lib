@@ -2,4 +2,5 @@
 
 set -e
 
+cd /code
 npm run test
