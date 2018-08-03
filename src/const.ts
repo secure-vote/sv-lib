@@ -8,8 +8,8 @@ const _raw_networkVars: { [netName: string]: EthNetConf } = {
     kovan: {
         indexEnsName: 'index.kov.sv',
         auxContract: '0x8d9d49f602e1e95b8dca42af1766963c3e4f7565',
-        httpProvider: 'https://kovan.eth.secure.vote/tokenvote-dev',
-        webSocketsProvider: 'wss://kovan.eth.secure.vote:8546/tokenvote',
+        httpProvider: 'https://kovan.eth.secure.vote/sv-lib',
+        webSocketsProvider: 'wss://kovan.eth.secure.vote:8546/sv-lib',
         delegationEnsName: 'delegation-2018-06-19.kov.sv',
         ensResolver: '0xc8c73829348cb15da4b0785a110017464fb8af51',
         ens: '0xd6F4f22eeC158c434b17d01f62f5dF33b108Ae93',
@@ -24,8 +24,8 @@ const _raw_networkVars: { [netName: string]: EthNetConf } = {
     mainnet: {
         indexEnsName: 'index.tokenvote.eth',
         auxContract: '0x91f34190ffcd934115bb2bd04c29e89362989121',
-        httpProvider: 'https://mainnet.eth.secure.vote/tokenvote',
-        webSocketsProvider: 'wss://mainnet.eth.secure.vote:8546/tokenvote',
+        httpProvider: 'https://mainnet.eth.secure.vote/sv-lib',
+        webSocketsProvider: 'wss://mainnet.eth.secure.vote:8546/sv-lib',
         delegationEnsName: 'delegate.secvote.eth',
         ensResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
         ens: '0x314159265dd8dbb310642f98f50c066173c1259b',
@@ -40,8 +40,8 @@ const _raw_networkVars: { [netName: string]: EthNetConf } = {
     ropsten: {
         indexEnsName: '',
         auxContract: '',
-        httpProvider: 'https://ropsten.eth.secure.vote/tokenvote-dev',
-        webSocketsProvider: 'wss://ropsten.eth.secure.vote:8546/tokenvote',
+        httpProvider: 'https://ropsten.eth.secure.vote/sv-lib',
+        webSocketsProvider: 'wss://ropsten.eth.secure.vote:8546/sv-lib',
         delegationEnsName: '',
         ensResolver: '',
         ens: '',
@@ -56,8 +56,8 @@ const _raw_networkVars: { [netName: string]: EthNetConf } = {
     classic: {
         indexEnsName: '',
         auxContract: '',
-        httpProvider: 'https://classic.eth.secure.vote/tokenvote-dev',
-        webSocketsProvider: '',
+        httpProvider: 'https://classic.eth.secure.vote/sv-lib',
+        webSocketsProvider: 'wss://classic.eth.secure.vote:8546/sv-lib',
         delegationEnsName: '',
         ensResolver: '',
         ens: '',
