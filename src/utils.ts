@@ -14,6 +14,19 @@ export const checkDecode = <S, E extends Error>(validationRes: t.Validation<S>, 
     }
 }
 
+
+export const now = (): number => {
+    return new Date().getTime() / 1000
+}
+
+
+export const debugLog = (funcName: string, msg: string) => {
+    if (process && process.env && process.env.DEBUG) {
+        console.log(`${now()} - ${funcName}: ${msg}`);
+    }
+}
+
+
 /**
  * This will take an Ethereum hex string (or a normal hex string) and
  * output a normal hex string (no '0x' header) or throw an error on a

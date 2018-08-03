@@ -1,5 +1,10 @@
 language: node_js
+services:
+  - docker
+sudo: required
 node_js:
   - "8"
 before_script:
-  - yarn build
+  - docker pull lambci/lambda:build-nodejs8.10
+script:
+  - docker run -v $(pwd):/code -it lambci/lambda:build-nodejs8.10 /code/docker-test.sh
