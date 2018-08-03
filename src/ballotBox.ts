@@ -336,10 +336,10 @@ export const deployBallotSpec = async (archivePushUrl: string, rawBallotSpecStri
         : Buffer.from(rawBallotSpecString).toString('base64')
     const ballotHash = sha256HashString(rawBallotSpecString)
 
-    const requestData = { ballotBase64: ballotBase64, assertSpecHash: ballotHash }
-    const requestHeaders = { 'Content-Type': 'application/json', 'x-api-key': 'UmNrB7cifZ2N1LlnyM4RXK1xuK2VpIQaamgmlSBb' }
+    const requestData = { ballotBase64, assertSpecHash: ballotHash }
+    const headers = { 'Content-Type': 'application/json', 'x-api-key': 'UmNrB7cifZ2N1LlnyM4RXK1xuK2VpIQaamgmlSBb' }
 
-    const response: any = await axios.post(archivePushUrl, requestData, { headers: requestHeaders }).catch(error => {
+    const response: any = await axios.post(archivePushUrl, requestData, { headers }).catch(error => {
         throw error
     })
 
