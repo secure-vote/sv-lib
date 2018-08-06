@@ -19,7 +19,7 @@ export const TimestampRT = t.refinement(t.Integer, i => 1500000000 <= i && i <= 
 export type Timestamp = t.TypeOf<typeof TimestampRT>
 
 export const validNetworkNames = ["mainnet", "testnet"]
-export const NetworkNameRT = t.refinement(t.string, s => s in validNetworkNames, 'NetworkName')
+export const NetworkNameRT = t.refinement(t.string, s => validNetworkNames.includes(s), 'NetworkName')
 export type NetworkName = t.TypeOf<typeof NetworkNameRT>
 
 export const EthAddressRT = t.refinement(t.string, a => isAddress(a), 'Ethereum Address')

@@ -284,7 +284,7 @@ export const castProxyVote = async (request, netConf: EthNetConf) => {
 }
 
 const ProxyProposalInputRT = t.type({
-    ballotSpec: Bytes32RT,
+    ballotSpec: t.string,
     democHash: Bytes32RT,
     startTime: TimestampRT,
     endTime: TimestampRT,
@@ -297,7 +297,7 @@ export const deployProxyBallot = async (
     proxyProposalReq: ProxyProposalRequest
 ) => {
     checkDecode(ProxyProposalInputRT.decode(proxyProposalReq))
-    // Check the network
+
     const { svApiUrl } = netConf
     const requestUrl = `${svApiUrl}/sv/light/submitProxyProposal`
 
