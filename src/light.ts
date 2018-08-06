@@ -18,15 +18,15 @@ import { ed25519SignatureIsValid } from './crypto'
 
 // Lovely ABIs
 // Note - have changed this from import to require as the import was not working on the nod
-const ResolverAbi = require('./smart_contracts/SV_ENS_Resolver.abi.json')
-const IndexAbi = require('./smart_contracts/SVLightIndex.abi.json')
-const BackendAbi = require('./smart_contracts/SVLightIndexBackend.abi.json')
-const BBFarmAbi = require('./smart_contracts/BBFarm.abi.json')
-const PaymentsAbi = require('./smart_contracts/SVPayments.abi.json')
-const AuxAbi = require('./smart_contracts/AuxAbi.abi.json')
-const AuctionAbi = require('./smart_contracts/CommAuctionIface.abi.json')
-const ERC20Abi = require('./smart_contracts/ERC20.abi.json')
-const UnsafeEd25519DelegationAbi = require('./smart_contracts/UnsafeEd25519Delegation.abi.json')
+const ResolverAbi = require('./smart_contracts/SV_ENS_Resolver.abi.json');
+const IndexAbi = require('./smart_contracts/SVLightIndex.abi.json');
+const BackendAbi = require('./smart_contracts/SVLightIndexBackend.abi.json');
+const BBFarmAbi = require('./smart_contracts/BBFarm.abi.json');
+const PaymentsAbi = require('./smart_contracts/SVPayments.abi.json');
+const AuxAbi = require('./smart_contracts/AuxAbi.abi.json');
+const AuctionAbi = require('./smart_contracts/CommAuctionIface.abi.json');
+const ERC20Abi = require('./smart_contracts/ERC20.abi.json');
+const UnsafeEd25519DelegationAbi = require('./smart_contracts/UnsafeEd25519Delegation.abi.json');
 
 /**
  * Return contract instances and web3 needed for SvLight usage
