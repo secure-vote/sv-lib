@@ -13,20 +13,20 @@ import * as svConst from './const'
 import * as svUtils from './utils'
 import * as API from './api'
 import { WindowWeb3Init, EthNetConf, SvNetwork, EthTx, BallotSpecV2, GlobalBallot } from './types'
-import { HexString, Bytes32, Bytes64, Bytes32RT, Bytes64RT, StellarAddressRT } from './runtimeTypes'
+import { HexString, Bytes32, Bytes64, Bytes32RT, Bytes64RT, StellarAddressRT, EthAddress, EthAddressRT } from './runtimeTypes'
 import { ed25519SignatureIsValid } from './crypto'
 
 // Lovely ABIs
 // Note - have changed this from import to require as the import was not working on the nod
-const ResolverAbi = require('./smart_contracts/SV_ENS_Resolver.abi.json');
-const IndexAbi = require('./smart_contracts/SVLightIndex.abi.json');
-const BackendAbi = require('./smart_contracts/SVLightIndexBackend.abi.json');
-const BBFarmAbi = require('./smart_contracts/BBFarm.abi.json');
-const PaymentsAbi = require('./smart_contracts/SVPayments.abi.json');
-const AuxAbi = require('./smart_contracts/AuxAbi.abi.json');
-const AuctionAbi = require('./smart_contracts/CommAuctionIface.abi.json');
-const ERC20Abi = require('./smart_contracts/ERC20.abi.json');
-const UnsafeEd25519DelegationAbi = require('./smart_contracts/UnsafeEd25519Delegation.abi.json');
+const ResolverAbi = require('./smart_contracts/SV_ENS_Resolver.abi.json')
+const IndexAbi = require('./smart_contracts/SVLightIndex.abi.json')
+const BackendAbi = require('./smart_contracts/SVLightIndexBackend.abi.json')
+const BBFarmAbi = require('./smart_contracts/BBFarm.abi.json')
+const PaymentsAbi = require('./smart_contracts/SVPayments.abi.json')
+const AuxAbi = require('./smart_contracts/AuxAbi.abi.json')
+const AuctionAbi = require('./smart_contracts/CommAuctionIface.abi.json')
+const ERC20Abi = require('./smart_contracts/ERC20.abi.json')
+const UnsafeEd25519DelegationAbi = require('./smart_contracts/UnsafeEd25519Delegation.abi.json')
 
 /**
  * Return contract instances and web3 needed for SvLight usage
@@ -36,7 +36,9 @@ const UnsafeEd25519DelegationAbi = require('./smart_contracts/UnsafeEd25519Deleg
 export const initializeSvLight = async (netConf: EthNetConf): Promise<SvNetwork> => {
     const { indexEnsName, ensResolver, webSocketsProvider, httpProvider, auxContract } = netConf
 
-    const web3 = new Web3(new Web3.providers.WebsocketProvider(webSocketsProvider));
+    const provider = new Web3.providers.WebsocketProvider(webSocketsProvider)
+    const web3 = new Web3(provider)
+
     svUtils.debugLog('initializeSvLight', `Web3 loaded: ${!!web3}`)
 
     const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
@@ -153,10 +155,11 @@ const _getBallotObjectFromIpfs = async (ballotSpecHash: Bytes32): Promise<string
 }
 
 const GetDemocNthBallotRT = t.type({
-    democHash: Bytes32RT, nthBallot: t.Integer
+    democHash: Bytes32RT,
+    nthBallot: t.Integer,
+    userEthAddress: EthAddressRT
 })
 type GetDemocNthBallot = t.TypeOf<typeof GetDemocNthBallotRT>
-
 
 /**
  * Attempts to retrieve a ballotSpec from ipfs and falls back to archive
@@ -167,13 +170,13 @@ type GetDemocNthBallot = t.TypeOf<typeof GetDemocNthBallotRT>
 export const getDemocNthBallot = async (svNetwork: SvNetwork, democBallotInfo: GetDemocNthBallot): Promise<GlobalBallot> => {
     // Destructure and set the variables that are needed
     const { index, aux, netConf } = svNetwork
-    const { democHash, nthBallot } = democBallotInfo
+    const { democHash, nthBallot, userEthAddress } = democBallotInfo
     const { archiveUrl } = netConf
 
     const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(index._address, democHash, nthBallot).call()
 
     const { ballotId, bbFarmAddress } = bbFarmAndBallotId
-    const userEthAddress = svConst.zeroAddr
+
     const ethBallotDetails = await aux.methods.getBallotDetails(ballotId, bbFarmAddress, userEthAddress).call()
 
     const rawBallotSpecString = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
@@ -187,7 +190,7 @@ export const getDemocNthBallot = async (svNetwork: SvNetwork, democBallotInfo: G
  * @param {Bytes64} ballotSpecHash - the hash of the ballot spec
  * @returns {Promise<string>} the raw string of the ballot spec
  */
-export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64): Promise<GlobalBallot[]> => {
+export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64, userEthAddress: EthAddress): Promise<GlobalBallot[]> => {
     const { backend } = svNetwork
     const democInfo = await backend.methods.getDInfo(democHash).call()
 
@@ -200,7 +203,7 @@ export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64):
     const numBallots = democInfo.nBallots
     const ballotsArray = []
     for (let i = 0; i < numBallots; i++) {
-        ballotsArray[i] = await getDemocNthBallot(svNetwork, { democHash: democHash, nthBallot: i })
+        ballotsArray[i] = await getDemocNthBallot(svNetwork, { democHash: democHash, nthBallot: i, userEthAddress })
     }
 
     return ballotsArray
@@ -213,8 +216,8 @@ export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64):
  * @param {string} tokenId the id of the token subgroup we want to retrieve
  * @returns {GlobalBallot[]} boolean value representing if the signature valid
  */
-export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes32, tokenId: string) => {
-    const allDemocBallots = await getDemocBallots(svNetwork, democHash)
+export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes32, tokenId: string, userEthAddress: EthAddress) => {
+    const allDemocBallots = await getDemocBallots(svNetwork, democHash, userEthAddress)
 
     // Check each ballot for valid signature
     const verifiedBallots = []
@@ -240,12 +243,16 @@ export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Byt
 export const isEd25519SignedBallotValid = (rawBallotSpecString: string): boolean => {
     const unszSpec = JSON.parse(rawBallotSpecString)
 
-    if (!!unszSpec.subgroupInner) return false
+    if (!unszSpec.subgroupInner.signature || !unszSpec.subgroupInner.proposerPk) return false
 
     const { signature, proposerPk } = unszSpec.subgroupInner
 
-    svUtils.checkDecode(Bytes64RT.decode(signature))
-    svUtils.checkDecode(StellarAddressRT.decode(proposerPk))
+    try {
+        svUtils.checkDecode(Bytes64RT.decode(signature))
+        svUtils.checkDecode(StellarAddressRT.decode(proposerPk))
+    } catch (e) {
+        return false
+    }
 
     const preppedBSpec = rawBallotSpecString.replace(signature, '**SIG_1**')
     return ed25519SignatureIsValid(preppedBSpec, proposerPk, signature)
@@ -490,7 +497,5 @@ export const signTx = async (web3: any, txData: string, privKey: Bytes64) => {
 }
 
 export const publishSignedTx = async (web3: any, rawTx: string): Promise<string> => {
-    return await web3.eth
-        .sendSignedTransaction(rawTx)
-        .then(r => r.transactionHash)
+    return await web3.eth.sendSignedTransaction(rawTx).then(r => r.transactionHash)
 }
