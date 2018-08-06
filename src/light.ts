@@ -1,32 +1,32 @@
-const NH = require('eth-ens-namehash')
 import axios from 'axios'
-const bs58 = require('bs58')
-const sha256 = require('sha256')
-
-const Web3 = require('web3')
-const detectNetwork = require('web3-detect-network')
+import * as NH from 'eth-ens-namehash'
+import * as bs58 from 'bs58'
+import * as sha256 from 'sha256'
 import * as web3Utils from 'web3-utils'
-
 import * as StellarBase from 'stellar-base'
 import * as assert from 'assert'
-import * as detectNetwork from 'web3-detect-network'
+import * as t from 'io-ts'
+const Web3 = require('web3')
+const detectNetwork = require('web3-detect-network')
 
 import * as svConst from './const'
 import * as svUtils from './utils'
-import { WindowWeb3Init, EthNetConf, SvNetwork, EthTx } from './types'
 import * as API from './api'
-import { HexString, Bytes32 } from './runtimeTypes'
+import { WindowWeb3Init, EthNetConf, SvNetwork, EthTx, BallotSpecV2, GlobalBallot } from './types'
+import { HexString, Bytes32, Bytes64, Bytes32RT, Bytes64RT, StellarAddressRT, EthAddress, EthAddressRT } from './runtimeTypes'
+import { ed25519SignatureIsValid } from './crypto'
 
 // Lovely ABIs
-import ResolverAbi from './smart_contracts/SV_ENS_Resolver.abi.json'
-import IndexAbi from './smart_contracts/SVLightIndex.abi.json'
-import BackendAbi from './smart_contracts/SVLightIndexBackend.abi.json'
-import BBFarmAbi from './smart_contracts/BBFarm.abi.json'
-import PaymentsAbi from './smart_contracts/SVPayments.abi.json'
-import AuxAbi from './smart_contracts/AuxAbi.abi.json'
-import AuctionAbi from './smart_contracts/CommAuctionIface.abi.json'
-import ERC20Abi from './smart_contracts/ERC20.abi.json'
-import UnsafeEd25519DelegationAbi from './smart_contracts/UnsafeEd25519Delegation.abi.json'
+// Note - have changed this from import to require as the import was not working on the nod
+const ResolverAbi = require('./smart_contracts/SV_ENS_Resolver.abi.json');
+const IndexAbi = require('./smart_contracts/SVLightIndex.abi.json');
+const BackendAbi = require('./smart_contracts/SVLightIndexBackend.abi.json');
+const BBFarmAbi = require('./smart_contracts/BBFarm.abi.json');
+const PaymentsAbi = require('./smart_contracts/SVPayments.abi.json');
+const AuxAbi = require('./smart_contracts/AuxAbi.abi.json');
+const AuctionAbi = require('./smart_contracts/CommAuctionIface.abi.json');
+const ERC20Abi = require('./smart_contracts/ERC20.abi.json');
+const UnsafeEd25519DelegationAbi = require('./smart_contracts/UnsafeEd25519Delegation.abi.json');
 
 /**
  * Return contract instances and web3 needed for SvLight usage
@@ -34,13 +34,17 @@ import UnsafeEd25519DelegationAbi from './smart_contracts/UnsafeEd25519Delegatio
  * @returns {Promise<SvNetwork>} The SvNetwork object based on `netConf`
  */
 export const initializeSvLight = async (netConf: EthNetConf): Promise<SvNetwork> => {
-    const { indexEnsName, ensResolver, httpProvider, auxContract } = netConf
+    const { indexEnsName, ensResolver, webSocketsProvider, httpProvider, auxContract } = netConf
 
-    const web3 = new Web3(new Web3.providers.HttpProvider(httpProvider))
+    const provider = new Web3.providers.WebsocketProvider(webSocketsProvider)
+    const web3 = new Web3(provider)
+
+    svUtils.debugLog('initializeSvLight', `Web3 loaded: ${!!web3}`)
+
     const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
-
-    const index = new web3.eth.Contract(IndexAbi, await resolveEnsAddress({ resolver }, indexEnsName))
-    const backendAddress = await getBackendAddress({ index })
+    const indexAddress = await resolveEnsAddress({ resolver }, indexEnsName)
+    const index = new web3.eth.Contract(IndexAbi, indexAddress)
+    const backendAddress = await index.methods.getBackend().call()
     const backend = new web3.eth.Contract(BackendAbi, backendAddress)
     const aux = new web3.eth.Contract(AuxAbi, auxContract)
     const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())
@@ -80,7 +84,8 @@ export const initializeWindowWeb3 = async (): Promise<WindowWeb3Init> => {
  * @param {Promise<string>} ensName
  */
 export const resolveEnsAddress = async ({ resolver }, ensName): Promise<string> => {
-    return await resolver.methods.addr(NH.hash(ensName)).call()
+    const addr = await resolver.methods.addr(NH.hash(ensName)).call()
+    return addr
 }
 
 export const getBackendAddress = async ({ index }) => {
@@ -116,9 +121,16 @@ export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
     return ballotObject
 }
 
-export const getBallotSpec = async (archiveUrl, ballotSpecHash): Promise<{ data: any }> => {
+
+/**
+ * Attempts to retrieve a ballotSpec from ipfs and falls back to archive
+ * @param {string} archiveUrl - the http archive url
+ * @param {Bytes64} ballotSpecHash - the hash of the url
+ * @returns {Promise<string>} the raw string of the ballot spec
+ */
+export const getBallotSpec = (archiveUrl: string, ballotSpecHash: Bytes64): Promise<string> => {
     // TODO refactor to be a bit more elegant
-    return new Promise<{ data: any }>((res, rej) => {
+    return new Promise<string>((res, rej) => {
         let done = false
         const doRes = obj => {
             if (!done) {
@@ -126,10 +138,10 @@ export const getBallotSpec = async (archiveUrl, ballotSpecHash): Promise<{ data:
                 res(obj)
             }
         }
-        getBallotObjectFromIpfs(ballotSpecHash).then(doRes)
+        _getBallotObjectFromIpfs(ballotSpecHash).then(doRes)
         setTimeout(() => {
             if (!done) {
-                getBallotObjectFromS3(archiveUrl, ballotSpecHash)
+                _getBallotObjectFromS3(archiveUrl, ballotSpecHash)
                     .then(doRes)
                     .catch(rej)
             }
@@ -137,27 +149,87 @@ export const getBallotSpec = async (archiveUrl, ballotSpecHash): Promise<{ data:
     })
 }
 
-export const getBallotObjectFromS3 = async (archiveUrl, ballotSpecHash) => {
-    return axios.get(archiveUrl + ballotSpecHash + '.json')
+/**
+ * Attempts to retrieve a ballotSpec from S3
+ * @param {string} archiveUrl - the url for the http archive
+ * @param {Bytes32} ballotSpecHash - the hash of the ballot spec
+ * @returns {Promise<string>} the raw string of the ballot spec
+ */
+const _getBallotObjectFromS3 = async (archiveUrl: string, ballotSpecHash: Bytes32): Promise<string> => {
+    const requestUrl = `${archiveUrl}${ballotSpecHash}.json`
+    const { data } = await axios.get(requestUrl, {
+        // We need to specify this transformResponse in order to avoid axios's default of parsing JSON
+        transformResponse: res => {
+            return res
+        },
+        responseType: 'text'
+    })
+    return data
 }
 
-export const getBallotObjectFromIpfs = async ballotSpecHash => {
+/**
+ * Attempts to retrieve a ballotSpec from ipfs
+ * @param {Bytes32} ballotSpecHash - the hash of the ballot spec
+ * @returns {Promise<string>} the raw string of the ballot spec
+ */
+const _getBallotObjectFromIpfs = async (ballotSpecHash: Bytes32): Promise<string> => {
     const ipfsUrl = 'https://ipfs.infura.io/api/v0/block/get?arg='
     const cidHex = '1220' + ballotSpecHash.substr(2)
     const bytes = Buffer.from(cidHex, 'hex')
     const cid = bs58.encode(bytes)
-    return await axios.get(ipfsUrl + cid)
+    const requestUrl = ipfsUrl + cid
+    const { data } = await axios.get(requestUrl, {
+        // We need to specify this transformResponse in order to avoid axios's default of parsing JSON
+        transformResponse: res => {
+            return res
+        },
+        responseType: 'text'
+    })
+    return data
 }
 
-// Take the svNetwork object and a democHash, will return all of the ballots from the democracy in an array
-export const getDemocBallots = async ({ svNetwork, democHash }) => {
-    const { backend } = svNetwork
-    const democInfo = await getDemocInfo({ backend, democHash })
+const GetDemocNthBallotRT = t.type({
+    democHash: Bytes32RT,
+    nthBallot: t.Integer,
+    userEthAddress: EthAddressRT
+})
+type GetDemocNthBallot = t.TypeOf<typeof GetDemocNthBallotRT>
 
-    // Throw an error if the democ info is not correct
-    const { erc20, owner } = democInfo
-    if (owner === '0x0000000000000000000000000000000000000000') {
-        throw new Error('Democracy Hash does not resolve to a democracy')
+/**
+ * Attempts to retrieve a ballotSpec from ipfs and falls back to archive
+ * @param {SvNetwork} svNetwork
+ * @param {GetDemocNthBallot} democBallotInfo - object containing the information about what ballot to retrieve
+ * @returns {Promise<GlobalBallot>} global ballot object containing all required ballot information
+ */
+export const getDemocNthBallot = async (svNetwork: SvNetwork, democBallotInfo: GetDemocNthBallot): Promise<GlobalBallot> => {
+    // Destructure and set the variables that are needed
+    const { index, aux, netConf } = svNetwork
+    const { democHash, nthBallot, userEthAddress } = democBallotInfo
+    const { archiveUrl } = netConf
+
+    const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(index._address, democHash, nthBallot).call()
+
+    const { ballotId, bbFarmAddress } = bbFarmAndBallotId
+
+    const ethBallotDetails = await aux.methods.getBallotDetails(ballotId, bbFarmAddress, userEthAddress).call()
+
+    const rawBallotSpecString = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
+
+    return { ...bbFarmAndBallotId, ...ethBallotDetails, rawBallotSpecString, data: JSON.parse(rawBallotSpecString) }
+}
+
+/**
+ * Returns an array of all ballots from a democracy
+ * @param {SvNetwork} svNetwork
+ * @param {Bytes64} ballotSpecHash - the hash of the ballot spec
+ * @returns {Promise<string>} the raw string of the ballot spec
+ */
+export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64, userEthAddress: EthAddress): Promise<GlobalBallot[]> => {
+    const { backend } = svNetwork
+    const democInfo = await backend.methods.getDInfo(democHash).call()
+
+    if (democInfo.erc20 == svConst.zeroAddr) {
+        console.warn(`getDemocBallots: Democracy ${democHash} has no associated ERC20. Is this the correct democracy hash?`)
     }
 
     // TODO - Work out where / how to push an errored ballot
@@ -165,10 +237,59 @@ export const getDemocBallots = async ({ svNetwork, democHash }) => {
     const numBallots = democInfo.nBallots
     const ballotsArray = []
     for (let i = 0; i < numBallots; i++) {
-        ballotsArray[i] = await getDemocNthBallot({ svNetwork }, { democHash: democHash, nthBallot: i })
+        ballotsArray[i] = await getDemocNthBallot(svNetwork, { democHash: democHash, nthBallot: i, userEthAddress })
     }
 
     return ballotsArray
+}
+
+/**
+ *
+ * @param {SvNetwork} svNetwork
+ * @param {Bytes32} democHash of the democracy we want to get the ballots from
+ * @param {string} tokenId the id of the token subgroup we want to retrieve
+ * @returns {GlobalBallot[]} boolean value representing if the signature valid
+ */
+export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes32, tokenId: string, userEthAddress: EthAddress) => {
+    const allDemocBallots = await getDemocBallots(svNetwork, democHash, userEthAddress)
+
+    // Check each ballot for valid signature
+    const verifiedBallots = []
+    const unverifiedBallots = []
+    for (let i = 0; i < allDemocBallots.length; i++) {
+        const currentBallot = allDemocBallots[i]
+        const { rawBallotSpecString } = currentBallot
+        if (isEd25519SignedBallotValid(rawBallotSpecString)) {
+            verifiedBallots.push(currentBallot)
+        } else {
+            unverifiedBallots.push(currentBallot) // We don't currently return this
+        }
+    }
+
+    return verifiedBallots.filter(ballot => ballot.data.subgroupInner.tokenId === tokenId)
+}
+
+/**
+ * Check if a raw ballotSpec contains a valid signature for a subgroup
+ * @param {string} rawBallotSpecString raw string of the ballot spec retrieved from ipfs
+ * @returns {boolean} boolean value representing if the signature valid
+ */
+export const isEd25519SignedBallotValid = (rawBallotSpecString: string): boolean => {
+    const unszSpec = JSON.parse(rawBallotSpecString)
+
+    if (!unszSpec.subgroupInner.signature || !unszSpec.subgroupInner.proposerPk) return false
+
+    const { signature, proposerPk } = unszSpec.subgroupInner
+
+    try {
+        svUtils.checkDecode(Bytes64RT.decode(signature))
+        svUtils.checkDecode(StellarAddressRT.decode(proposerPk))
+    } catch (e) {
+        return false
+    }
+
+    const preppedBSpec = rawBallotSpecString.replace(signature, '**SIG_1**')
+    return ed25519SignatureIsValid(preppedBSpec, proposerPk, signature)
 }
 
 /** Takes in the svNetwork object and returns all relevant addresses */
@@ -366,19 +487,10 @@ export const createEd25519DelegationTransaction = (
  * @param pubKey stellar pubkey
  * @param signature 64 byte signature as eth hex
  * @returns {boolean}
+ * This function has been deprecated in favour of more general ed25519SignatureIsValid function in /crypto
  */
 export const ed25519DelegationIsValid = (dlgtRequest: string, pubKey: string, signature: string) => {
-    const _sig = svUtils.cleanEthHex(signature)
-    assert.equal(_sig.length, 128, 'Invalid signature, should be a 64 byte hex string')
-
-    // Create the keypair from the public key
-    const kp = StellarBase.Keypair.fromPublicKey(pubKey)
-
-    // Create a buffer from the signature
-    const sigBuffer = Buffer.from(svUtils.hexToUint8Array(_sig))
-
-    // Verify the request against the signature
-    return kp.verify(dlgtRequest, sigBuffer)
+    return ed25519SignatureIsValid(dlgtRequest, pubKey, signature)
 }
 
 /**
@@ -411,10 +523,13 @@ export const submitEd25519Delegation = async (
         broadcast: opts && opts.broadcast === false ? false : true
     }
 
-    const requestUrl = API.submitEd25519DelegationUrl(ethNetConf)
+    return await API.postEd25519Delegation(ethNetConf, delegationRequest)
+}
 
-    return await axios
-        .post(requestUrl, delegationRequest)
-        .then(API.extractData)
-        .catch(API.processApiError)
+export const signTx = async (web3: any, txData: string, privKey: Bytes64) => {
+    return await web3.eth.accounts.signTransaction(txData, privKey)
+}
+
+export const publishSignedTx = async (web3: any, rawTx: string): Promise<string> => {
+    return await web3.eth.sendSignedTransaction(rawTx).then(r => r.transactionHash)
 }

@@ -1,6 +1,12 @@
 import * as Account from 'eth-lib/lib/account'
+import * as StellarBase from 'stellar-base'
 import * as Hash from 'eth-lib/lib/hash'
 import * as web3Utils from 'web3-utils'
+const sha256 = require('sha256')
+import { toEthHex, cleanEthHex, hexToUint8Array, debugLog } from './utils'
+import * as assert from 'assert'
+import { Bytes64 } from './runtimeTypes'
+const Web3 = require('web3')
 
 /**
  * Like web3.eth.accounts.hashMessage without the envelope.
@@ -12,9 +18,9 @@ import * as web3Utils from 'web3-utils'
  *  The hashed message (using keccak256)
  */
 export const hashMsgRaw = (data: string | number[]): string => {
-  const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data
-  const msgBuffer = Buffer.from(msg)
-  return Hash.keccak256s(msgBuffer)
+    const msg = web3Utils.isHexStrict(data) ? web3Utils.hexToBytes(data) : data
+    const msgBuffer = Buffer.from(msg)
+    return Hash.keccak256s(msgBuffer)
 }
 
 /**
@@ -29,17 +35,17 @@ export const hashMsgRaw = (data: string | number[]): string => {
  * @returns {{messageHash: string, r: string, s: string, v: string}}
  */
 export const ethSignHash = (messageHash: string, privateKey: string) => {
-  // near identical to web3-eth-accounts (web3 v1)
-  // the main difference is we don't envelop the data.
-  const signature = Account.sign(messageHash, privateKey)
-  const vrs = Account.decodeSignature(signature)
-  return {
-    messageHash,
-    v: vrs[0],
-    r: vrs[1],
-    s: vrs[2],
-    signature
-  }
+    // near identical to web3-eth-accounts (web3 v1)
+    // the main difference is we don't envelop the data.
+    const signature = Account.sign(messageHash, privateKey)
+    const vrs = Account.decodeSignature(signature)
+    return {
+        messageHash,
+        v: vrs[0],
+        r: vrs[1],
+        s: vrs[2],
+        signature
+    }
 }
 
 export /**
@@ -51,12 +57,35 @@ export /**
  * @returns {{verified: bool, address: EthAddress}}
  */
 const ethVerifySig = (messageHash: string, [v, r, s]: string[]) => {
-  const address = Account.recover(
-    messageHash,
-    Account.encodeSignature([v, r, s])
-  )
-  return {
-    verified: true,
-    address
-  }
+    debugLog('ethVerifySig', `verifying messageHash: ${messageHash}`);
+    const address = Account.recover(messageHash, Account.encodeSignature([v, r, s]))
+    return {
+        verified: true,
+        address
+    }
+}
+
+export const sha256HashString = (stringToHash: string): Bytes64 => {
+    return toEthHex(sha256(stringToHash))
+}
+
+/**
+ * Verify a ed25519 signature
+ * @param signedData eth hex string of the dlgt request
+ * @param pubKey stellar pubkey
+ * @param signature 64 byte signature as eth hex
+ * @returns {boolean}
+ */
+export const ed25519SignatureIsValid = (signedData: string, pubKey: string, signature: string) => {
+    const _sig = cleanEthHex(signature)
+    assert.equal(_sig.length, 128, 'Invalid signature, should be a 64 byte hex string')
+
+    // Create the keypair from the public key
+    const kp = StellarBase.Keypair.fromPublicKey(pubKey)
+
+    // Create a buffer from the signature
+    const sigBuffer = Buffer.from(hexToUint8Array(_sig))
+
+    // Verify the request against the signature
+    return kp.verify(signedData, sigBuffer)
 }
