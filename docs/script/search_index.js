@@ -30,6 +30,12 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "sv-lib/src/runtimetypes.ts~ethaddressrt",
+    "variable/index.html#static-variable-EthAddressRT",
+    "<span>EthAddressRT</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
+    "variable"
+  ],
+  [
     "sv-lib/src/errors.ts~ethneterror",
     "class/src/errors.ts~EthNetError.html",
     "<span>EthNetError</span> <span class=\"search-result-import-path\">sv-lib/src/errors.ts</span>",
@@ -45,6 +51,24 @@ window.esdocSearchIndex = [
     "sv-lib/src/runtimetypes.ts~hexstringrt",
     "variable/index.html#static-variable-HexStringRT",
     "<span>HexStringRT</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
+    "variable"
+  ],
+  [
+    "sv-lib/src/runtimetypes.ts~networknamert",
+    "variable/index.html#static-variable-NetworkNameRT",
+    "<span>NetworkNameRT</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
+    "variable"
+  ],
+  [
+    "sv-lib/src/runtimetypes.ts~stellaraddressrt",
+    "variable/index.html#static-variable-StellarAddressRT",
+    "<span>StellarAddressRT</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
+    "variable"
+  ],
+  [
+    "sv-lib/src/runtimetypes.ts~timestamprt",
+    "variable/index.html#static-variable-TimestampRT",
+    "<span>TimestampRT</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
     "variable"
   ],
   [
@@ -90,6 +114,24 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "sv-lib/src/utils.ts~debuglog",
+    "function/index.html#static-function-debugLog",
+    "<span>debugLog</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/ballotbox.ts~deployballotspec",
+    "function/index.html#static-function-deployBallotSpec",
+    "<span>deployBallotSpec</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/ballotbox.ts~deployproxyballot",
+    "function/index.html#static-function-deployProxyBallot",
+    "<span>deployProxyBallot</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/utils.ts~doesnethaveindex",
     "function/index.html#static-function-doesNetHaveIndex",
     "<span>doesNetHaveIndex</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
@@ -99,6 +141,12 @@ window.esdocSearchIndex = [
     "sv-lib/src/light.ts~ed25519delegationisvalid",
     "function/index.html#static-function-ed25519DelegationIsValid",
     "<span>ed25519DelegationIsValid</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/crypto.ts~ed25519signatureisvalid",
+    "function/index.html#static-function-ed25519SignatureIsValid",
+    "<span>ed25519SignatureIsValid</span> <span class=\"search-result-import-path\">sv-lib/src/crypto.ts</span>",
     "function"
   ],
   [
@@ -144,24 +192,6 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
-    "sv-lib/src/light.ts~getbackendaddress",
-    "function/index.html#static-function-getBackendAddress",
-    "<span>getBackendAddress</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
-    "function"
-  ],
-  [
-    "sv-lib/src/light.ts~getballotobjectfromipfs",
-    "function/index.html#static-function-getBallotObjectFromIpfs",
-    "<span>getBallotObjectFromIpfs</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
-    "function"
-  ],
-  [
-    "sv-lib/src/light.ts~getballotobjectfroms3",
-    "function/index.html#static-function-getBallotObjectFromS3",
-    "<span>getBallotObjectFromS3</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
-    "function"
-  ],
-  [
     "sv-lib/src/light.ts~getballotspec",
     "function/index.html#static-function-getBallotSpec",
     "<span>getBallotSpec</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
@@ -192,21 +222,27 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
-    "sv-lib/src/light.ts~getdemocinfo",
-    "function/index.html#static-function-getDemocInfo",
-    "<span>getDemocInfo</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
-    "function"
-  ],
-  [
     "sv-lib/src/light.ts~getdemocnthballot",
     "function/index.html#static-function-getDemocNthBallot",
     "<span>getDemocNthBallot</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
+    "sv-lib/src/light.ts~getfilterdemocballots",
+    "function/index.html#static-function-getFilterDemocBallots",
+    "<span>getFilterDemocBallots</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/const.ts~getnetwork",
     "function/index.html#static-function-getNetwork",
     "<span>getNetwork</span> <span class=\"search-result-import-path\">sv-lib/src/const.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/ballotbox.ts~getproxysequencenumber",
+    "function/index.html#static-function-getProxySequenceNumber",
+    "<span>getProxySequenceNumber</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
     "function"
   ],
   [
@@ -252,6 +288,12 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "sv-lib/src/light.ts~ised25519signedballotvalid",
+    "function/index.html#static-function-isEd25519SignedBallotValid",
+    "<span>isEd25519SignedBallotValid</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/ballotbox.ts~mkpacked",
     "function/index.html#static-function-mkPacked",
     "<span>mkPacked</span> <span class=\"search-result-import-path\">sv-lib/src/ballotBox.ts</span>",
@@ -282,6 +324,18 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
+    "sv-lib/src/utils.ts~now",
+    "function/index.html#static-function-now",
+    "<span>now</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/api.ts~posted25519delegation",
+    "function/index.html#static-function-postEd25519Delegation",
+    "<span>postEd25519Delegation</span> <span class=\"search-result-import-path\">sv-lib/src/api.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/light.ts~prepareed25519delegation",
     "function/index.html#static-function-prepareEd25519Delegation",
     "<span>prepareEd25519Delegation</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
@@ -300,9 +354,27 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
+    "sv-lib/src/light.ts~publishsignedtx",
+    "function/index.html#static-function-publishSignedTx",
+    "<span>publishSignedTx</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
     "sv-lib/src/light.ts~resolveensaddress",
     "function/index.html#static-function-resolveEnsAddress",
     "<span>resolveEnsAddress</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/crypto.ts~sha256hashstring",
+    "function/index.html#static-function-sha256HashString",
+    "<span>sha256HashString</span> <span class=\"search-result-import-path\">sv-lib/src/crypto.ts</span>",
+    "function"
+  ],
+  [
+    "sv-lib/src/light.ts~signtx",
+    "function/index.html#static-function-signTx",
+    "<span>signTx</span> <span class=\"search-result-import-path\">sv-lib/src/light.ts</span>",
     "function"
   ],
   [
@@ -328,6 +400,12 @@ window.esdocSearchIndex = [
     "function/index.html#static-function-toEthHex",
     "<span>toEthHex</span> <span class=\"search-result-import-path\">sv-lib/src/utils.ts</span>",
     "function"
+  ],
+  [
+    "sv-lib/src/runtimetypes.ts~validnetworknames",
+    "variable/index.html#static-variable-validNetworkNames",
+    "<span>validNetworkNames</span> <span class=\"search-result-import-path\">sv-lib/src/runtimeTypes.ts</span>",
+    "variable"
   ],
   [
     "sv-lib/src/ballotbox.ts~verifysignedballotforproxy",

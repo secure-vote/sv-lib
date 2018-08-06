@@ -1,4 +1,5 @@
-import { ProxyVote } from './types';
+import * as t from 'io-ts';
+import { ProxyVote, EthNetConf, SvNetwork } from './types';
 /**
  * This object tracks the flags used for SV ballot boxes. They determine the submission
  * methods and whether ballots are tracked as binding, official, or testing.
@@ -98,4 +99,28 @@ export declare const prepareWeb3BBVoteTx: ({ txInfo }: {
     data: any;
     gas: any;
 }>;
-export declare const castProxyVote: (request: any, netConf: any) => Promise<{}>;
+export declare const castProxyVote: (request: any, netConf: EthNetConf) => Promise<any>;
+export declare const deployProxyBallot: (netConf: EthNetConf, proxyProposalReq: t.TypeOfProps<{
+    ballotSpec: t.RefinementType<t.RefinementType<t.StringType, string, string, t.mixed>, string, string, t.mixed>;
+    democHash: t.RefinementType<t.RefinementType<t.StringType, string, string, t.mixed>, string, string, t.mixed>;
+    startTime: t.RefinementType<t.RefinementType<t.NumberType, number, number, t.mixed>, number, number, t.mixed>;
+    endTime: t.RefinementType<t.RefinementType<t.NumberType, number, number, t.mixed>, number, number, t.mixed>;
+    networkName: t.RefinementType<t.StringType, string, string, t.mixed>;
+}>) => Promise<import("axios").AxiosResponse<any>>;
+/**
+ * Attempts to deploy the a raw ballot spec to IPFS and the ballot archive
+ * @param {string} archivePushUrl - Url for the ballot to be deployed to
+ * @param {string} rawBallotSpecString - the stringified ballot spec
+ *
+ * @returns {string} if successful, will return the ballot hash as a string
+ */
+export declare const deployBallotSpec: (archivePushUrl: string, rawBallotSpecString: string) => Promise<string>;
+/**
+ * Retrieves the sequence number for a proxy voting address on a particular ballot
+ * @param {SvNetwork} svNetwork
+ * @param {Bytes32} ballotId
+ * @param {EthAddress} voterAddress - the voting PK of the voter
+ *
+ * @returns {number} the sequence number for the voter to use
+ */
+export declare const getProxySequenceNumber: (svNetwork: SvNetwork, ballotId: string, voterAddress: string) => Promise<number>;

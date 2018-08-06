@@ -1,22 +1,27 @@
 {
-  "coverage": "45.58%",
-  "expectCount": 68,
-  "actualCount": 31,
+  "coverage": "43.15%",
+  "expectCount": 95,
+  "actualCount": 41,
   "files": {
     "src/api.ts": {
-      "expectCount": 3,
+      "expectCount": 4,
       "actualCount": 1,
       "undocumentLines": [
-        2,
-        5
+        3,
+        9,
+        16
       ]
     },
     "src/ballotBox.ts": {
-      "expectCount": 9,
-      "actualCount": 7,
+      "expectCount": 15,
+      "actualCount": 9,
       "undocumentLines": [
         1,
-        188
+        2,
+        11,
+        193,
+        213,
+        220
       ]
     },
     "src/const.ts": {
@@ -26,16 +31,20 @@
         2,
         3,
         4,
-        66,
-        72,
-        89,
-        106
+        70,
+        76,
+        93,
+        110
       ]
     },
     "src/crypto.ts": {
-      "expectCount": 3,
-      "actualCount": 3,
-      "undocumentLines": []
+      "expectCount": 7,
+      "actualCount": 4,
+      "undocumentLines": [
+        5,
+        8,
+        62
+      ]
     },
     "src/errors.ts": {
       "expectCount": 4,
@@ -43,47 +52,56 @@
       "undocumentLines": []
     },
     "src/light.ts": {
-      "expectCount": 29,
-      "actualCount": 10,
+      "expectCount": 38,
+      "actualCount": 17,
       "undocumentLines": [
-        1,
+        8,
+        9,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        142,
+        246,
+        249,
+        252,
+        257,
+        290,
+        296,
+        311,
+        422,
+        425
+      ]
+    },
+    "src/runtimeTypes.ts": {
+      "expectCount": 8,
+      "actualCount": 0,
+      "undocumentLines": [
         3,
         4,
         5,
         6,
-        72,
-        75,
-        78,
-        97,
-        117,
-        120,
-        128,
-        160,
-        163,
-        166,
-        171,
-        204,
-        210,
-        225
-      ]
-    },
-    "src/runtimeTypes.ts": {
-      "expectCount": 3,
-      "actualCount": 0,
-      "undocumentLines": [
-        2,
-        3,
-        4
+        7,
+        8,
+        9,
+        10
       ]
     },
     "src/utils.ts": {
-      "expectCount": 10,
+      "expectCount": 12,
       "actualCount": 6,
       "undocumentLines": [
         7,
-        37,
-        58,
-        59
+        13,
+        16,
+        45,
+        66,
+        67
       ]
     }
   }

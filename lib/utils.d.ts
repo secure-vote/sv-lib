@@ -1,5 +1,7 @@
 import * as t from 'io-ts';
 export declare const checkDecode: <S, E extends Error>(validationRes: import("fp-ts/lib/Either").Either<t.ValidationError[], S>, mkErr?: (s: string) => E) => void;
+export declare const now: () => number;
+export declare const debugLog: (funcName: string, msg: string) => void;
 /**
  * This will take an Ethereum hex string (or a normal hex string) and
  * output a normal hex string (no '0x' header) or throw an error on a
