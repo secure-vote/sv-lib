@@ -37,6 +37,7 @@ export const initializeSvLight = async (netConf: EthNetConf): Promise<SvNetwork>
     const { indexEnsName, ensResolver, webSocketsProvider, httpProvider, auxContract } = netConf
 
     const web3 = new Web3(new Web3.providers.WebsocketProvider(webSocketsProvider));
+
     svUtils.debugLog('initializeSvLight', `Web3 loaded: ${!!web3}`)
 
     const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
@@ -240,12 +241,16 @@ export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Byt
 export const isEd25519SignedBallotValid = (rawBallotSpecString: string): boolean => {
     const unszSpec = JSON.parse(rawBallotSpecString)
 
-    if (!!unszSpec.subgroupInner) return false
+    if (!unszSpec.subgroupInner.signature || !unszSpec.subgroupInner.proposerPk) return false
 
     const { signature, proposerPk } = unszSpec.subgroupInner
 
-    svUtils.checkDecode(Bytes64RT.decode(signature))
-    svUtils.checkDecode(StellarAddressRT.decode(proposerPk))
+    try {
+        svUtils.checkDecode(Bytes64RT.decode(signature))
+        svUtils.checkDecode(StellarAddressRT.decode(proposerPk))
+    } catch (e) {
+        return false;
+    }
 
     const preppedBSpec = rawBallotSpecString.replace(signature, '**SIG_1**')
     return ed25519SignatureIsValid(preppedBSpec, proposerPk, signature)
