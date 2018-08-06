@@ -13,7 +13,7 @@ import * as svConst from './const'
 import * as svUtils from './utils'
 import * as API from './api'
 import { WindowWeb3Init, EthNetConf, SvNetwork, EthTx, BallotSpecV2, GlobalBallot } from './types'
-import { HexString, Bytes32, Bytes64, Bytes32RT, Bytes64RT, StellarAddressRT } from './runtimeTypes'
+import { HexString, Bytes32, Bytes64, Bytes32RT, Bytes64RT, StellarAddressRT, EthAddress, EthAddressRT } from './runtimeTypes'
 import { ed25519SignatureIsValid } from './crypto'
 
 // Lovely ABIs
@@ -36,7 +36,8 @@ const UnsafeEd25519DelegationAbi = require('./smart_contracts/UnsafeEd25519Deleg
 export const initializeSvLight = async (netConf: EthNetConf): Promise<SvNetwork> => {
     const { indexEnsName, ensResolver, webSocketsProvider, httpProvider, auxContract } = netConf
 
-    const web3 = new Web3(new Web3.providers.WebsocketProvider(webSocketsProvider));
+    const provider = new Web3.providers.WebsocketProvider(webSocketsProvider)
+    const web3 = new Web3(provider)
 
     svUtils.debugLog('initializeSvLight', `Web3 loaded: ${!!web3}`)
 
@@ -154,7 +155,7 @@ const _getBallotObjectFromIpfs = async (ballotSpecHash: Bytes32): Promise<string
 }
 
 const GetDemocNthBallotRT = t.type({
-    democHash: Bytes32RT, nthBallot: t.Integer
+    democHash: Bytes32RT, nthBallot: t.Integer, userEthAddress: EthAddressRT
 })
 type GetDemocNthBallot = t.TypeOf<typeof GetDemocNthBallotRT>
 
@@ -168,13 +169,13 @@ type GetDemocNthBallot = t.TypeOf<typeof GetDemocNthBallotRT>
 export const getDemocNthBallot = async (svNetwork: SvNetwork, democBallotInfo: GetDemocNthBallot): Promise<GlobalBallot> => {
     // Destructure and set the variables that are needed
     const { index, aux, netConf } = svNetwork
-    const { democHash, nthBallot } = democBallotInfo
+    const { democHash, nthBallot, userEthAddress } = democBallotInfo
     const { archiveUrl } = netConf
 
     const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(index._address, democHash, nthBallot).call()
 
     const { ballotId, bbFarmAddress } = bbFarmAndBallotId
-    const userEthAddress = svConst.zeroAddr
+
     const ethBallotDetails = await aux.methods.getBallotDetails(ballotId, bbFarmAddress, userEthAddress).call()
 
     const rawBallotSpecString = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
@@ -188,7 +189,7 @@ export const getDemocNthBallot = async (svNetwork: SvNetwork, democBallotInfo: G
  * @param {Bytes64} ballotSpecHash - the hash of the ballot spec
  * @returns {Promise<string>} the raw string of the ballot spec
  */
-export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64): Promise<GlobalBallot[]> => {
+export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64, userEthAddress: EthAddress): Promise<GlobalBallot[]> => {
     const { backend } = svNetwork
     const democInfo = await backend.methods.getDInfo(democHash).call()
 
@@ -201,7 +202,7 @@ export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64):
     const numBallots = democInfo.nBallots
     const ballotsArray = []
     for (let i = 0; i < numBallots; i++) {
-        ballotsArray[i] = await getDemocNthBallot(svNetwork, { democHash: democHash, nthBallot: i })
+        ballotsArray[i] = await getDemocNthBallot(svNetwork, { democHash: democHash, nthBallot: i, userEthAddress })
     }
 
     return ballotsArray
@@ -214,8 +215,8 @@ export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64):
  * @param {string} tokenId the id of the token subgroup we want to retrieve
  * @returns {GlobalBallot[]} boolean value representing if the signature valid
  */
-export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes32, tokenId: string) => {
-    const allDemocBallots = await getDemocBallots(svNetwork, democHash)
+export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes32, tokenId: string, userEthAddress: EthAddress) => {
+    const allDemocBallots = await getDemocBallots(svNetwork, democHash, userEthAddress)
 
     // Check each ballot for valid signature
     const verifiedBallots = []
