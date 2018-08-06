@@ -88,6 +88,40 @@ export const resolveEnsAddress = async ({ resolver }, ensName): Promise<string> 
     return addr
 }
 
+export const getBackendAddress = async ({ index }) => {
+    return await index.methods.getBackend().call()
+}
+
+export const getDemocInfo = async ({ backend, democHash }) => {
+    return await backend.methods.getDInfo(democHash).call()
+}
+
+export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
+    // Destructure and set the variables that are needed
+    const { index, backend, aux, netConf } = svNetwork
+    const { democHash, nthBallot } = democBallotInfo
+    const indexAddress = index._address
+    const backendAddress = backend._address
+    const archiveUrl = { netConf }
+
+    const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(indexAddress, democHash, nthBallot).call()
+
+    const { ballotId, bbFarmAddress } = bbFarmAndBallotId
+    const userEthAddress = '0x0000000000000000000000000000000000000000'
+    const ethBallotDetails = await aux.methods.getBallotDetails(ballotId, bbFarmAddress, userEthAddress).call()
+
+    const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
+
+    const ballotObject = {
+        ...bbFarmAndBallotId,
+        ...ethBallotDetails,
+        data: { ...ballotSpec.data }
+    }
+
+    return ballotObject
+}
+
+
 /**
  * Attempts to retrieve a ballotSpec from ipfs and falls back to archive
  * @param {string} archiveUrl - the http archive url
