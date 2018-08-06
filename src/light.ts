@@ -88,39 +88,6 @@ export const resolveEnsAddress = async ({ resolver }, ensName): Promise<string> 
     return addr
 }
 
-export const getBackendAddress = async ({ index }) => {
-    return await index.methods.getBackend().call()
-}
-
-export const getDemocInfo = async ({ backend, democHash }) => {
-    return await backend.methods.getDInfo(democHash).call()
-}
-
-export const getDemocNthBallot = async ({ svNetwork }, democBallotInfo) => {
-    // Destructure and set the variables that are needed
-    const { index, backend, aux, netConf } = svNetwork
-    const { democHash, nthBallot } = democBallotInfo
-    const indexAddress = index._address
-    const backendAddress = backend._address
-    const archiveUrl = { netConf }
-
-    const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(indexAddress, democHash, nthBallot).call()
-
-    const { ballotId, bbFarmAddress } = bbFarmAndBallotId
-    const userEthAddress = '0x0000000000000000000000000000000000000000'
-    const ethBallotDetails = await aux.methods.getBallotDetails(ballotId, bbFarmAddress, userEthAddress).call()
-
-    const ballotSpec = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
-
-    const ballotObject = {
-        ...bbFarmAndBallotId,
-        ...ethBallotDetails,
-        data: { ...ballotSpec.data }
-    }
-
-    return ballotObject
-}
-
 
 /**
  * Attempts to retrieve a ballotSpec from ipfs and falls back to archive
@@ -221,10 +188,11 @@ export const getDemocNthBallot = async (svNetwork: SvNetwork, democBallotInfo: G
 /**
  * Returns an array of all ballots from a democracy
  * @param {SvNetwork} svNetwork
- * @param {Bytes64} ballotSpecHash - the hash of the ballot spec
- * @returns {Promise<string>} the raw string of the ballot spec
+ * @param {Bytes32} democHash - the hash of the ballot spec
+ * @param {EthAddress} userEthAddress the user's address
+ * @returns {Promise<GlobalBallot[]>} -------- todo --------------
  */
-export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64, userEthAddress: EthAddress): Promise<GlobalBallot[]> => {
+export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes32, userEthAddress: EthAddress): Promise<GlobalBallot[]> => {
     const { backend } = svNetwork
     const democInfo = await backend.methods.getDInfo(democHash).call()
 
@@ -248,9 +216,10 @@ export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes64, 
  * @param {SvNetwork} svNetwork
  * @param {Bytes32} democHash of the democracy we want to get the ballots from
  * @param {string} tokenId the id of the token subgroup we want to retrieve
- * @returns {GlobalBallot[]} boolean value representing if the signature valid
+ * @param {EthAddress} userEthAddress the user's address
+ * @returns {Promise<GlobalBallot[]>} ---------- todo --------------
  */
-export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes32, tokenId: string, userEthAddress: EthAddress) => {
+export const getFilterDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes32, tokenId: string, userEthAddress: EthAddress): Promise<GlobalBallot[]> => {
     const allDemocBallots = await getDemocBallots(svNetwork, democHash, userEthAddress)
 
     // Check each ballot for valid signature

@@ -1,17 +1,20 @@
-import axios, { AxiosResponse, AxiosError } from 'axios'
+import { AxiosResponse, AxiosError, default as axios } from 'axios'
 
 import { ApiError } from './errors'
 import { EthNetConf, Ed25519DelegationResp } from './types'
 
-export const processApiError = <T>(err: AxiosError): T => {
-    throw err.response.status && err.response.status === 400 && (err.response.data as any).error ? new ApiError((err.response.data as any).error) : err
+export const processApiError = (err: AxiosError) => {
+    if (err.response && err.response.status === 400 && err.response.data.error) {
+        throw new ApiError(err.response.data.error)
+    }
+    throw err
 }
 
-export const extractData = <T>(req: AxiosResponse): T => req.data as T
+export const extractData = function<T>(req: AxiosResponse<T>): T { return req.data }
 
 /**
  * Generate the submitEd25519Delegation API URL
- * @param {EthNetConf} ethNetConf
+ * @param {EthNetConf} netConf
  * @returns {string} The URL for this method
  */
 export const submitEd25519DelegationUrl = (netConf: EthNetConf): string => `${netConf.svApiUrl}/sv/light/submitEd25519Delegation`
