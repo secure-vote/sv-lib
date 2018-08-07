@@ -42,7 +42,10 @@ export type SvNetwork = {
     index: any
     backend: any
     aux: any
-    payments: any
+    payments: any,
+    events: {
+        getBlockPeriodic: any
+    }
 }
 
 export type BallotSpecV2 = {
