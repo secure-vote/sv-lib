@@ -373,3 +373,21 @@ export const getProxySequenceNumber = async (svNetwork: SvNetwork, ballotId: Byt
     const bbFarmContract = new web3.eth.Contract(BBFarmAbi, bbFarmAddress)
     return await bbFarmContract.methods.getSequenceNumber(ballotId, voterAddress).call()
 }
+
+/**
+ * Takes the network details string returned by the BBFarm contract and returns network specific values
+ * @param {Bytes32} networkDetails [32b unallocated][32b chainId][32b networkId][160b bbFarm addr on foreign network]
+ *
+ * @returns {object} containing the chainId, networkId and address of the remote BBFarm
+ */
+export const extractNetworkDetails = async (networkDetails: Bytes32) => {
+    const chainId = parseInt(networkDetails.slice(10, 18));
+    const networkId = parseInt(networkDetails.slice(18, 26));
+    const remoteBBFarmAddress = '0x' + networkDetails.slice(26);
+
+    return {
+        chainId,
+        networkId,
+        remoteBBFarmAddress
+    }
+}
