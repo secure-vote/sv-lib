@@ -66,13 +66,11 @@ export const initializeSvLight = async (netConf: EthNetConf, opts?: InitSvLightO
             : { mkProvider: new Web3.providers.HttpProvider(_opts.httpProvider) }
 
     const web3 = new Web3(mkProvider)
-    console.log('web3 :', web3);
 
     //getblockperiod function
     const gbpF = () => {
         web3.eth.getBlockNumber()
             .then(bn => {
-                console.log(bn)
                 svUtils.debugLog("GetBlockPeriodic", bn)
             })
             .catch(e => svUtils.debugLog("GetBlockPeriodic -- ERROR", e))
