@@ -208,7 +208,6 @@ export const getDemocNthBallot = async (svNetwork: SvNetwork, democBallotInfo: G
     const { archiveUrl } = netConf
 
     const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(index._address, democHash, nthBallot).call()
-    console.log('bbFarmAndBallotId :', bbFarmAndBallotId);
 
     const { ballotId, bbFarmAddress } = bbFarmAndBallotId
 

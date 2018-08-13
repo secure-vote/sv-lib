@@ -271,7 +271,6 @@ export const castProxyVote = async (request, netConf: EthNetConf) => {
     const testing = verifySignedBallotForProxy(request)
 
     request.netConf = netConf
-    console.log('request going to cast proxy vote API:', request);
 
     return await axios.post(requestUrl, request)
         .then(response => {
@@ -371,6 +370,9 @@ export const getProxySequenceNumber = async (svNetwork: SvNetwork, ballotId: Byt
 
     // Get and return the sequence number
     const bbFarmContract = new web3.eth.Contract(BBFarmAbi, bbFarmAddress)
+    const votingNetworkDetails = await bbFarmContract.methods.getVotingNetworkDetails()
+    console.log('votingNetworkDetails :', votingNetworkDetails);
+
     return await bbFarmContract.methods.getSequenceNumber(ballotId, voterAddress).call()
 }
 
