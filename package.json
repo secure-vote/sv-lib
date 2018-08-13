@@ -1,6 +1,6 @@
 {
   "name": "sv-lib",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "SecureVote Light supporting functionality",
   "main": "lib/index.js",
   "module-commented-out": "lib/index.es5.js",
@@ -88,17 +88,17 @@
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.1.0",
     "tslint-config-standard": "^7.0.0",
-    "typedoc": "^0.11.0",
+    "typedoc": "^0.11.1",
     "typescript": "^3.0.0-rc",
     "validate-commit-msg": "^2.12.2"
   },
   "scripts": {
     "dev": "tsc -w --outDir dev-lib --declarationDir dev-lib",
-    "docs": "rimraf docs && esdoc && cp CNAME_DOCS docs/CNAME",
+    "docs": "rimraf docs && typedoc --out docs --target es6 --mode file --ignoreCompilerErrors src && cp CNAME_DOCS docs/CNAME",
     "prepublish": "true # yarn build",
     "lint": "tslint -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf lib",
-    "build": "tsc --module commonjs && cp -a ./src/smart_contracts ./lib/smart_contracts && yarn build:rollup && yarn docs # typedoc --out docs --target es6 --theme minimal --mode file src",
+    "build": "tsc --module commonjs && cp -a ./src/smart_contracts ./lib/smart_contracts && yarn build:rollup && yarn docs",
     "build:rollup": "rollup -c rollup.config.ts",
     "start": "rollup -c rollup.config.ts -w",
     "test": "jest --detectOpenHandles",

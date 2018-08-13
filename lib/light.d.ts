@@ -1,4 +1,5 @@
-import { WindowWeb3Init, EthNetConf, SvNetwork } from './types';
+import * as t from 'io-ts';
+import { WindowWeb3Init, EthNetConf, SvNetwork, GlobalBallot } from './types';
 /**
  * Return contract instances and web3 needed for SvLight usage
  * @param {EthNetConf} netConf Config file for all current network
@@ -18,25 +19,47 @@ export declare const initializeWindowWeb3: () => Promise<WindowWeb3Init>;
 export declare const resolveEnsAddress: ({ resolver }: {
     resolver: any;
 }, ensName: any) => Promise<string>;
-export declare const getBackendAddress: ({ index }: {
-    index: any;
-}) => Promise<any>;
-export declare const getDemocInfo: ({ backend, democHash }: {
-    backend: any;
-    democHash: any;
-}) => Promise<any>;
-export declare const getDemocNthBallot: ({ svNetwork }: {
-    svNetwork: any;
-}, democBallotInfo: any) => Promise<any>;
-export declare const getBallotSpec: (archiveUrl: any, ballotSpecHash: any) => Promise<{
-    data: any;
-}>;
-export declare const getBallotObjectFromS3: (archiveUrl: any, ballotSpecHash: any) => Promise<import("axios").AxiosResponse<any>>;
-export declare const getBallotObjectFromIpfs: (ballotSpecHash: any) => Promise<import("axios").AxiosResponse<any>>;
-export declare const getDemocBallots: ({ svNetwork, democHash }: {
-    svNetwork: any;
-    democHash: any;
-}) => Promise<any[]>;
+/**
+ * Attempts to retrieve a ballotSpec from ipfs and falls back to archive
+ * @param {string} archiveUrl - the http archive url
+ * @param {Bytes64} ballotSpecHash - the hash of the url
+ * @returns {Promise<string>} the raw string of the ballot spec
+ */
+export declare const getBallotSpec: (archiveUrl: string, ballotSpecHash: string) => Promise<string>;
+/**
+ * Attempts to retrieve a ballotSpec from ipfs and falls back to archive
+ * @param {SvNetwork} svNetwork
+ * @param {GetDemocNthBallot} democBallotInfo - object containing the information about what ballot to retrieve
+ * @returns {Promise<GlobalBallot>} global ballot object containing all required ballot information
+ */
+export declare const getDemocNthBallot: (svNetwork: SvNetwork, democBallotInfo: t.TypeOfProps<{
+    democHash: t.RefinementType<t.RefinementType<t.StringType, string, string, t.mixed>, string, string, t.mixed>;
+    nthBallot: t.RefinementType<t.NumberType, number, number, t.mixed>;
+    userEthAddress: t.RefinementType<t.StringType, string, string, t.mixed>;
+}>) => Promise<GlobalBallot>;
+/**
+ * Returns an array of all ballots from a democracy
+ * @param {SvNetwork} svNetwork
+ * @param {Bytes32} democHash - the hash of the ballot spec
+ * @param {EthAddress} userEthAddress the user's address
+ * @returns {Promise<GlobalBallot[]>} -------- todo --------------
+ */
+export declare const getDemocBallots: (svNetwork: SvNetwork, democHash: string, userEthAddress: string) => Promise<GlobalBallot[]>;
+/**
+ *
+ * @param {SvNetwork} svNetwork
+ * @param {Bytes32} democHash of the democracy we want to get the ballots from
+ * @param {string} tokenId the id of the token subgroup we want to retrieve
+ * @param {EthAddress} userEthAddress the user's address
+ * @returns {Promise<GlobalBallot[]>} ---------- todo --------------
+ */
+export declare const getFilterDemocBallots: (svNetwork: SvNetwork, democHash: string, tokenId: string, userEthAddress: string) => Promise<GlobalBallot[]>;
+/**
+ * Check if a raw ballotSpec contains a valid signature for a subgroup
+ * @param {string} rawBallotSpecString raw string of the ballot spec retrieved from ipfs
+ * @returns {boolean} boolean value representing if the signature valid
+ */
+export declare const isEd25519SignedBallotValid: (rawBallotSpecString: string) => boolean;
 /** Takes in the svNetwork object and returns all relevant addresses */
 export declare const getContractAddresses: ({ svNetwork }: {
     svNetwork: any;
@@ -115,6 +138,7 @@ export declare const createEd25519DelegationTransaction: (svNetwork: any, dlgtRe
  * @param pubKey stellar pubkey
  * @param signature 64 byte signature as eth hex
  * @returns {boolean}
+ * This function has been deprecated in favour of more general ed25519SignatureIsValid function in /crypto
  */
 export declare const ed25519DelegationIsValid: (dlgtRequest: string, pubKey: string, signature: string) => any;
 /**
@@ -125,4 +149,6 @@ export declare const ed25519DelegationIsValid: (dlgtRequest: string, pubKey: str
  * @param _signature
  * @param opts
  */
-export declare const submitEd25519Delegation: (ethNetConf: EthNetConf, dlgtRequest: string, stellarPK: string, _signature: string, opts?: any) => Promise<any>;
+export declare const submitEd25519Delegation: (ethNetConf: EthNetConf, dlgtRequest: string, stellarPK: string, _signature: string, opts?: any) => Promise<import("./types").Ed25519DelegationResp>;
+export declare const signTx: (web3: any, txData: string, privKey: string) => Promise<any>;
+export declare const publishSignedTx: (web3: any, rawTx: string) => Promise<string>;

@@ -30,3 +30,12 @@ export declare const ethVerifySig: (messageHash: string, [v, r, s]: string[]) =>
     verified: boolean;
     address: any;
 };
+export declare const sha256HashString: (stringToHash: string) => string;
+/**
+ * Verify a ed25519 signature
+ * @param signedData eth hex string of the dlgt request
+ * @param pubKey stellar pubkey
+ * @param signature 64 byte signature as eth hex
+ * @returns {boolean}
+ */
+export declare const ed25519SignatureIsValid: (signedData: string, pubKey: string, signature: string) => any;

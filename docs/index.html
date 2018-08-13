@@ -1,115 +1,488 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html class="default no-js">
 <head>
-  <meta charset="utf-8">
-  <base data-ice="baseUrl">
-  <title data-ice="title">Home | sv-lib</title>
-  <link type="text/css" rel="stylesheet" href="css/style.css">
-  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
-  <script src="script/prettify/prettify.js"></script>
-  <script src="script/manual.js"></script>
-<meta name="description" content="SecureVote Light supporting functionality"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="sv-lib"><meta property="twitter:description" content="SecureVote Light supporting functionality"></head>
-<body class="layout-container" data-ice="rootContainer">
-
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>sv-lib</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
 <header>
-  <a href="./">Home</a>
-  
-  <a href="identifiers.html">Reference</a>
-  <a href="source.html">Source</a>
-  
-  <div class="search-box">
-  <span>
-    <img src="./image/search.png">
-    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
-  </span>
-    <ul class="search-result"></ul>
-  </div>
-<a style="position:relative; top:3px;" href="https://github.com/secure-vote/sv-lib"><img width="20px" src="./image/github.png"></a></header>
-
-<nav class="navigation" data-ice="nav"><div>
-  <ul>
-    
-  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/errors.ts~ApiError.html">ApiError</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/errors.ts~DecodeError.html">DecodeError</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/errors.ts~EthNetError.html">EthNetError</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/errors.ts~HexError.html">HexError</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-extractData">extractData</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-processApiError">processApiError</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-submitEd25519DelegationUrl">submitEd25519DelegationUrl</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-castProxyVote">castProxyVote</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRange3VoteData">genRange3VoteData</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkPacked">mkPacked</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSignedBallotForProxy">mkSignedBallotForProxy</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mkSubmissionBits">mkSubmissionBits</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-prepareWeb3BBVoteTx">prepareWeb3BBVoteTx</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-verifySignedBallotForProxy">verifySignedBallotForProxy</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getNetwork">getNetwork</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-networkName">networkName</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethSignHash">ethSignHash</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethVerifySig">ethVerifySig</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hashMsgRaw">hashMsgRaw</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashBSpec">checkBallotHashBSpec</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkBallotHashGBallot">checkBallotHashGBallot</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkIfAddressIsEditor">checkIfAddressIsEditor</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createEd25519DelegationTransaction">createEd25519DelegationTransaction</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ed25519DelegationIsValid">ed25519DelegationIsValid</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBackendAddress">getBackendAddress</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBallotObjectFromIpfs">getBallotObjectFromIpfs</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBallotObjectFromS3">getBallotObjectFromS3</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBallotSpec">getBallotSpec</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCommunityBallotPrice">getCommunityBallotPrice</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getContractAddresses">getContractAddresses</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getCurrentGasPrice">getCurrentGasPrice</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocBallots">getDemocBallots</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocInfo">getDemocInfo</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDemocNthBallot">getDemocNthBallot</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getSingularCleanAbi">getSingularCleanAbi</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUnsafeEd25519Delegations">getUnsafeEd25519Delegations</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initializeSvLight">initializeSvLight</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-initializeWindowWeb3">initializeWindowWeb3</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-prepareEd25519Delegation">prepareEd25519Delegation</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resolveEnsAddress">resolveEnsAddress</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stellarPkToHex">stellarPkToHex</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-submitEd25519Delegation">submitEd25519Delegation</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-weiToCents">weiToCents</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-checkDecode">checkDecode</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-cleanEthHex">cleanEthHex</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-doesNetHaveIndex">doesNetHaveIndex</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ethAddrEq">ethAddrEq</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genRandomHex">genRandomHex</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexToBase32">hexToBase32</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexToUint8Array">hexToUint8Array</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-toEthHex">toEthHex</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-flags">flags</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Ed25519DelegatePrefix">Ed25519DelegatePrefix</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-networkVars">networkVars</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroAddr">zeroAddr</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-zeroHash">zeroHash</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Bytes32RT">Bytes32RT</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Bytes64RT">Bytes64RT</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-HexStringRT">HexStringRT</a></span></span></li>
-</ul>
-</div>
-</nav>
-
-<div class="content" data-ice="content"><div data-ice="index" class="github-markdown"><h1 id="sv-lib">sv-lib</h1><p>Library for supporting SecureVote Light apps</p>
-<h2 id="usage">Usage</h2><pre><code class="lang-javascript"><code class="source-code prettyprint">const svUtils = require(&apos;sv-lib/lib/utils&apos;);
-const svLight = require(&apos;sv-lib/lib/light&apos;);</code>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">sv-lib</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> sv-lib</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="sv-lib">sv-lib</h1>
+				<p>Library for supporting SecureVote Light apps</p>
+				<h2 id="usage">Usage</h2>
+				<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> svUtils = <span class="hljs-built_in">require</span>(<span class="hljs-string">'sv-lib/lib/utils'</span>);
+<span class="hljs-keyword">const</span> svLight = <span class="hljs-built_in">require</span>(<span class="hljs-string">'sv-lib/lib/light'</span>);
 </code></pre>
-<h1 id="documentation">Documentation</h1><p><a href="https://lib.docs.secure.vote/">https://lib.docs.secure.vote/</a></p>
+				<h1 id="documentation">Documentation</h1>
+				<p><a href="https://lib.docs.secure.vote/">https://lib.docs.secure.vote/</a></p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-class">
+						<a href="classes/apierror.html" class="tsd-kind-icon">Api<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/decodeerror.html" class="tsd-kind-icon">Decode<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/ethneterror.html" class="tsd-kind-icon">Eth<wbr>Net<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/hexerror.html" class="tsd-kind-icon">Hex<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#ballotspecv2" class="tsd-kind-icon">Ballot<wbr>Spec<wbr>V2</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#bytes32" class="tsd-kind-icon">Bytes32</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#bytes64" class="tsd-kind-icon">Bytes64</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#ed25519delegationresp" class="tsd-kind-icon">Ed25519<wbr>Delegation<wbr>Resp</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#ethaddress" class="tsd-kind-icon">Eth<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#ethnetconf" class="tsd-kind-icon">Eth<wbr>Net<wbr>Conf</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#ethtx" class="tsd-kind-icon">Eth<wbr>Tx</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-not-exported">
+						<a href="globals.html#getdemocnthballot" class="tsd-kind-icon">Get<wbr>Democ<wbr>Nth<wbr>Ballot</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#globalballot" class="tsd-kind-icon">Global<wbr>Ballot</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#hexstring" class="tsd-kind-icon">Hex<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#networkname" class="tsd-kind-icon">Network<wbr>Name</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-not-exported">
+						<a href="globals.html#proxyproposalrequest" class="tsd-kind-icon">Proxy<wbr>Proposal<wbr>Request</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#proxyvote" class="tsd-kind-icon">Proxy<wbr>Vote</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#stellaraddress" class="tsd-kind-icon">Stellar<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#svnetwork" class="tsd-kind-icon">Sv<wbr>Network</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#timestamp" class="tsd-kind-icon">Timestamp</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#windowweb3init" class="tsd-kind-icon">Window<wbr>Web3<wbr>Init</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#auctionabi" class="tsd-kind-icon">Auction<wbr>Abi</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#auxabi" class="tsd-kind-icon">Aux<wbr>Abi</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#b32_alpha" class="tsd-kind-icon">B32_<wbr>ALPHA</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#bbfarmabi" class="tsd-kind-icon">BBFarm<wbr>Abi</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#bn" class="tsd-kind-icon">BN</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#backendabi" class="tsd-kind-icon">Backend<wbr>Abi</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#bytes32rt" class="tsd-kind-icon">Bytes32RT</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#bytes64rt" class="tsd-kind-icon">Bytes64RT</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#erc20abi" class="tsd-kind-icon">ERC20<wbr>Abi</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#ed25519delegateprefix" class="tsd-kind-icon">Ed25519<wbr>Delegate<wbr>Prefix</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#ethaddressrt" class="tsd-kind-icon">Eth<wbr>AddressRT</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#getdemocnthballotrt" class="tsd-kind-icon">Get<wbr>Democ<wbr>Nth<wbr>BallotRT</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#hexstringrt" class="tsd-kind-icon">Hex<wbr>StringRT</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#indexabi" class="tsd-kind-icon">Index<wbr>Abi</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#networknamert" class="tsd-kind-icon">Network<wbr>NameRT</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#paymentsabi" class="tsd-kind-icon">Payments<wbr>Abi</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#proxyproposalinputrt" class="tsd-kind-icon">Proxy<wbr>Proposal<wbr>InputRT</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#resolverabi" class="tsd-kind-icon">Resolver<wbr>Abi</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#stellaraddressrt" class="tsd-kind-icon">Stellar<wbr>AddressRT</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#timestamprt" class="tsd-kind-icon">TimestampRT</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#unsafeed25519delegationabi" class="tsd-kind-icon">Unsafe<wbr>Ed25519<wbr>Delegation<wbr>Abi</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#web3" class="tsd-kind-icon">Web3</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#btoa" class="tsd-kind-icon">btoa</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#detectnetwork" class="tsd-kind-icon">detect<wbr>Network</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#networkvars" class="tsd-kind-icon">network<wbr>Vars</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#sha256" class="tsd-kind-icon">sha256</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#validnetworknames" class="tsd-kind-icon">valid<wbr>Network<wbr>Names</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#zeroaddr" class="tsd-kind-icon">zero<wbr>Addr</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#zerohash" class="tsd-kind-icon">zero<wbr>Hash</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-not-exported">
+						<a href="globals.html#_getballotobjectfromipfs" class="tsd-kind-icon">_get<wbr>Ballot<wbr>Object<wbr>From<wbr>Ipfs</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-not-exported">
+						<a href="globals.html#_getballotobjectfroms3" class="tsd-kind-icon">_get<wbr>Ballot<wbr>Object<wbr>From<wbr>S3</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#castproxyvote" class="tsd-kind-icon">cast<wbr>Proxy<wbr>Vote</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#checkballothashbspec" class="tsd-kind-icon">check<wbr>Ballot<wbr>HashBSpec</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#checkballothashgballot" class="tsd-kind-icon">check<wbr>Ballot<wbr>HashGBallot</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#checkdecode" class="tsd-kind-icon">check<wbr>Decode</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#checkifaddressiseditor" class="tsd-kind-icon">check<wbr>IfAddress<wbr>IsEditor</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#cleanethhex" class="tsd-kind-icon">clean<wbr>Eth<wbr>Hex</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createed25519delegationtransaction" class="tsd-kind-icon">create<wbr>Ed25519<wbr>Delegation<wbr>Transaction</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#debuglog" class="tsd-kind-icon">debug<wbr>Log</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deployballotspec" class="tsd-kind-icon">deploy<wbr>Ballot<wbr>Spec</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#deployproxyballot" class="tsd-kind-icon">deploy<wbr>Proxy<wbr>Ballot</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#doesnethaveindex" class="tsd-kind-icon">does<wbr>Net<wbr>Have<wbr>Index</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#ed25519delegationisvalid" class="tsd-kind-icon">ed25519<wbr>Delegation<wbr>IsValid</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#ed25519signatureisvalid" class="tsd-kind-icon">ed25519<wbr>Signature<wbr>IsValid</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#ethaddreq" class="tsd-kind-icon">eth<wbr>Addr<wbr>Eq</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#ethsignhash" class="tsd-kind-icon">eth<wbr>Sign<wbr>Hash</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#ethverifysig" class="tsd-kind-icon">eth<wbr>Verify<wbr>Sig</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#extractdata" class="tsd-kind-icon">extract<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#genrandomhex" class="tsd-kind-icon">gen<wbr>Random<wbr>Hex</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#genrange3votedata" class="tsd-kind-icon">gen<wbr>Range3<wbr>Vote<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getballotspec" class="tsd-kind-icon">get<wbr>Ballot<wbr>Spec</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getcommunityballotprice" class="tsd-kind-icon">get<wbr>Community<wbr>Ballot<wbr>Price</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getcontractaddresses" class="tsd-kind-icon">get<wbr>Contract<wbr>Addresses</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getcurrentgasprice" class="tsd-kind-icon">get<wbr>Current<wbr>Gas<wbr>Price</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getdemocballots" class="tsd-kind-icon">get<wbr>Democ<wbr>Ballots</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getdemocnthballot" class="tsd-kind-icon">get<wbr>Democ<wbr>Nth<wbr>Ballot</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getfilterdemocballots" class="tsd-kind-icon">get<wbr>Filter<wbr>Democ<wbr>Ballots</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getnetwork" class="tsd-kind-icon">get<wbr>Network</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getproxysequencenumber" class="tsd-kind-icon">get<wbr>Proxy<wbr>Sequence<wbr>Number</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getsingularcleanabi" class="tsd-kind-icon">get<wbr>Singular<wbr>Clean<wbr>Abi</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getunsafeed25519delegations" class="tsd-kind-icon">get<wbr>Unsafe<wbr>Ed25519<wbr>Delegations</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hashmsgraw" class="tsd-kind-icon">hash<wbr>Msg<wbr>Raw</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hextobase32" class="tsd-kind-icon">hex<wbr>ToBase32</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hextouint8array" class="tsd-kind-icon">hex<wbr>ToUint8<wbr>Array</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#initializesvlight" class="tsd-kind-icon">initialize<wbr>SvLight</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#initializewindowweb3" class="tsd-kind-icon">initialize<wbr>Window<wbr>Web3</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#ised25519signedballotvalid" class="tsd-kind-icon">is<wbr>Ed25519<wbr>Signed<wbr>Ballot<wbr>Valid</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#mkpacked" class="tsd-kind-icon">mk<wbr>Packed</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#mksignedballotforproxy" class="tsd-kind-icon">mk<wbr>Signed<wbr>Ballot<wbr>For<wbr>Proxy</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#mksubmissionbits" class="tsd-kind-icon">mk<wbr>Submission<wbr>Bits</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#networkname" class="tsd-kind-icon">network<wbr>Name</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#now" class="tsd-kind-icon">now</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#posted25519delegation" class="tsd-kind-icon">post<wbr>Ed25519<wbr>Delegation</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#prepareed25519delegation" class="tsd-kind-icon">prepare<wbr>Ed25519<wbr>Delegation</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#prepareweb3bbvotetx" class="tsd-kind-icon">prepare<wbr>Web3BBVote<wbr>Tx</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#processapierror" class="tsd-kind-icon">process<wbr>Api<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#publishsignedtx" class="tsd-kind-icon">publish<wbr>Signed<wbr>Tx</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#resolveensaddress" class="tsd-kind-icon">resolve<wbr>Ens<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#sha256hashstring" class="tsd-kind-icon">sha256<wbr>Hash<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#signtx" class="tsd-kind-icon">sign<wbr>Tx</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#stellarpktohex" class="tsd-kind-icon">stellar<wbr>PkTo<wbr>Hex</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#submited25519delegation" class="tsd-kind-icon">submit<wbr>Ed25519<wbr>Delegation</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#submited25519delegationurl" class="tsd-kind-icon">submit<wbr>Ed25519<wbr>Delegation<wbr>Url</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-not-exported">
+						<a href="globals.html#toalphabet" class="tsd-kind-icon">to<wbr>Alphabet</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#toethhex" class="tsd-kind-icon">to<wbr>Eth<wbr>Hex</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#verifysignedballotforproxy" class="tsd-kind-icon">verify<wbr>Signed<wbr>Ballot<wbr>For<wbr>Proxy</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#weitocents" class="tsd-kind-icon">wei<wbr>ToCents</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-is-not-exported">
+						<a href="globals.html#_raw_networkvars" class="tsd-kind-icon">_raw_<wbr>network<wbr>Vars</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#flags" class="tsd-kind-icon">flags</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
 </div>
-</div>
-
-<footer class="footer">
-  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
 </footer>
-
-<script src="script/search_index.js"></script>
-<script src="script/search.js"></script>
-<script src="script/pretty-print.js"></script>
-<script src="script/inherited-summary.js"></script>
-<script src="script/test-summary.js"></script>
-<script src="script/inner-link.js"></script>
-<script src="script/patch-for-local.js"></script>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>
