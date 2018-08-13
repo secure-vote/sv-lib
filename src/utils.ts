@@ -20,9 +20,9 @@ export const now = (): number => {
 }
 
 
-export const debugLog = (funcName: string, msg: string) => {
+export const debugLog = (funcName: string, msg: string | Error | number | any) => {
     if (process && process.env && process.env.DEBUG) {
-        console.log(`${now()} - ${funcName}: ${msg}`);
+        console.log(`${now()} - ${funcName}:`, msg);
     }
 }
 

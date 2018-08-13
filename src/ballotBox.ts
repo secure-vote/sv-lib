@@ -1,5 +1,6 @@
 const btoa = require('btoa')
 const BN = require('bn.js')
+const Web3 = require('web3')
 import * as R from 'ramda'
 import * as assert from 'assert'
 import * as web3Utils from 'web3-utils'
@@ -12,6 +13,7 @@ import * as Light from './light'
 
 import { Bytes64, Bytes32, TimestampRT, NetworkNameRT, Bytes32RT, EthAddress, EthAddressRT } from './runtimeTypes';
 import { ProxyVote, EthNetConf, BallotSpecV2, SvNetwork } from './types'
+import { getNetwork } from './const';
 
 const BBFarmAbi = require('./smart_contracts/BBFarm.abi.json')
 
@@ -271,7 +273,6 @@ export const castProxyVote = async (request, netConf: EthNetConf) => {
     const testing = verifySignedBallotForProxy(request)
 
     request.netConf = netConf
-    console.log('request going to cast proxy vote API:', request);
 
     return await axios.post(requestUrl, request)
         .then(response => {
@@ -284,7 +285,7 @@ export const castProxyVote = async (request, netConf: EthNetConf) => {
 }
 
 const ProxyProposalInputRT = t.type({
-    ballotSpec: Bytes32RT,
+    ballotSpec: t.string,
     democHash: Bytes32RT,
     startTime: TimestampRT,
     endTime: TimestampRT,
@@ -297,7 +298,7 @@ export const deployProxyBallot = async (
     proxyProposalReq: ProxyProposalRequest
 ) => {
     checkDecode(ProxyProposalInputRT.decode(proxyProposalReq))
-    // Check the network
+
     const { svApiUrl } = netConf
     const requestUrl = `${svApiUrl}/sv/light/submitProxyProposal`
 
@@ -371,5 +372,43 @@ export const getProxySequenceNumber = async (svNetwork: SvNetwork, ballotId: Byt
 
     // Get and return the sequence number
     const bbFarmContract = new web3.eth.Contract(BBFarmAbi, bbFarmAddress)
-    return await bbFarmContract.methods.getSequenceNumber(ballotId, voterAddress).call()
+    const bbFarmVersion = await bbFarmContract.methods.getVersion().call()
+
+    // getVotingNetworkDetails is only in bb farm version 3+
+    if (bbFarmVersion < 3) {
+        return await bbFarmContract.methods.getSequenceNumber(ballotId, voterAddress).call()
+    }
+
+    // Check the voting network details
+    const votingNetworkDetails = await bbFarmContract.methods.getVotingNetworkDetails().call()
+    const { networkId, chainId, remoteBBFarmAddress } = explodeForeignNetDetails(votingNetworkDetails)
+    const bbFarmNetwork = getNetwork(networkId, chainId)
+
+    // If the bbFarmNetwork is the same as the svNetwork we've been passed in we can safely return the sequence number using web3 that we've been passed in
+    if (bbFarmNetwork.name === svNetwork.netConf.name) {
+        return await bbFarmContract.methods.getSequenceNumber(ballotId, voterAddress).call()
+    } // If they are different, we need to initialise a web3 instance for the foreign bbFarm network and get the sequence nubmer
+    else {
+        const remoteWeb3 = new Web3(bbFarmNetwork.httpProvider)
+        const remoteBBFarmContract = new remoteWeb3.eth.Contract(BBFarmAbi, remoteBBFarmAddress)
+        return await remoteBBFarmContract.methods.getSequenceNumber(ballotId, voterAddress).call()
+    }
+}
+
+/**
+ * Takes the network details string returned by the BBFarm contract and returns network specific values
+ * @param {Bytes32} networkDetails [32b unallocated][32b chainId][32b networkId][160b bbFarm addr on foreign network]
+ *
+ * @returns {object} containing the chainId, networkId and address of the remote BBFarm
+ */
+export const explodeForeignNetDetails = (networkDetails: Bytes32) => {
+    const chainId = parseInt(networkDetails.slice(10, 18));
+    const networkId = parseInt(networkDetails.slice(18, 26));
+    const remoteBBFarmAddress = '0x' + networkDetails.slice(26);
+
+    return {
+        chainId,
+        networkId,
+        remoteBBFarmAddress
+    }
 }

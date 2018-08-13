@@ -28,18 +28,58 @@ const AuctionAbi = require('./smart_contracts/CommAuctionIface.abi.json');
 const ERC20Abi = require('./smart_contracts/ERC20.abi.json');
 const UnsafeEd25519DelegationAbi = require('./smart_contracts/UnsafeEd25519Delegation.abi.json');
 
+
+type InitSvLightOptsPartial = {
+    useWebsockets?: boolean
+    httpProvider?: string
+    webSocketsProvider?: string
+}
+class InitSvLightOptsFull {
+    useWebsockets: boolean
+    httpProvider: string
+    webSocketsProvider: string
+}
+class InitSvLightOptsWExtras extends InitSvLightOptsFull{
+    [key: string]: any
+}
+class InitSvLightOpts extends InitSvLightOptsFull {
+    constructor(opts: InitSvLightOptsPartial, defaults: InitSvLightOptsWExtras) {
+        super()
+        this.useWebsockets = opts.useWebsockets || defaults.useWebsockets
+        this.httpProvider = opts.httpProvider || defaults.httpProvider
+        this.webSocketsProvider = opts.webSocketsProvider || defaults.webSocketsProvider
+    }
+}
+
 /**
  * Return contract instances and web3 needed for SvLight usage
  * @param {EthNetConf} netConf Config file for all current network
+ * @param {InitSvLightOpts?} opts Optional
  * @returns {Promise<SvNetwork>} The SvNetwork object based on `netConf`
  */
-export const initializeSvLight = async (netConf: EthNetConf): Promise<SvNetwork> => {
-    const { indexEnsName, ensResolver, webSocketsProvider, httpProvider, auxContract } = netConf
+export const initializeSvLight = async (netConf: EthNetConf, opts?: InitSvLightOptsPartial): Promise<SvNetwork> => {
+    const _opts = new InitSvLightOpts(opts, {...netConf, useWebsockets: false})
 
-    const provider = new Web3.providers.WebsocketProvider(webSocketsProvider)
-    const web3 = new Web3(provider)
+    const { mkProvider } =
+        _opts.useWebsockets
+            ? { mkProvider: new Web3.providers.WebsocketProvider(_opts.webSocketsProvider) }
+            : { mkProvider: new Web3.providers.HttpProvider(_opts.httpProvider) }
+
+    const web3 = new Web3(mkProvider)
+
+    //getblockperiod function
+    const gbpF = () => {
+        web3.eth.getBlockNumber()
+            .then(bn => {
+                svUtils.debugLog("GetBlockPeriodic", bn)
+            })
+            .catch(e => svUtils.debugLog("GetBlockPeriodic -- ERROR", e))
+    }
+    const getBlockPeriodic = setInterval(gbpF, 10000)
 
     svUtils.debugLog('initializeSvLight', `Web3 loaded: ${!!web3}`)
+
+    const { indexEnsName, ensResolver, auxContract } = netConf
 
     const resolver = new web3.eth.Contract(ResolverAbi, ensResolver)
     const indexAddress = await resolveEnsAddress({ resolver }, indexEnsName)
@@ -49,15 +89,7 @@ export const initializeSvLight = async (netConf: EthNetConf): Promise<SvNetwork>
     const aux = new web3.eth.Contract(AuxAbi, auxContract)
     const payments = new web3.eth.Contract(PaymentsAbi, await index.methods.getPayments().call())
 
-    return {
-        netConf,
-        web3,
-        resolver,
-        index,
-        backend,
-        aux,
-        payments
-    }
+    return { netConf, web3, resolver, index, backend, aux, payments, events: { getBlockPeriodic } }
 }
 
 /**
@@ -338,16 +370,7 @@ export const checkBallotHashGBallot = ballotObject => {
 // Takes the name of an abi and a method name
 // Returns a new ABI array with only the requested method
 export const getSingularCleanAbi = (requestedAbiName, methodName) => {
-    const abiList = {
-        ResolverAbi: ResolverAbi,
-        IndexAbi: IndexAbi,
-        BackendAbi: BackendAbi,
-        BBFarmAbi: BBFarmAbi,
-        PaymentsAbi: PaymentsAbi,
-        AuxAbi: AuxAbi,
-        AuctionAbi: AuctionAbi,
-        ERC20Abi: ERC20Abi
-    }
+    const abiList = { ResolverAbi, IndexAbi, BackendAbi, BBFarmAbi, PaymentsAbi, AuxAbi, AuctionAbi, ERC20Abi, UnsafeEd25519DelegationAbi }
 
     const selectedAbi = abiList[requestedAbiName]
     const methodObject = selectedAbi.filter(abi => abi.name == methodName)
