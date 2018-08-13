@@ -367,17 +367,7 @@ export const checkBallotHashGBallot = ballotObject => {
 // Takes the name of an abi and a method name
 // Returns a new ABI array with only the requested method
 export const getSingularCleanAbi = (requestedAbiName, methodName) => {
-    const abiList = {
-        ResolverAbi: ResolverAbi,
-        IndexAbi: IndexAbi,
-        BackendAbi: BackendAbi,
-        BBFarmAbi: BBFarmAbi,
-        PaymentsAbi: PaymentsAbi,
-        AuxAbi: AuxAbi,
-        AuctionAbi: AuctionAbi,
-        ERC20Abi: ERC20Abi,
-        UnsafeEd25519DelegationAbi: UnsafeEd25519DelegationAbi
-    }
+    const abiList = { ResolverAbi, IndexAbi, BackendAbi, BBFarmAbi, PaymentsAbi, AuxAbi, AuctionAbi, ERC20Abi, UnsafeEd25519DelegationAbi }
 
     const selectedAbi = abiList[requestedAbiName]
     const methodObject = selectedAbi.filter(abi => abi.name == methodName)
