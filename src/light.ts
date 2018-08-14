@@ -207,6 +207,7 @@ export const getDemocNthBallot = async (svNetwork: SvNetwork, democBallotInfo: G
     const { democHash, nthBallot, userEthAddress } = democBallotInfo
     const { archiveUrl } = netConf
 
+
     const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(index._address, democHash, nthBallot).call()
     const { ballotId, bbFarmAddress } = bbFarmAndBallotId
 
@@ -225,10 +226,11 @@ export const getDemocNthBallot = async (svNetwork: SvNetwork, democBallotInfo: G
 
     const rawBallotSpecString = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
 
+
     return { ...bbFarmAndBallotId, ...ethBallotDetails, rawBallotSpecString, data: JSON.parse(rawBallotSpecString) }
 }
 
-const _getForeignBallotInfo = async (svNetwork: SvNetwork, ballotId: string, bbFarmAddress: EthAddress, userEthAddress: EthAddress) => {
+const _getForeignBallotInfo = async (svNetwork: SvNetwork, ballotId: string, bbFarmAddress: EthAddress, userEthAddress: EthAddress): Promise<any> => {
     const { web3 } = svNetwork
     const bbFarmContract = new web3.eth.Contract(BBFarmAbi, bbFarmAddress)
     const votingNetworkDetails = await bbFarmContract.methods.getVotingNetworkDetails().call()
@@ -265,7 +267,6 @@ export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes32, 
 
         ballotsArray[i] = ballotInfo
     }
-    console.log('ballotsArray :', ballotsArray);
     return ballotsArray
 }
 
@@ -554,7 +555,7 @@ export const publishSignedTx = async (web3: any, rawTx: string): Promise<string>
     return await web3.eth.sendSignedTransaction(rawTx).then(r => r.transactionHash)
 }
 
-export const getTxReciept = async (netConf: EthNetConf, txId: Bytes32): Promise<string> => {
+export const getTxReciept = async (netConf: EthNetConf, txId: Bytes32): Promise<object> => {
     const { httpProvider } = netConf
     const web3 = new Web3(httpProvider)
     return await web3.eth.getTransactionReceipt(txId)
