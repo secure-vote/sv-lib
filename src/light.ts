@@ -15,6 +15,7 @@ import * as API from './api'
 import { WindowWeb3Init, EthNetConf, SvNetwork, EthTx, BallotSpecV2, GlobalBallot } from './types'
 import { HexString, Bytes32, Bytes64, Bytes32RT, Bytes64RT, StellarAddressRT, EthAddress, EthAddressRT } from './runtimeTypes'
 import { ed25519SignatureIsValid } from './crypto'
+import { explodeForeignNetDetails } from './ballotBox';
 
 // Lovely ABIs
 // Note - have changed this from import to require as the import was not working on the nod
@@ -202,19 +203,42 @@ type GetDemocNthBallot = t.TypeOf<typeof GetDemocNthBallotRT>
  */
 export const getDemocNthBallot = async (svNetwork: SvNetwork, democBallotInfo: GetDemocNthBallot): Promise<GlobalBallot> => {
     // Destructure and set the variables that are needed
-    const { index, aux, netConf } = svNetwork
+    const { index, aux, netConf, web3 } = svNetwork
     const { democHash, nthBallot, userEthAddress } = democBallotInfo
     const { archiveUrl } = netConf
 
     const bbFarmAndBallotId = await aux.methods.getBBFarmAddressAndBallotId(index._address, democHash, nthBallot).call()
-
     const { ballotId, bbFarmAddress } = bbFarmAndBallotId
 
     const ethBallotDetails = await aux.methods.getBallotDetails(ballotId, bbFarmAddress, userEthAddress).call()
 
+    const hexBallotId = web3.utils.toHex(web3.utils.toBN(ballotId))
+    const namespace = web3.utils.padLeft(hexBallotId, 64).slice(0, 10)
+    const namespaceBytes = web3.utils.hexToBytes(namespace)
+
+    if (namespaceBytes[0] != 0 && namespaceBytes[1] != 0) {
+        const foreignBBFarmDetails = await _getForeignBallotInfo(svNetwork, ballotId, bbFarmAddress, userEthAddress)
+
+        ethBallotDetails.nVotesCast = foreignBBFarmDetails.nVotesCast
+        ethBallotDetails.hasVoted = foreignBBFarmDetails.hasVoted
+    }
+
     const rawBallotSpecString = await getBallotSpec(archiveUrl, ethBallotDetails.specHash)
 
     return { ...bbFarmAndBallotId, ...ethBallotDetails, rawBallotSpecString, data: JSON.parse(rawBallotSpecString) }
+}
+
+const _getForeignBallotInfo = async (svNetwork: SvNetwork, ballotId: string, bbFarmAddress: EthAddress, userEthAddress: EthAddress) => {
+    const { web3 } = svNetwork
+    const bbFarmContract = new web3.eth.Contract(BBFarmAbi, bbFarmAddress)
+    const votingNetworkDetails = await bbFarmContract.methods.getVotingNetworkDetails().call()
+    const { networkId, chainId, remoteBBFarmAddress } = explodeForeignNetDetails(votingNetworkDetails)
+
+    const { httpProvider } = svConst.getNetwork(networkId, chainId)
+
+    const remoteWeb3 = new Web3(httpProvider)
+    const remoteBBFarmContract = new remoteWeb3.eth.Contract(BBFarmAbi, remoteBBFarmAddress)
+    return await remoteBBFarmContract.methods.getDetails(ballotId, userEthAddress).call()
 }
 
 /**
@@ -237,9 +261,11 @@ export const getDemocBallots = async (svNetwork: SvNetwork, democHash: Bytes32, 
     const numBallots = democInfo.nBallots
     const ballotsArray = []
     for (let i = 0; i < numBallots; i++) {
-        ballotsArray[i] = await getDemocNthBallot(svNetwork, { democHash: democHash, nthBallot: i, userEthAddress })
-    }
+        const ballotInfo = await getDemocNthBallot(svNetwork, { democHash: democHash, nthBallot: i, userEthAddress })
 
+        ballotsArray[i] = ballotInfo
+    }
+    console.log('ballotsArray :', ballotsArray);
     return ballotsArray
 }
 
