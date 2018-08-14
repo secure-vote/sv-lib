@@ -551,3 +551,9 @@ export const signTx = async (web3: any, txData: string, privKey: Bytes64) => {
 export const publishSignedTx = async (web3: any, rawTx: string): Promise<string> => {
     return await web3.eth.sendSignedTransaction(rawTx).then(r => r.transactionHash)
 }
+
+export const getTxReciept = async (netConf: EthNetConf, txId: Bytes32): Promise<string> => {
+    const { httpProvider } = netConf
+    const web3 = new Web3(httpProvider)
+    return await web3.eth.getTransactionReceipt(txId)
+}
