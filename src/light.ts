@@ -524,6 +524,7 @@ export const submitEd25519Delegation = async (
     dlgtRequest: Bytes32,
     stellarPK: string,
     _signature: HexString,
+    networkName: string,
     opts?
 ) => {
     const signature = svUtils.toEthHex(_signature)
@@ -537,6 +538,7 @@ export const submitEd25519Delegation = async (
         signature: signature,
         publickey: stellarPK,
         packed: dlgtRequest,
+        networkName,
         subgroupVersion: 1,
         broadcast: opts && opts.broadcast === false ? false : true
     }
