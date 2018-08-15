@@ -66,7 +66,7 @@ test('generates correct range3 voteData', () => {
 })
 
 test('ballot deploys correctly', async () => {
-    jest.setTimeout(15000)
+    jest.setTimeout(25000)
 
     const goodBSpecString =
         '{"ballotVersion":2,"ballotInner":{"ballotTitle":"Testing","shortDesc":"Testing","longDesc":"Testing","subgroup":null,"discussionLink":null,"encryptionPK":null},"optionsVersion":2,"optionsInner":{"options":null,"aux":null},"subgroupVersion":1,"subgroupInner":{"tokenId":"testing_id_3","networkId":[42,42],"delegationSc":"0x005645072d7c244476e3099619a6089245b6a958","signature":"**SIG_1**","sigType":"ed25519","proposerPk":"GBQLUYK4AWPXZT7TUHUM3QA4XL5XUHLWXIXZP3IJDLS4QD77UASNNKGX"}}'
