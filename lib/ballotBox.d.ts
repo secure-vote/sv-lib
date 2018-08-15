@@ -101,7 +101,7 @@ export declare const prepareWeb3BBVoteTx: ({ txInfo }: {
 }>;
 export declare const castProxyVote: (request: any, netConf: EthNetConf) => Promise<any>;
 export declare const deployProxyBallot: (netConf: EthNetConf, proxyProposalReq: t.TypeOfProps<{
-    ballotSpec: t.RefinementType<t.RefinementType<t.StringType, string, string, t.mixed>, string, string, t.mixed>;
+    ballotSpec: t.StringType;
     democHash: t.RefinementType<t.RefinementType<t.StringType, string, string, t.mixed>, string, string, t.mixed>;
     startTime: t.RefinementType<t.RefinementType<t.NumberType, number, number, t.mixed>, number, number, t.mixed>;
     endTime: t.RefinementType<t.RefinementType<t.NumberType, number, number, t.mixed>, number, number, t.mixed>;
@@ -124,3 +124,14 @@ export declare const deployBallotSpec: (archivePushUrl: string, rawBallotSpecStr
  * @returns {number} the sequence number for the voter to use
  */
 export declare const getProxySequenceNumber: (svNetwork: SvNetwork, ballotId: string, voterAddress: string) => Promise<number>;
+/**
+ * Takes the network details string returned by the BBFarm contract and returns network specific values
+ * @param {Bytes32} networkDetails [32b unallocated][32b chainId][32b networkId][160b bbFarm addr on foreign network]
+ *
+ * @returns {object} containing the chainId, networkId and address of the remote BBFarm
+ */
+export declare const explodeForeignNetDetails: (networkDetails: string) => {
+    chainId: number;
+    networkId: number;
+    remoteBBFarmAddress: string;
+};

@@ -37,6 +37,9 @@ export declare type SvNetwork = {
     backend: any;
     aux: any;
     payments: any;
+    events: {
+        getBlockPeriodic: any;
+    };
 };
 export declare type BallotSpecV2 = {
     ballotVersion: number;

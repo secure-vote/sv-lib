@@ -1,11 +1,17 @@
 import * as t from 'io-ts';
 import { WindowWeb3Init, EthNetConf, SvNetwork, GlobalBallot } from './types';
+declare type InitSvLightOptsPartial = {
+    useWebsockets?: boolean;
+    httpProvider?: string;
+    webSocketsProvider?: string;
+};
 /**
  * Return contract instances and web3 needed for SvLight usage
  * @param {EthNetConf} netConf Config file for all current network
+ * @param {InitSvLightOpts?} opts Optional
  * @returns {Promise<SvNetwork>} The SvNetwork object based on `netConf`
  */
-export declare const initializeSvLight: (netConf: EthNetConf) => Promise<SvNetwork>;
+export declare const initializeSvLight: (netConf: EthNetConf, opts?: InitSvLightOptsPartial) => Promise<SvNetwork>;
 /**
  * Initialise a Web3 instance based on the window's web3.currentProvider
  * @returns {Promise<WindowWeb3Init>} Object containing the web3 instance and metadata
@@ -149,6 +155,8 @@ export declare const ed25519DelegationIsValid: (dlgtRequest: string, pubKey: str
  * @param _signature
  * @param opts
  */
-export declare const submitEd25519Delegation: (ethNetConf: EthNetConf, dlgtRequest: string, stellarPK: string, _signature: string, opts?: any) => Promise<import("./types").Ed25519DelegationResp>;
+export declare const submitEd25519Delegation: (ethNetConf: EthNetConf, dlgtRequest: string, stellarPK: string, _signature: string, networkName: string, opts?: any) => Promise<import("./types").Ed25519DelegationResp>;
 export declare const signTx: (web3: any, txData: string, privKey: string) => Promise<any>;
 export declare const publishSignedTx: (web3: any, rawTx: string) => Promise<string>;
+export declare const getTxReciept: (netConf: EthNetConf, txId: string) => Promise<object>;
+export {};
